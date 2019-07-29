@@ -1,0 +1,18 @@
+Inserting timers into 3 functions 
+Inserting timing Instrimentation into - cuDevicePrimaryCtxRetain
+Function Name: cuDevicePrimaryCtxRetain,cuDevicePrimaryCtxRetain,1
+Inserting timing Instrimentation into - targ123be1
+Function Name: targ123be1,targ123be1,2
+Inserting timing Instrimentation into - cuCtxSynchronize
+Function Name: cuCtxSynchronize,cuCtxSynchronize,3
+Starting timing log
+Starting keyfile
+Wrote stack with hash id: 1
+GPU will delay for - 118264320000 clock cycles (72 seconds)
+Left CPU Work, waiting on GPU synchronization
+Wrote stack with hash id: 2
+GPU synchronization complete - Actual Delay 11
+GPU will delay for - 118264320000 clock cycles (72 seconds)
+Left CPU Work, waiting on GPU synchronization
+GPU synchronization complete - Actual Delay 11
+[TIMEAPP] Application runtime without instrimentation - 174.11

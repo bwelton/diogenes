@@ -1,0 +1,5 @@
+#!/bin/bash
+
+## Create instrimentation Libraries 
+bash @CMAKE_INSTALL_PREFIX@/bin/inst_app.sh @LIBCUDA_SO@ @CMAKE_INSTALL_PREFIX@/defs/DetectDuplicates.def $1/libcuda.so.1
+bash @CMAKE_INSTALL_PREFIX@/bin/inst_app.sh @LIBCUDA_SO@ @CMAKE_INSTALL_PREFIX@/defs/DriverAPIWrapper.def $2/libcuda.so.1

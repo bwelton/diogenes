@@ -1,0 +1,3 @@
+#!/bin/bash
+export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/lib:$LD_LIBRARY_PATH
+export DYNINSTAPI_RT_LIB=@@DYNINST_ROOT@/lib@/lib/libdyninstAPI_RT.so 

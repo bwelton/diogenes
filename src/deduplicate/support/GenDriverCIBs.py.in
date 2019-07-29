@@ -1,0 +1,20 @@
+import os
+import sys
+
+f = open("@CUPTI_DRIVER_CIBHEADER@", "r")
+data = f.readlines()
+f.close()
+
+f = open("@PROJECT_SOURCE_DIR@/src/deduplicate/CUPTIDriverCIBTranslate.h","w")
+f.write("#pragma once\n#include <map>\n#include <cupti.h>\nstd::map<CUpti_CallbackId, const char *> DriverCIBMap = {")
+outStr = ""
+for x in data:
+	if "=" in x:
+		tmp = x.split("=")
+		tmp[0] = tmp[0].lstrip()
+		tmp[0] = tmp[0].rstrip()
+		textName = tmp[0].replace("CUPTI_DRIVER_TRACE_CBID_",'')
+		outStr += "{" + tmp[0] + ',"' + textName + '"},\n'
+outStr = outStr[:-2] + "};"
+f.write(outStr)
+f.close()

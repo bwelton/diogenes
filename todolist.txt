@@ -1,0 +1,6 @@
+List of things that must be done:
+
+1. Clean up instrimentation code
+2. Write wrappers for memset/memcpy so that they may not be instrimented. 
+3. Add the logic to track and compare memory ranges. 
+4. Output instruction address aggregates for each instruction hit on the path

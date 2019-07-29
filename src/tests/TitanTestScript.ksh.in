@@ -1,0 +1,20 @@
+#!/bin/ksh
+#PBS -N DedupTesting
+#PBS -j oe
+#PBS -l nodes=1
+#PBS -l walltime=00:20:00
+#PBS -A @PROJ_ID@
+
+source /opt/modules/default/init/ksh
+mkdir -p @CMAKE_INSTALL_PREFIX@/tests/runs
+cd @CMAKE_INSTALL_PREFIX@/tests/runs
+
+export MODULEPATH=$MODULEPATH:@SPACK_MOD_DIR@
+
+## Get module names to load
+rm -f ./load_modules.sh
+python @CMAKE_INSTALL_PREFIX@/tests/LoadSpackModules.py
+source ./load_modules.sh
+rm -f ./load_modules.sh
+
+source @CMAKE_INSTALL_PREFIX@/tests/RunTests.sh

@@ -1,0 +1,7 @@
+GPU will delay for - 118264320000 clock cycles (72 seconds)
+Left CPU Work, waiting on GPU synchronization
+GPU synchronization complete - Actual Delay 10
+GPU will delay for - 118264320000 clock cycles (72 seconds)
+Left CPU Work, waiting on GPU synchronization
+GPU synchronization complete - Actual Delay 10
+[TIMEAPP] Application runtime without instrimentation - 177.635

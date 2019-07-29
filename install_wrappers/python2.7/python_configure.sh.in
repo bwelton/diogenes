@@ -1,0 +1,2 @@
+#!/bin/bash
+CXX="@CMAKE_CXX_COMPILER@" CC="@CMAKE_C_COMPILER@" @PROJECT_BINARY_DIR@/3rdparty/python/configure "$@"

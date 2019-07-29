@@ -1,0 +1,22 @@
+mkdir -p @CMAKE_INSTALL_PREFIX@/tests/runs
+cd @CMAKE_INSTALL_PREFIX@/tests/runs
+
+# Build the instrimentation library
+rm -f ./libcuda.so.1
+bash @CMAKE_INSTALL_PREFIX@/bin/inst_app.sh @LIBCUDA_SO@ @CMAKE_INSTALL_PREFIX@/defs/DetectDuplicates.def ./libcuda.so.1
+export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/tests/runs:$LD_LIBRARY_PATH
+
+## Launch the tests
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/launch_check
+#rm @CMAKE_INSTALL_PREFIX@/tests/runs/dedup_settings.conf
+#echo "EnableStackTracing=true\n" > @CMAKE_INSTALL_PREFIX@/tests/runs/dedup_settings.conf
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/basic_checker_test
+#rm @CMAKE_INSTALL_PREFIX@/tests/runs/dedup_settings.conf
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/timeline_checker
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/desthash_check
+cp @CMAKE_INSTALL_PREFIX@/tests/dedup_test_configure.conf @CMAKE_INSTALL_PREFIX@/tests/runs/dedup_settings.conf
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/cupti_test
+rm @CMAKE_INSTALL_PREFIX@/tests/runs/dedup_settings.conf
+cp @CMAKE_INSTALL_PREFIX@/tests/*.py @CMAKE_INSTALL_PREFIX@/tests/runs/
+//@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/PerfEstimateCheck
+@LAUNCHER@ @CMAKE_INSTALL_PREFIX@/tests/TestDedupSavings

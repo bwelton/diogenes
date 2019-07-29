@@ -1,0 +1,84 @@
+#include <boost/program_options.hpp>
+#include <stdio.h>
+#include <iostream> 
+#include <sstream>
+#include <boost/any.hpp>
+#include "SyncTesting.h"
+#include "LogInfo.h"
+
+void split(const std::string &s, char delim, std::vector<std::string> & result) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+}
+
+int main(int argc, char * argv[]) {
+	using namespace boost::program_options;
+	variables_map vm;
+	try
+	{
+		options_description desc{"Options"};
+		desc.add_options()
+		("help,h", "Help screen")
+		("prog,p", value<std::vector<std::string> >()->multitoken(), "Program to instrument with all parameters")
+		("plugindir", value<std::string>()->default_value(std::string("@CMAKE_INSTALL_PREFIX@/lib")), "Directory containing the plugins (install lib directory)")
+		("synch,s", bool_switch()->default_value(false), "Enable synchronization checker")
+		("reevaluate,r", bool_switch()->default_value(false), "Reevaluate existing synchronization trace files")
+		("decode,d", bool_switch()->default_value(false), "Decode stack trace file only (using symtab to get line info)")
+		("infile,i",value<std::string>()->default_value(std::string("")), "Input file to decode")
+		("outfile,o",value<std::string>()->default_value(std::string("")), "Ouput file to decode");
+
+		if (argc <= 2) {
+			std::ifstream settings_file( "settings.ini" , std::ifstream::in );
+			store( parse_config_file( settings_file , desc ), vm );
+			settings_file.close();
+			notify( vm );  
+		} else {
+		    store(parse_command_line(argc, argv, desc), vm);
+		    notify(vm);
+		}
+		if (vm["decode"].as<bool>() == true) {
+			if (vm["infile"].as<std::string>() == std::string("") || vm["outfile"].as<std::string>() == std::string("")){
+				std::cerr << "Input file or output file not set, exiting now" << std::endl;
+				return 0;
+			}
+			SyncTesting runSync(vm);
+			runSync.DecodeStack(vm["infile"].as<std::string>(), vm["outfile"].as<std::string>());					
+			return 0;
+		}
+		if (vm.count("prog") == 0 && vm["reevaluate"].as<bool>() == false) {
+			std::cerr << "Program to instriment is not set, specify with -p or -prog" << std::endl; 
+			exit(-1);
+		} else if (vm["reevaluate"].as<bool>() == false) {
+
+			std::vector<std::string> progName = vm["prog"].as<std::vector<std::string> >();
+			std::vector<std::string> newParam;
+			if (argc <= 2) {
+				split(progName[0], ' ', newParam);
+				vm.erase("prog");
+				vm.insert(std::make_pair("prog",variable_value(boost::any_cast<std::vector<std::string> >(newParam), false)));
+				notify( vm );
+			} else {
+				newParam = progName;
+			}
+			std::string pluginDirectory = vm["plugindir"].as<std::string>();
+			std::cerr << "Beginning Instrimentation of Program - " << newParam[0] << std::endl;
+			std::cerr << "Arguments to program: ";
+			for (auto i : newParam)
+				std::cerr << i << " ";
+			std::cerr << std::endl;
+			std::cerr << "Plugin Directory In Use - " << pluginDirectory << std::endl; 
+			if (vm["synch"].as<bool>() == true) {
+				SyncTesting runSync(vm);
+				runSync.Run();
+			}
+		} else if (vm["reevaluate"].as<bool>() == true) {
+			SyncTesting runSync(vm);
+			runSync.ReprocessModel();
+		}
+	} catch (const error &ex) {
+		std::cerr << ex.what() << '\n';
+	}
+}

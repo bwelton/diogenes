@@ -1,0 +1,20 @@
+add_library(DataSyncTimer SHARED "DataSyncTimer.cpp")
+add_compile_options(-O3 -g)
+target_link_libraries(DataSyncTimer ${Boost_LIBRARIES})
+target_link_libraries(DataSyncTimer ${DYNINST_LIBRARIES})
+target_link_libraries(DataSyncTimer "-lpthread")
+target_link_libraries(DataSyncTimer DriverAPIWrapper)
+target_link_libraries(DataSyncTimer PluginCommon)
+INCLUDE_DIRECTORIES(DataSyncTimer ${CUDA_TOOLKIT_ROOT_DIR}/include)
+INCLUDE_DIRECTORIES(DataSyncTimer ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
+INCLUDE_DIRECTORIES(DataSyncTimer ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/common")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/deduplicate")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/launcher")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/plugins/common")
+target_link_libraries(DataSyncTimer "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -lcudart -L${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/lib64 -lcupti -lboost_timer")
+install(TARGETS DataSyncTimer
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib/plugins
+        ARCHIVE DESTINATION lib/static)

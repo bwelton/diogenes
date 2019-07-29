@@ -1,0 +1,1 @@
+EXTERN_FLAG std::function<${RETURN_TYPE}(${PARAMETER_TYPES_ORIG})> Bound_${CALL_NAME};

@@ -1,0 +1,20 @@
+add_library(DriverAPITrace SHARED "DriverAPITrace.cpp")
+add_compile_options(-O3 -g)
+target_link_libraries(DriverAPITrace ${Boost_LIBRARIES})
+target_link_libraries(DriverAPITrace ${DYNINST_LIBRARIES})
+target_link_libraries(DriverAPITrace "-lpthread")
+target_link_libraries(DriverAPITrace DriverAPIWrapper)
+target_link_libraries(DriverAPITrace PluginCommon)
+INCLUDE_DIRECTORIES(DriverAPITrace ${CUDA_TOOLKIT_ROOT_DIR}/include)
+INCLUDE_DIRECTORIES(DriverAPITrace ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
+INCLUDE_DIRECTORIES(DriverAPITrace ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/common")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/deduplicate")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/launcher")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/plugins/common")
+target_link_libraries(DriverAPITrace "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -lcudart -L${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/lib64 -lcupti -lboost_timer")
+install(TARGETS DriverAPITrace
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib/plugins
+        ARCHIVE DESTINATION lib/static)

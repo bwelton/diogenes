@@ -1,0 +1,20 @@
+add_library(TimeCall SHARED "TimeCall.cpp")
+add_compile_options(-O3 -g)
+target_link_libraries(TimeCall ${Boost_LIBRARIES})
+target_link_libraries(TimeCall ${DYNINST_LIBRARIES})
+target_link_libraries(TimeCall "-lpthread")
+target_link_libraries(TimeCall DriverAPIWrapper)
+target_link_libraries(TimeCall PluginCommon)
+INCLUDE_DIRECTORIES(TimeCall ${CUDA_TOOLKIT_ROOT_DIR}/include)
+INCLUDE_DIRECTORIES(TimeCall ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
+INCLUDE_DIRECTORIES(TimeCall ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/common")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/deduplicate")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/launcher")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/driverapi/plugins/common")
+target_link_libraries(TimeCall "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -lcudart -L${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/lib64 -lcupti -lboost_timer")
+install(TARGETS TimeCall
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib/plugins
+        ARCHIVE DESTINATION lib/static)
