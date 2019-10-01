@@ -1,0 +1,20 @@
+Time(s) (% of execution time)
+Template and Function Folds
+===================================
+214.026s(15.73%) Fold on cudaFree (DEBUG ID: 7)
+95.251s( 7.00%) Fold on cudaMemcpy (DEBUG ID: 2)
+ 4.112s( 0.30%) Fold on cudaDeviceReset (DEBUG ID: 34)
+ 1.000s( 0.07%) Fold on cudaDeviceSynchronize (DEBUG ID: 12)
+ 0.138s( 0.01%) Fold on cublasGemmStridedBatchedEx (DEBUG ID: 22)
+ 0.018s( 0.00%) Fold on cudaFreeHost (DEBUG ID: 30)
+Sequences of Unnecessary Operations
+===================================
+155.785s (11.45)% Sequence starting at call doALS(int const*, int const*,  in tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 738
+64.027s (4.70)% Sequence starting at call doALS(int const*, int const*,  in tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994
+Single Points of Interest
+===================================
+  214.026s(15.73%) cudaFree in main at line 0
+  30.130s(2.21%) cudaMemcpy in main at line 0
+---------------
+Back/Previous
+Exit

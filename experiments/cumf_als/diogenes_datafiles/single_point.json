@@ -1,0 +1,2382 @@
+{
+    "Elements": [
+        {
+            "DisplayID": 50000068, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 856"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000067, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 856"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000068
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000066, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 856"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000067
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000065, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 856"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000066
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000136, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000135, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000136
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000134, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000135
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000133, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000134
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000160, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1014"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000159, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1014"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000160
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000158, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1014"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000159
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000157, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1014"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000158
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000076, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 878"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000075, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 878"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000076
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000074, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 878"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000075
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000073, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 878"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000074
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000056, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 849"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000055, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 849"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000056
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000054, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 849"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000055
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000053, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 849"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000054
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000042, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 761"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000041, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 761"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000042
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000040, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 761"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000041
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000039, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 761"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000040
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000064, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 855"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000063, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 855"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000064
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000062, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 855"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000063
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000061, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 855"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000062
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000116, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 986"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000115, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 986"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000116
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000114, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 986"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000115
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000113, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 986"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000114
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000092, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 963"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000091, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 963"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000092
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000090, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 963"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000091
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000089, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 963"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000090
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000120, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 987"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000119, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 987"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000120
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000118, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 987"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000119
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000117, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 987"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000118
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000088, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 961"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000087, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 961"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000088
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000086, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 961"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000087
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000085, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 961"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000086
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000164, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1015"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000163, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1015"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000164
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000162, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1015"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000163
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000161, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1015"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000162
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000112, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 985"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000111, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 985"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000112
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000110, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 985"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000111
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000109, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 985"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000110
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000156, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1013"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000155, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1013"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000156
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000154, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1013"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000155
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000153, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1013"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000154
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000034, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "214.026s(15.73%) cudaFree in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "22.645s(1.66%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1014"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000157
+                }, 
+                {
+                    "Text": [
+                        "20.989s(1.54%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 961"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000085
+                }, 
+                {
+                    "Text": [
+                        "16.224s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 963"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000089
+                }, 
+                {
+                    "Text": [
+                        "16.130s(1.19%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 855"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000061
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 987"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000117
+                }, 
+                {
+                    "Text": [
+                        "15.698s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 986"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000113
+                }, 
+                {
+                    "Text": [
+                        "15.643s(1.15%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 856"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000065
+                }, 
+                {
+                    "Text": [
+                        "15.575s(1.14%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1013"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000153
+                }, 
+                {
+                    "Text": [
+                        "15.241s(1.12%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 985"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000109
+                }, 
+                {
+                    "Text": [
+                        "15.121s(1.11%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 994"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000133
+                }, 
+                {
+                    "Text": [
+                        "14.298s(1.05%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 849"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000053
+                }, 
+                {
+                    "Text": [
+                        "12.773s(0.94%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 878"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000073
+                }, 
+                {
+                    "Text": [
+                        "10.933s(0.80%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 1015"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000161
+                }, 
+                {
+                    "Text": [
+                        "4.956s(0.36%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 761"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000039
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000096, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 975"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000095, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 975"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000096
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000094, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 975"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000095
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000093, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 975"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000094
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000033, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 739"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": null
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000032, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 739"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) __libc_start_main in libc.so.6 at line 0"
+                    ], 
+                    "depth": 5, 
+                    "LinkIDs": 50000033
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000031, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 739"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) generic_start_main.isra.0 in libc.so.6 at line 0"
+                    ], 
+                    "depth": 4, 
+                    "LinkIDs": 50000032
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000030, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 739"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) main in main.cpp at line 147"
+                    ], 
+                    "depth": 3, 
+                    "LinkIDs": 50000031
+                }
+            ]
+        }, 
+        {
+            "DisplayID": 50000001, 
+            "TextRows": [
+                {
+                    "Text": [
+                        "30.130s(2.21%) cudaMemcpy in main at line 0"
+                    ], 
+                    "depth": 1, 
+                    "LinkIDs": null
+                }, 
+                {
+                    "Text": [
+                        "26.921s(1.98%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 975"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000093
+                }, 
+                {
+                    "Text": [
+                        "2.737s(0.20%) doALS(int const*, int const*, float cons in /var/tmp/tmpxft_0002152b_00000000-5_als.cudafe1.cpp at line 739"
+                    ], 
+                    "depth": 2, 
+                    "LinkIDs": 50000030
+                }
+            ]
+        }
+    ], 
+    "initial": [
+        {
+            "Text": [
+                "214.026s(15.73%) cudaFree in main at line 0"
+            ], 
+            "depth": 1, 
+            "timeData": 214.02593856500008, 
+            "LinkIDs": 50000034
+        }, 
+        {
+            "Text": [
+                "30.130s(2.21%) cudaMemcpy in main at line 0"
+            ], 
+            "depth": 1, 
+            "timeData": 30.129516579000043, 
+            "LinkIDs": 50000001
+        }
+    ]
+}
