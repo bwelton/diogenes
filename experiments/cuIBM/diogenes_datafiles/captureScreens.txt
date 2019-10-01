@@ -1,0 +1,186 @@
+Time(s) (% of execution time)
+Template and Function Folds
+===================================
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+191.853s(10.25%) Fold on cudaDeviceSynchronize (DEBUG ID: 50)
+146.557s( 7.83%) Fold on cudaMemcpyAsync (DEBUG ID: 10)
+ 7.073s( 0.38%) Fold on cudaStreamSynchronize (DEBUG ID: 2)
+Sequences of Unnecessary Operations
+===================================
+150.353s (8.03)% Sequence starting at call cusp::norm_type<cusp::detail:: in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 98
+98.803s (5.28)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+80.535s (4.30)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+74.350s (3.97)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 150
+68.610s (3.66)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+66.502s (3.55)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+64.414s (3.44)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+9.643s (0.52)% Sequence starting at call cusp::norm_type<cusp::array1d< in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 53
+8.268s (0.44)% Sequence starting at call thrust::detail::contiguous_sto in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+7.361s (0.39)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.413s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.399s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.393s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.993s (0.16)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 150
+2.861s (0.15)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.787s (0.15)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.676s (0.14)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.595s (0.14)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+Single Points of Interest
+===================================
+  421.716s(22.52%) cudaFree in cuibm at line 0
+  136.150s(7.27%) cudaDeviceSynchronize in cuibm at line 0
+  80.938s(4.32%) cudaMemcpyAsync in cuibm at line 0
+  4.331s(0.23%) cudaStreamSynchronize in cuibm at line 0
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+  421.716s(22.52%) cudaFree in cuibm at line 0
+    152.208s(8.13%) thrust::detail::contiguous_storage<doubl in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    97.795s(5.22%) thrust::pair<thrust::detail::normal_iter in /var/tmp/welton2/tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 85
+    50.778s(2.71%) thrust::detail::contiguous_storage<int,  in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    32.788s(1.75%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    29.261s(1.56%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    20.714s(1.11%) cusp::detail::temporary_array<double, cu in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    16.681s(0.89%) cusp::norm_type<cusp::detail::temporary_ in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    15.579s(0.83%) thrust::pair<thrust::detail::normal_iter in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    2.129s(0.11%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 85
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+  421.716s(22.52%) cudaFree in cuibm at line 0
+    152.208s(8.13%) thrust::detail::contiguous_storage<doubl in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+      108.819s(5.81%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 226
+      16.698s(0.89%) void cusp::krylov::cg_detail::cg<cusp::s in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 170
+      10.741s(0.57%) void cusp::krylov::bicg_detail::bicgstab in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 170
+      10.538s(0.56%) void cusp::krylov::bicg_detail::bicgstab in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 170
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+  421.716s(22.52%) cudaFree in cuibm at line 0
+    152.208s(8.13%) thrust::detail::contiguous_storage<doubl in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    97.795s(5.22%) thrust::pair<thrust::detail::normal_iter in /var/tmp/welton2/tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 85
+    50.778s(2.71%) thrust::detail::contiguous_storage<int,  in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    32.788s(1.75%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    29.261s(1.56%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    20.714s(1.11%) cusp::detail::temporary_array<double, cu in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    16.681s(0.89%) cusp::norm_type<cusp::detail::temporary_ in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    15.579s(0.83%) thrust::pair<thrust::detail::normal_iter in /var/tmp/welton2/tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+    2.129s(0.11%) void cusp::system::detail::generic::mult in /var/tmp/welton2/tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 85
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+Template and Function Folds
+===================================
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+191.853s(10.25%) Fold on cudaDeviceSynchronize (DEBUG ID: 50)
+146.557s( 7.83%) Fold on cudaMemcpyAsync (DEBUG ID: 10)
+ 7.073s( 0.38%) Fold on cudaStreamSynchronize (DEBUG ID: 2)
+Sequences of Unnecessary Operations
+===================================
+150.353s (8.03)% Sequence starting at call cusp::norm_type<cusp::detail:: in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 98
+98.803s (5.28)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+80.535s (4.30)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+74.350s (3.97)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 150
+68.610s (3.66)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+66.502s (3.55)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+64.414s (3.44)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+9.643s (0.52)% Sequence starting at call cusp::norm_type<cusp::array1d< in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 53
+8.268s (0.44)% Sequence starting at call thrust::detail::contiguous_sto in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 85
+7.361s (0.39)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.413s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.399s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+3.393s (0.18)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.993s (0.16)% Sequence starting at call void cusp::system::detail::gen in tmpxft_00018c77_00000000-5_NavierStokesSolver.cudafe1.cpp at line 150
+2.861s (0.15)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.787s (0.15)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.676s (0.14)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+2.595s (0.14)% Sequence starting at call thrust::pair<thrust::detail::n in tmpxft_000187cc_00000000-5_DFModifiedSolver.cudafe1.cpp at line 53
+Single Points of Interest
+===================================
+  421.716s(22.52%) cudaFree in cuibm at line 0
+  136.150s(7.27%) cudaDeviceSynchronize in cuibm at line 0
+  80.938s(4.32%) cudaMemcpyAsync in cuibm at line 0
+  4.331s(0.23%) cudaStreamSynchronize in cuibm at line 0
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    Conditionally unnecessary synchronization/transfer (see: conditions)
+  113.375s(6.06%) thrust::pair<...> (DEBUG ID: 217)
+    Conditionally unnecessary synchronization/transfer (see: conditions)
+  65.258s(3.49%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 949)
+    Conditionally unnecessary synchronization/transfer (see: conditions)
+  20.714s(1.11%) cusp::detail::temporary_array<...> (DEBUG ID: 1983)
+    Conditionally unnecessary synchronization/transfer (see: conditions)
+  17.950s(0.96%) cusp::norm_type<...> (DEBUG ID: 901)
+    Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    144.059s(7.69%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 961)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    32.992s(1.76%) void cusp::krylov::cg_detail::cg<...> (DEBUG ID: 2281)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    24.762s(1.32%) void cusp::krylov::bicg_detail::bicgstab<...> (DEBUG ID: 2041)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    144.059s(7.69%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 961)
+      78.030s(4.17%) void cusp::multilevel<...> (DEBUG ID: 2156)
+        Conditionally unnecessary synchronization/transfer (see: conditions)
+      43.547s(2.33%) void preconditioner<...> (DEBUG ID: 2125)
+        Conditionally unnecessary synchronization/transfer (see: conditions)
+      21.969s(1.17%) void cusp::relaxation::jacobi<...> (DEBUG ID: 2210)
+        Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    144.059s(7.69%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 961)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    32.992s(1.76%) void cusp::krylov::cg_detail::cg<...> (DEBUG ID: 2281)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    24.762s(1.32%) void cusp::krylov::bicg_detail::bicgstab<...> (DEBUG ID: 2041)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    144.059s(7.69%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 961)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    32.992s(1.76%) void cusp::krylov::cg_detail::cg<...> (DEBUG ID: 2281)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    24.762s(1.32%) void cusp::krylov::bicg_detail::bicgstab<...> (DEBUG ID: 2041)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
+Time(s) (% of execution time)
+421.716s(22.52%) Fold on cudaFree (DEBUG ID: 32)
+  202.985s(10.84%) thrust::detail::contiguous_storage<...> (DEBUG ID: 162)
+    144.059s(7.69%) void cusp::system::detail::generic::multiply<...> (DEBUG ID: 961)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    32.992s(1.76%) void cusp::krylov::cg_detail::cg<...> (DEBUG ID: 2281)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+    24.762s(1.32%) void cusp::krylov::bicg_detail::bicgstab<...> (DEBUG ID: 2041)
+      Conditionally unnecessary synchronization/transfer (see: conditions)
+---------------
+Back/Previous
+Exit
