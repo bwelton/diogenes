@@ -4,6 +4,10 @@ Diogenes is a performance tool to identify unnecessary/misplaced synchronization
 
 This project is very much a work in progress and is very much in a research state (lots of dead code, difficult to build, lots of bugs, no polish, etc).  
 
+**NOTE**
+
+There is an enormous bug fix patch in the works. In addition a few new features will be added soon. In the near future, work will begin on generalizing Diogenes to take it out of the PhD realm and into something usable by other (such as the ability to run on more systems other than LLNL's machines). If you are interested in running Diogenes on your machine, contact me at welton [at] cs.wisc.edu. 
+
 **Building and Installation**
 
 Due to the number of dependencies that this project has (Dyninst, Boost, Cuda, Libdwarf, Libelf, and others), it is highly recommended you build this package with the spack package manager (https://github.com/LLNL/spack). A premade spack repo package for this project is availible in spack/. Adding ./spack to ~/.spack/repos.yaml will allow you to build the deduplicator with the following commands:
