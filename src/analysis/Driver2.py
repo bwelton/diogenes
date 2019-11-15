@@ -331,18 +331,37 @@ class JSStack:
             opTime = 0.0
         syncSavings = 0.0
 
+        syncCorrectedTime = 0.0
+        deltaUseTime = 0.0
+        FIDelayavg = 0.0
+        if self._fiCount > 0:
+            FIDelayavg = (float(self._useDelay) / float(self._fiCount))
+
+        if self._syncUses > 0:
+            syncCorrectedTime = syncOnlyTime * float(self._syncUses)
+            deltaUseTime = deltaAvg * float(self._syncUses)
+            if FIDelayavg != 0:
+                if (FIDelayavg > syncCorrectedTime):
+                    syncCorrectedTime = 0.0
+                else:
+                    syncCorrectedTime = FIDelayavg
+     
+                if (FIDelayavg > deltaUseTime):
+                    deltaUseTime = 0.0
+                else:
+                    deltaUseTime = FIDelayavg
+
         if syncOnlyTime < deltaAvg or self._deltaCount == 0:
             if self.CheckIfDependsRequired():
-                syncSavings = self._syncOnlyTime - (syncOnlyTime * float(self._syncUses))
+                syncSavings = self._syncOnlyTime - syncCorrectedTime
                 #syncSavings = 0.0
             else:
                 syncSavings = self._syncOnlyTime
         else:
             if self.CheckIfDependsRequired():
-                syncSavings = (deltaAvg * self._count) - (deltaAvg * float(self._syncUses))
+                syncSavings = (deltaAvg * self._count) - deltaUseTime
             else:
                 syncSavings = (deltaAvg * self._count)
-
         avgTrans = 0.0
         if self._transferCount > 0:
             avgTrans = float(opTime)
