@@ -1,11 +1,13 @@
-#pragma ONCE
-#include "StackTrie.h"
+#ifndef COMMON_STACKWALK_HEADER
+#define COMMON_STACKWALK_HEADER 1
 #include <stdbool.h>
 #include <string.h>
 #include <malloc.h>
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <unistd.h>
+#include "StackTrie.h"
+
 typedef struct StackwalkInst{
 	void * (*sw_mallow_wrapper)(size_t);
 	void (*sw_free_wrapper)(void *);
@@ -16,3 +18,4 @@ typedef struct StackwalkInst{
 StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *));
 uint64_t Stackwalk_GetStackID(StackwalkInst * swalk);
 
+#endif

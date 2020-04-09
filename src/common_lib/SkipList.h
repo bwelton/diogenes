@@ -1,4 +1,5 @@
-#pragma ONCE
+#ifndef COMMON_SKIPLIST_HEADER
+#define COMMON_SKIPLIST_HEADER 1
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -29,3 +30,4 @@ uint64_t SkipListHandle_FindNearestElement(uint64_t item, size_t * size);
 void SkipListHandle_AddElement(uint64_t item, size_t size);
 void SkipListHandle_RemoveElement(uint64_t item);
 void SkipListHandle_DebugPrint();
+#endif

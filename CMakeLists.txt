@@ -7,12 +7,13 @@ SET(CMAKE_C_STANDARD 11)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 project(diogenes_c)
 find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
-#find_package(CUDA REQUIRED)
-#include(${CMAKE_SOURCE_DIR}/CudaLibDetect.cmake)
-
+find_package(CUDA REQUIRED)
+include(${CMAKE_SOURCE_DIR}/FindGotcha.cmake)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/common_lib)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/SyncDetector)
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/inst_lib)
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/common_lib)
+
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/deduplicate)
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/python_wrapper)
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/scripts)

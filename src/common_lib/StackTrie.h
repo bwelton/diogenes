@@ -1,4 +1,5 @@
-#pragma ONCE
+#ifndef COMMON_STACKTRIE_HEADER
+#define COMMON_STACKTRIE_HEADER 1
 #include <pthread.h>
 #include "HashMap.h"
 
@@ -16,3 +17,4 @@ StackTrie * StackTrie_Initalize(uint64_t key, void * data, void * (*allocator_fu
 bool StackTrie_InsertStack(StackTrie * tree, uint64_t * elementArray, void ** dataArray, uint64_t count);
 bool StackTrie_LookupStack(StackTrie * tree, uint64_t * elementArray, void ** returnData, uint64_t count);
 StackTrie * StackTrie_GetThreadSpecific(void * (*allocator_fun)(size_t), void (*free_fun)(void *));
+#endif
