@@ -9,6 +9,7 @@
 #include <sys/mman.h>
 #include <stdint.h> 
 #include <stdbool.h>
+#include "CVector.h"
 typedef struct KeyValuePair KeyValuePair;
 typedef struct HashMap HashMap;
 struct KeyValuePair {
@@ -42,3 +43,6 @@ bool HashMap_FindValue(HashMap * map, uint64_t key, void ** data);
 void HashMap_EraseElement(HashMap * map, uint64_t key);
 void HashMap_InsertElement(HashMap * map, uint64_t key, void * data);
 void HashMap_DebugPrintBuckets(HashMap * map);
+KeyValuePair ** HashMap_DumpElements(HashMap * map, size_t * size);
+void * KeyValuePair_GetData(KeyValuePair * pair);
+uint64_t KeyValuePair_GetKey(KeyValuePair * pair);

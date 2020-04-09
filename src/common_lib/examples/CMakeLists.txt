@@ -1,0 +1,10 @@
+add_executable(TestHashMap "TestHashMap.c")
+
+INCLUDE_DIRECTORIES(TestHashMap ${CUDA_TOOLKIT_ROOT_DIR}/include)
+INCLUDE_DIRECTORIES(TestHashMap ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
+INCLUDE_DIRECTORIES(TestHashMap ${GOTCHA_INSTALL_DIR}/include)
+INCLUDE_DIRECTORIES(TestHashMap ${CMAKE_SOURCE_DIR}/src/common_lib)
+add_dependencies(TestHashMap DiogenesCommon)
+target_link_libraries(TestHashMap DiogenesCommon)
+target_link_libraries(TestHashMap "-L${GOTCHA_INSTALL_DIR}/lib -lgotcha")
+target_link_libraries(TestHashMap "-lpthread -ldl")

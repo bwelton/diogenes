@@ -90,6 +90,30 @@ void PageLocker_LockMemory(PageLocker * locker) {
 	pagesToLock->count = 0;
 }
 
+RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint64_t size) {
+	RelockIndex ret = -1;
+	PageMemArrays * lockedPages = locker->pagesLocked;
+	for (int i = 0; i < lockedPages->count; i++) {
+		uint64_t taddr = (uint64_t)lockedPages->pages[i];
+		uint64_t tsize = lockedPages->sizes[i];
+		if (taddr <= (uint64_t)addr &&  taddr + tsize >= (uint64_t)addr){
+			mprotect(lockedPages->pages[i], lockedPages->sizes[i], PROT_READ|PROT_WRITE);
+			ret = i;
+			break;
+		}
+	}
+	return ret;
+}
+
+void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index) {
+	if(index < 0)
+		return;
+	PageMemArrays * lockedPages = locker->pagesLocked;
+	if (index >= lockedPages->count)
+		return;
+	mprotect(lockedPages->pages[index], lockedPages->sizes[index], PROT_NONE);
+}
+
 int PageLocker_UnlockMemory(PageLocker * locker) {
 	PageMemArrays * lockedPages = locker->pagesLocked;
 	int iter = lockedPages->count;

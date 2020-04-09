@@ -1,4 +1,5 @@
-#pragma ONCE
+#ifndef COMMON_PAGELOCKER_HEADER
+#define COMMON_PAGELOCKER_HEADER 1
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -8,6 +9,8 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include "SkipList.h"
+
+typedef int RelockIndex;
 typedef struct PageMemArrays{
 	void ** pages;
 	size_t * sizes;
@@ -27,3 +30,6 @@ void PageLocker_Initalize(PageLocker ** locker);
 void PageLocker_AddTransferPage(PageLocker * locker, void * mem, size_t size);
 void PageLocker_LockMemory(PageLocker * locker);
 int PageLocker_UnlockMemory(PageLocker * locker);
+RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint64_t size);
+void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index);
+#endif

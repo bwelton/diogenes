@@ -1,5 +1,36 @@
 #include "StackTrie.h"
 
+void StackTrie_ConvertTreeToStackKey(StackTrie * tree, CVector * ret, CVector * stack) {
+	bool first = false;
+	if (stack == NULL) {
+		stack =  CVector_Init(tree->stacktrie_allocator, tree->stacktrie_free, 19*100);
+		first = true;
+	}
+	size_t elementWritten = 0;
+	if (first == false){
+		char tmp[20];
+		elementWritten = snprintf(tmp, 20, "%llx,", tree->key);
+		CVector_Append(stack, tmp, elementWritten);
+	}
+	if (tree->data != NULL){
+		char tmp[100];
+		size_t written = snprintf(tmp, 100, "%llu$", (uint64_t)tree->data);
+		CVector_Append(ret, tmp, written);
+		void * data = CVector_GetData(stack, &written);
+		CVector_Append(ret, data, written-1);
+		tmp[0] = '\000';
+		written = snprintf(tmp, 100, "\n");
+		CVector_Append(ret, tmp, written);
+	}
+	size_t childSize = 0;
+	KeyValuePair ** children = HashMap_DumpElements(tree->children, childSize);
+	for (size_t i = 0; i < childSize; i++) {
+		StackTrie_ConvertTreeToStackKey((StackTrie*)KeyValuePair_GetData(children[i]),ret,stack);
+	}
+	CVector_EraseElement(stack, elementWritten);
+}
+
+
 StackTrie * StackTrie_Initalize(uint64_t key, void * data, void * (*allocator_fun)(size_t), void (*free_fun)(void *)) {
 	StackTrie * ret = (StackTrie*)allocator_fun(sizeof(StackTrie));
 	ret->stacktrie_allocator = allocator_fun;

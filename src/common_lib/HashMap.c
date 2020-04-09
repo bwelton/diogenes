@@ -11,6 +11,42 @@ uint64_t HashMap_KeyGenerator(uint64_t key) {
 	return key;
 }
 
+uint64_t KeyValuePair_GetKey(KeyValuePair * pair){
+	if (pair == NULL)
+		return 0;
+	return pair->key;
+}
+
+
+void * KeyValuePair_GetData(KeyValuePair * pair){
+	if (pair == NULL)
+		return NULL;
+	return pair->data;
+}
+
+
+
+
+KeyValuePair ** HashMap_DumpElements(HashMap * map, size_t * size) {
+	KeyValuePair ** ret = (KeyValuePair**)map->hashmap_allocator(map->elementCount * sizeof(KeyValuePair*));
+	size_t curPos = 0;
+	for (size_t i = 0; i < map->bucketCount; i++) {
+		if(map->buckets[i] != NULL) {
+			KeyValuePair * next = map->buckets[i];
+			while (next != NULL) {
+				if (curPos >= map->elementCount) {
+					assert(1==0);
+				}
+				ret[curPos] = next;
+				next = next->next;
+				curPos++;
+			}
+		}
+	}
+	*size  = curPos;
+	return ret;
+}
+
 void * HashMap_AllocElement(HashMap * map, size_t size) {
 	return map->hashmap_allocator(size);
 }
