@@ -1,4 +1,5 @@
 #include "StackTrie.h"
+#include "CVector.h"
 #include <assert.h>
 
 
@@ -26,6 +27,14 @@ int main() {
 	uint64_t testSet5[] = {5,4,7,9,5};
 	uint64_t testData5[] = {0,0,0,0,7};
 	StackTrie_InsertStack(tree, testSet5, (void**)testData5, 5);
+	CVector * resultVec = CVector_Init(malloc, free, 20);
+	StackTrie_ConvertTreeToStackKey(tree, resultVec, NULL);
+	size_t size = 0;
+	char * ptr = (char *)CVector_GetData(resultVec,&size);
+	ptr[size] = '\000';
+	fprintf(stderr, "OUTPUT:\n%s\n",ptr);
+
+
 
 	testData1[4] = 0;
 	assert(StackTrie_LookupStack(tree, testSet1, (void**)testData1, 5) == true);

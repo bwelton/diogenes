@@ -2,7 +2,7 @@
 
 StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *)) {
 	StackwalkInst * ret = (StackwalkInst*)allocator_fun(sizeof(StackwalkInst));
-	ret->sw_mallow_wrapper = allocator_fun;
+	ret->sw_malloc_wrapper = allocator_fun;
 	ret->sw_free_wrapper = free_fun;
 	ret->globalID = 1;
 	ret->tree = StackTrie_Initalize(0, NULL, allocator_fun, free_fun);
@@ -25,4 +25,13 @@ uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
 		return insert[ret-1];
 	}
 
+}
+
+char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size) {
+	CVector * resultVec = CVector_Init(inst->sw_malloc_wrapper, inst->sw_free_wrapper, 100000);
+	StackTrie_ConvertTreeToStackKey(inst->tree, resultVec, NULL);
+	*size = 0;
+	char * ptr = (char *)CVector_GetData(resultVec,size);
+	ptr[*size] = '\000';
+	return ptr;
 }

@@ -1,0 +1,7 @@
+#ifndef SYNCDETECT_FILENAMES
+#define SYNCDETECT_FILENAMES 1
+
+#define SYNC_STACKCAPTURE_FILE "DIOG_SYNC_StackCapture.txt"
+#define SYNC_STACKCOLLISION_FILE "DIOG_SYNC_StackCollision.txt"
+
+#endif

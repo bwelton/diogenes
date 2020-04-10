@@ -16,6 +16,13 @@
 #include "PageLocker.h"
 #include "Stackwalk.h"
 #include "StackTrie.h"
+#include "SyncdetectFilenames.h"
+
+typedef struct NecessarySyncs{
+	uint64_t sync;
+	uint64_t use;
+} NecessarySyncs;
+
 // Exit handlers
 void mutatee_exit_handler();
 void DIOG_Synchronization_Post();
@@ -31,6 +38,7 @@ int syncdetect_cuMemcpyDtoHAsync_v2(void* dstHost, CUdeviceptr srcDevice, size_t
 int syncdetect_cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount, CUstream hStream);
 int syncdetect_cuMemcpyAsync(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount, CUstream hStream);
 void syncdetect_free(void * ptr);
+uint64_t GetStackID();
 
 // Global wrapper variables
 extern typeof(&syncdetect_cuMemAllocHost_v2) syncdetect_cuMemAllocHost_v2_wrapper;
@@ -42,6 +50,8 @@ extern typeof(&syncdetect_free) syncdetect_free_wrapper;
 extern typeof(&syncdetect_cuMemcpyDtoHAsync_v2) syncdetect_cuMemcpyDtoHAsync_v2_wrapper;
 extern typeof(&syncdetect_cuMemcpyHtoDAsync_v2) syncdetect_cuMemcpyHtoDAsync_v2_wrapper;
 extern typeof(&syncdetect_cuMemcpyAsync) syncdetect_cuMemcpyAsync_wrapper;
-
-
+extern StackwalkInst * globalWalker;
+extern volatile uint64_t currentStackID;
+extern volatile bool syncdetect_exitinit;
+extern StackTrie * syncdetect_necessary_syncs;
 #endif

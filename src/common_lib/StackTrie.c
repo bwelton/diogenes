@@ -23,7 +23,7 @@ void StackTrie_ConvertTreeToStackKey(StackTrie * tree, CVector * ret, CVector * 
 		CVector_Append(ret, tmp, written);
 	}
 	size_t childSize = 0;
-	KeyValuePair ** children = HashMap_DumpElements(tree->children, childSize);
+	KeyValuePair ** children = HashMap_DumpElements(tree->children, &childSize);
 	for (size_t i = 0; i < childSize; i++) {
 		StackTrie_ConvertTreeToStackKey((StackTrie*)KeyValuePair_GetData(children[i]),ret,stack);
 	}

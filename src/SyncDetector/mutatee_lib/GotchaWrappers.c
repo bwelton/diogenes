@@ -1,23 +1,48 @@
 #include "SyncDetector.h"
 
 StackwalkInst * globalWalker = NULL;
-
+volatile uint64_t currentStackID = 0;
 size_t pagesize = 0;
 volatile bool syncdetect_exitinit = false;
+StackTrie * syncdetect_necessary_syncs = NULL;
+
+void WriteStacktrieToFile(const char * fname, StackTrie * write) {
+	if (write == NULL)
+		return;
+	FILE * out = fopen(fname, "wb");
+	CVector * resultVec = CVector_Init(syncdetect_malloc_wrapper, syncdetect_free_wrapper, 100000);
+	StackTrie_ConvertTreeToStackKey(write, resultVec, NULL);
+	size_t size = 0;
+	char * ptr = (char *)CVector_GetData(resultVec,&size);
+	ptr[size] = '\000';
+	fwrite(ptr, 1, size, out);
+	fclose(out);
+}
+
 
 void mutatee_exit_handler() {
 	syncdetect_exitinit = true;
+	WriteStacktrieToFile(SYNC_STACKCOLLISION_FILE, syncdetect_necessary_syncs);
+	if (globalWalker != NULL)
+		WriteStacktrieToFile(SYNC_STACKCAPTURE_FILE,globalWalker->tree);
+	globalWalker = NULL;
+	syncdetect_necessary_syncs = NULL;
 }
 
 uint64_t GetStackID() {
+	if (syncdetect_exitinit)
+		return 0;
 	if (globalWalker == NULL){
 		globalWalker = Stackwalk_Init(syncdetect_malloc_wrapper,syncdetect_free_wrapper);
 	}
+	if (syncdetect_necessary_syncs == NULL)
+		syncdetect_necessary_syncs = StackTrie_Initalize(0, NULL, syncdetect_malloc_wrapper, syncdetect_free_wrapper);
+
 	return Stackwalk_GetStackID(globalWalker);
 }
 
 void DIOG_Synchronization_Post() {
-	uint64_t stackID = GetStackID();
+	currentStackID = GetStackID();
 	PageLocker * local_locker = PageLocker_GetThreadSpecific();
 	PageLocker_LockMemory(local_locker);
 }
