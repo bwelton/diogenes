@@ -1,5 +1,6 @@
 #include "StackTrie.h"
 #include "CVector.h"
+#include "ReadStackKeys.h"
 #include <assert.h>
 
 
@@ -32,9 +33,20 @@ int main() {
 	size_t size = 0;
 	char * ptr = (char *)CVector_GetData(resultVec,&size);
 	ptr[size] = '\000';
-	fprintf(stderr, "OUTPUT:\n%s\n",ptr);
+	fprintf(stderr, "OUTPUT:\n%s\nEND",ptr);
 
-
+	HashMap * ret = ReadStackKeys(malloc, free, ptr, size);
+	uint64_t readKeysSize = 0;
+	uint64_t * keys = ReadStackKeys_GetIds(ret, &readKeysSize);
+	for (uint64_t i = 0; i < readKeysSize; i++) {
+		uint64_t entryCount = 0;
+		StackKeyEntry * entries = ReadStackKeys_GetElementAt(ret, keys[i], &entryCount);
+		fprintf(stderr, "%llu$",keys[i]);
+		for (uint64_t n = 0; n < entryCount; n++) {
+			fprintf(stderr, "%s@%llu,", entries[n].libname, entries[n].addr);
+		}
+		fprintf(stderr, "\n");
+	}
 
 	testData1[4] = 0;
 	assert(StackTrie_LookupStack(tree, testSet1, (void**)testData1, 5) == true);

@@ -1,4 +1,5 @@
-#pragma ONCE
+#ifndef COMMON_HASHMAP
+#define COMMON_HASHMAP 1
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -46,3 +47,4 @@ void HashMap_DebugPrintBuckets(HashMap * map);
 KeyValuePair ** HashMap_DumpElements(HashMap * map, size_t * size);
 void * KeyValuePair_GetData(KeyValuePair * pair);
 uint64_t KeyValuePair_GetKey(KeyValuePair * pair);
+#endif

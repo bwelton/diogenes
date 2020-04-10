@@ -8,8 +8,8 @@ void StackTrie_ConvertTreeToStackKey(StackTrie * tree, CVector * ret, CVector * 
 	}
 	size_t elementWritten = 0;
 	if (first == false){
-		char tmp[20];
-		elementWritten = snprintf(tmp, 20, "%llx,", tree->key);
+		char tmp[100];
+		elementWritten = snprintf(tmp, 100, "VIRTADDR@%llx,", tree->key);
 		CVector_Append(stack, tmp, elementWritten);
 	}
 	if (tree->data != NULL){
