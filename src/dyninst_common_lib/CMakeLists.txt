@@ -1,4 +1,4 @@
-add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp")
+add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp" "DyninstOneTime.cpp")
 
 INCLUDE_DIRECTORIES(DiogenesDyninstCommon ${CUDA_TOOLKIT_ROOT_DIR}/include)
 INCLUDE_DIRECTORIES(DiogenesDyninstCommon ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)

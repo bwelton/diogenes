@@ -49,7 +49,6 @@ BPatch_object * DyninstProcess::LoadLibrary(std::string library) {
 			return i.first;
 		}
 	}
-
 	std::cerr << "[DyninstProcess::LoadLibrary] Loading libray - " << original << std::endl;
 	// Not already loaded, return a new loaded library.
 	return appProc->loadLibrary(original.c_str());
