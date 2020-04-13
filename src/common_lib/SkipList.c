@@ -214,7 +214,7 @@ void SkipListHandle_DebugPrint() {
 	while(cur != NULL) {
 		SkipListNode * next = cur;
 		while(next != NULL) {
-			fprintf(stdout, "(%llu,%llu,%p,%p),",next->value, next->size, next->levelDown, next);
+			fprintf(stdout, "(%"PRIu64",%"PRIu64",%p,%p),",next->value, next->size, next->levelDown, next);
 			next = next->next;
 		}
 		cur = cur->levelDown;

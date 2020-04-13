@@ -82,7 +82,7 @@ void PageLocker_LockMemory(PageLocker * locker) {
 			lockedPages->sizes[lockPageCount] = sizeToLock;	
 			lockPageCount++;		
 		} else {
-			fprintf(stderr, "%s, %p, %llu\n", "Could not lock pages!", pagesToLock->pages[i],  pagesToLock->sizes[i]);
+			fprintf(stderr, "%s, %p, %"PRIu64"\n", "Could not lock pages!", pagesToLock->pages[i],  pagesToLock->sizes[i]);
 			assert(1==0);
 		}
 	}
