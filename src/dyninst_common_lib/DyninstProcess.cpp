@@ -1,6 +1,6 @@
 #include "DyninstProcess.h"
 //extern BPatch bpatch;
-
+namespace DiogenesCommon{
 DyninstProcess::DyninstProcess(int argc, char ** argv) {
 	_argv = argv;
 	_argc = argc;
@@ -257,3 +257,4 @@ BPatch_addressSpace * DyninstProcess::GetAddressSpace() {
 	return _aspace;
 }
 
+}

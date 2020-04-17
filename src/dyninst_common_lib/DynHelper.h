@@ -31,6 +31,7 @@
 #include "BPatch_basicBlock.h"
 #include "dynC.h"
 #include "set"
+
 //#include "Constants.h"
 using namespace Dyninst;
 using namespace ParseAPI;
@@ -40,4 +41,5 @@ using namespace SymtabAPI;
 std::vector<BPatch_object *> DynHelper_GetObjects(BPatch_addressSpace * aspace);
 
 bool DynHelper_CheckIfFileExists(const std::string& name);
+uint64_t DynHelper_GetSynchronizationOffset();
 #endif

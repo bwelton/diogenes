@@ -1,6 +1,6 @@
 #include "DyninstOneTime.h"
 
-bool OneTime_InsertOneTimeCall(DyninstProcess * proc, std::string libname, std::string funcName) {
+bool OneTime_InsertOneTimeCall(DiogenesCommon::DyninstProcess * proc, std::string libname, std::string funcName) {
     BPatch_object * libLoaded = proc->LoadLibrary(libname.c_str());
 
     std::vector<BPatch_function *> ret;
@@ -17,7 +17,5 @@ bool OneTime_InsertOneTimeCall(DyninstProcess * proc, std::string libname, std::
     std::vector<BPatch_snippet*> recordArgs;
 	BPatch_funcCallExpr entryExpr(*(ret[0]), recordArgs);
     dynamic_cast<BPatch_process*>(proc->GetAddressSpace())->oneTimeCode(entryExpr);
-
-    
 
 }

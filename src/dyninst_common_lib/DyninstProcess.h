@@ -40,6 +40,7 @@ using namespace ParseAPI;
 using namespace PatchAPI;
 using namespace SymtabAPI;
 
+namespace DiogenesCommon {
 class DyninstProcess {
 public:
 	DyninstProcess(int argc, char ** argv);
@@ -61,3 +62,4 @@ private:
 	bool _openInsertions;
 	BPatch bpatch;
 };
+}

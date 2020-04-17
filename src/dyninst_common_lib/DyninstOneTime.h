@@ -31,6 +31,6 @@
 #include "set"
 #include "DyninstProcess.h"
 
-bool OneTime_InsertOneTimeCall(DyninstProcess * proc, std::string libname, std::string funcName);
+bool OneTime_InsertOneTimeCall(DiogenesCommon::DyninstProcess * proc, std::string libname, std::string funcName);
 
 #endif

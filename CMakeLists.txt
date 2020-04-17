@@ -17,6 +17,11 @@ if (NOT DEFINED LIBUNWIND_INSTALL_DIR)
 	message(ERROR " Set -DLIBUNWIND_INSTALL_DIR= to the directory libunwind is installed in")
 endif(NOT DEFINED LIBUNWIND_INSTALL_DIR)
 
+if (NOT DEFINED LIBCSA_INSTALL_DIR)
+	message(ERROR " Set -DLIBCSA_INSTALL_DIR= to the directory cuda_sync_analyzer (github: dyninst/tools/cuda_sync_analyzer) is installed in")
+endif(NOT DEFINED LIBCSA_INSTALL_DIR)
+
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/common_lib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/SyncDetector)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/dyninst_common_lib)
