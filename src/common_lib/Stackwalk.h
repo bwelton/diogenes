@@ -1,5 +1,8 @@
 #ifndef COMMON_STACKWALK_HEADER
 #define COMMON_STACKWALK_HEADER 1
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 #include <malloc.h>

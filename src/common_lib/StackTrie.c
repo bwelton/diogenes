@@ -9,12 +9,12 @@ void StackTrie_ConvertTreeToStackKey(StackTrie * tree, CVector * ret, CVector * 
 	size_t elementWritten = 0;
 	if (first == false){
 		char tmp[100];
-		elementWritten = snprintf(tmp, 100, "VIRTADDR@%llx,", tree->key);
+		elementWritten = snprintf(tmp, 100, "VIRTADDR@%"PRIx64",", tree->key);
 		CVector_Append(stack, tmp, elementWritten);
 	}
 	if (tree->data != NULL){
 		char tmp[100];
-		size_t written = snprintf(tmp, 100, "%llu$", (uint64_t)tree->data);
+		size_t written = snprintf(tmp, 100, "%"PRIu64"$", (uint64_t)tree->data);
 		CVector_Append(ret, tmp, written);
 		void * data = CVector_GetData(stack, &written);
 		CVector_Append(ret, data, written-1);

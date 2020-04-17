@@ -1,15 +1,7 @@
 #include "Stackwalk.h"
 
-StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *)) {
-	StackwalkInst * ret = (StackwalkInst*)allocator_fun(sizeof(StackwalkInst));
-	ret->sw_malloc_wrapper = allocator_fun;
-	ret->sw_free_wrapper = free_fun;
-	ret->globalID = 1;
-	ret->tree = StackTrie_Initalize(0, NULL, allocator_fun, free_fun);
-	return ret;
-}
 
-uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
+uint64_t Stackwalk_GetStackID_GNUBtrace(StackwalkInst * inst) {
 	void * local_stack[100];
 	uint64_t data[100];
 	int ret = backtrace(local_stack, 100);
@@ -26,6 +18,56 @@ uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
 	}
 
 }
+
+StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *)) {
+	StackwalkInst * ret = (StackwalkInst*)allocator_fun(sizeof(StackwalkInst));
+	ret->sw_malloc_wrapper = allocator_fun;
+	ret->sw_free_wrapper = free_fun;
+	ret->globalID = 1;
+	ret->tree = StackTrie_Initalize(0, NULL, allocator_fun, free_fun);
+	return ret;
+}
+
+uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
+  unw_cursor_t cursor; unw_context_t uc;
+  unw_word_t ip, sp;
+
+  uint64_t instPointerAddr[100];
+  uint64_t data[100];
+  size_t pos = 0;
+  unw_getcontext(&uc);
+  unw_init_local(&cursor, &uc);
+  while (unw_step(&cursor) > 0) {
+    unw_get_reg(&cursor, UNW_REG_IP, &ip);
+	instPointerAddr[pos] = (uint64_t)ip;
+	pos++;
+	if (pos >= 100)
+		assert(1 == 0);
+    fprintf(stdout,"[Stackwalk_GetStackID_libunwind] ip = %lx\n", (long) ip);
+  }
+
+  StackTrie * tree = inst->tree;
+  if (StackTrie_LookupStack(tree, instPointerAddr, (void **)data, pos) == true)
+		return ((uint64_t*)data)[pos - 1];
+  else
+  {
+		uint64_t insert[100];
+		insert[pos-1] = inst->globalID;
+		inst->globalID++;
+		StackTrie_InsertStack(tree, instPointerAddr, (void **)insert, pos);
+		return insert[pos-1];	  
+  }
+}
+
+uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
+#ifdef USE_GNU_BACKTRACE
+	return Stackwalk_GetStackID_GNUBtrace(inst);
+#endif
+
+
+}
+
+
 
 char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size) {
 	CVector * resultVec = CVector_Init(inst->sw_malloc_wrapper, inst->sw_free_wrapper, 100000);

@@ -1,5 +1,7 @@
 #ifndef COMMON_CVECTOR_HEADER
 #define COMMON_CVECTOR_HEADER 1
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include <signal.h>

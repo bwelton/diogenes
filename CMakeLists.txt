@@ -10,6 +10,13 @@ find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
 find_package(CUDA REQUIRED)
 include(${CMAKE_SOURCE_DIR}/FindGotcha.cmake)
 include(${CMAKE_SOURCE_DIR}/DyninstInstall.cmake)
+add_compile_options("-funwind-tables" "-g")
+
+
+if (NOT DEFINED LIBUNWIND_INSTALL_DIR)
+	message(ERROR " Set -DLIBUNWIND_INSTALL_DIR= to the directory libunwind is installed in")
+endif(NOT DEFINED LIBUNWIND_INSTALL_DIR)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/common_lib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/SyncDetector)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/dyninst_common_lib)

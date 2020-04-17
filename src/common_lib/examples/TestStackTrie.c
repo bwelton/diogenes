@@ -41,9 +41,9 @@ int main() {
 	for (uint64_t i = 0; i < readKeysSize; i++) {
 		uint64_t entryCount = 0;
 		StackKeyEntry * entries = ReadStackKeys_GetElementAt(ret, keys[i], &entryCount);
-		fprintf(stderr, "%llu$",keys[i]);
+		fprintf(stderr, "%"PRIu64"$",keys[i]);
 		for (uint64_t n = 0; n < entryCount; n++) {
-			fprintf(stderr, "%s@%llu,", entries[n].libname, entries[n].addr);
+			fprintf(stderr, "%s@%"PRIu64",", entries[n].libname, entries[n].addr);
 		}
 		fprintf(stderr, "\n");
 	}

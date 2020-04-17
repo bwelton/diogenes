@@ -10,7 +10,7 @@ HashMap * ReadStackKeys(void * (*allocator_fun)(size_t), void (*free_fun)(void *
 		curLocation = strtok_r(ptr, "$", &save2);
 		if (curLocation == NULL)
 			break;
-		if (sscanf(curLocation, "%llu", &ident) != 1){
+		if (sscanf(curLocation, "%"PRIu64"", &ident) != 1){
 			fprintf(stderr, "%s\n", "FATAL ERROR IN SSCANF!!!");
 			assert(1==0);
 		}
@@ -25,7 +25,7 @@ HashMap * ReadStackKeys(void * (*allocator_fun)(size_t), void (*free_fun)(void *
 			strcpy(e.libname, strN);
 			e.addr = 0;
 			save4 =  strtok_r(NULL, "@", &save4);
-			sscanf(save4, "%llu", &(e.addr));
+			sscanf(save4, "%"PRIu64"", &(e.addr));
 			CVector_Append(data, &e, sizeof(StackKeyEntry));
 			element = strtok_r(NULL, ",", &save3);
 		}

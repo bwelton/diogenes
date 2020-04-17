@@ -1,5 +1,7 @@
 #ifndef COMMON_STACKTRIE_HEADER
 #define COMMON_STACKTRIE_HEADER 1
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <pthread.h>
 #include "CVector.h"
 #include "HashMap.h"

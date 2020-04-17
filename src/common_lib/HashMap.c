@@ -144,7 +144,7 @@ void HashMap_EraseKey(HashMap * map, KeyValuePair * cur) {
 		m = m->next;
 	}
 	// }
-	fprintf(stderr, "%s: %llu\n", "Could not find key!", cur->key);
+	fprintf(stderr, "%s: %"PRIu64"\n", "Could not find key!", cur->key);
 }
 
 void HashMap_EraseElement(HashMap * map, uint64_t key) {
@@ -240,9 +240,9 @@ bool HashMap_FindValue(HashMap * map, uint64_t key, void ** data) {
 void HashMap_DebugPrintBuckets(HashMap * map) {
 	for (size_t i = 0; i < map->bucketCount; i++) {
 		KeyValuePair * bucket = map->buckets[i];
-		fprintf(stderr, "Bucket ID: %llu Elements = ", i);
+		fprintf(stderr, "Bucket ID: %"PRIu64" Elements = ", i);
 		while(bucket != NULL) {
-			fprintf(stderr, "(%llu,%p),", bucket->key, bucket->data);
+			fprintf(stderr, "(%"PRIu64",%p),", bucket->key, bucket->data);
 			bucket =  bucket->next;
 		}
 		fprintf(stderr, "\n");

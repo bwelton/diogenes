@@ -1,5 +1,7 @@
 #ifndef COMMON_HASHMAP
 #define COMMON_HASHMAP 1
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
