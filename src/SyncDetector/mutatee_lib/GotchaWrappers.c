@@ -1,6 +1,8 @@
 #include "SyncDetector.h"
 
 StackwalkInst * globalWalker = NULL;
+
+volatile bool syncdetect_disablememcapture = false;
 volatile uint64_t currentStackID = 0;
 size_t pagesize = 0;
 volatile bool syncdetect_exitinit = false;
@@ -22,6 +24,7 @@ void WriteStacktrieToFile(const char * fname, StackTrie * write) {
 
 void mutatee_exit_handler() {
 	syncdetect_exitinit = true;
+	CaptureProcMap_Write("ProcMap.txt");
 	WriteStacktrieToFile(SYNC_STACKCOLLISION_FILE, syncdetect_necessary_syncs);
 	if (globalWalker != NULL)
 		WriteStacktrieToFile(SYNC_STACKCAPTURE_FILE,globalWalker->tree);
@@ -37,8 +40,10 @@ uint64_t GetStackID() {
 	}
 	if (syncdetect_necessary_syncs == NULL)
 		syncdetect_necessary_syncs = StackTrie_Initalize(0, NULL, syncdetect_malloc_wrapper, syncdetect_free_wrapper);
-
-	return Stackwalk_GetStackID(globalWalker);
+	syncdetect_disablememcapture = true;
+	uint64_t ret =  Stackwalk_GetStackID(globalWalker);
+	syncdetect_disablememcapture = false;
+	return ret;
 }
 
 void DIOG_Synchronization_Post() {
@@ -64,10 +69,12 @@ void * syncdetect_malloc(size_t size) {
 	if (pagesize == 0)
 		pagesize = getpagesize();
 	//fprintf(stderr,"IN MALLOC\n");
+	if (syncdetect_disablememcapture)
+		return syncdetect_malloc_wrapper(size);
 	//void * ret= syncdetect_malloc_wrapper(size);
-    void * ret= memalign(pagesize,size);
-/*    if(!syncdetect_exitinit)
-    	PageLocker_AddMemoryAllocation(ret, size);*/
+    void * ret= memalign(pagesize,GetPageRound(size));
+    if(!syncdetect_exitinit)
+    	PageLocker_AddMemoryAllocation(ret, GetPageRound(size));
     return ret;
 }
 
@@ -107,6 +114,7 @@ inline void syncdetect_LockAddress(void * memAddr, size_t size, RelockIndex inde
 
 int syncdetect_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount ) {
 	int ret;
+	fprintf(stderr, "In htod_v2\n");
 	RelockIndex tmp = syncdetect_Pretransfer((void*)srcHost, ByteCount);
 	ret = syncdetect_cuMemcpyHtoD_v2_wrapper(dstDevice,  srcHost, ByteCount);
 	syncdetect_LockAddress((void*)srcHost, ByteCount, tmp);

@@ -1,6 +1,7 @@
 #include "DynHelper.h"
 #include "DyninstProcess.h"
 #include "DyninstOneTime.h"
+#include "DyninstEntryExit.h"
 #include <stdint.h>
 
 int main(int argc, char * argv[]) {
@@ -15,6 +16,7 @@ int main(int argc, char * argv[]) {
     proc.LaunchProcess();
     proc.LoadLibrary("libcuda.so");
     proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"));
+    DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
     proc.RunUntilCompleation(std::string(""));
 }

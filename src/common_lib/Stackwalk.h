@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include "StackTrie.h"
 #include "CVector.h"
+
 typedef struct StackwalkInst{
 	void * (*sw_malloc_wrapper)(size_t);
 	void (*sw_free_wrapper)(void *);

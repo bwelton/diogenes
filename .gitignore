@@ -1,1 +1,11 @@
 *.json
+install/
+build/
+install/lib/libDiogenesCommon.so
+install/lib/libDiogenesDyninstCommon.so
+install/lib/libSyncDetectorMutatee.so
+install/bin/SyncDetector
+procmapdump2.txt
+procmapdump.txt
+install/bin/SyncDetector
+pmaps

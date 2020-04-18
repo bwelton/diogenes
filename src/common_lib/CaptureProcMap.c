@@ -3,18 +3,23 @@
 void CaptureProcMap_Write(char * filename) {
 	char capture[200];
 	snprintf(capture, 200, "/proc/%d/maps", getpid());
-	FILE * fread = fopen(capture, "rb");
-	if (fread == NULL){
+	fprintf(stderr, "Opening procmap file: %s\n", capture);
+	FILE * readFile = fopen(capture, "rb");
+	if (readFile == NULL){
 		fprintf(stderr, "%s %d\n", "COULD NOT OPEN PROCMAP FOR: ", getpid());
 		return;
 	}
-	
-	fseek(fread, 0, SEEK_END);
-	size_t fsize = ftell(fread);
-	fseek(fread, 0, SEEK_SET);
+	rewind(readFile);
+	fseek(readFile, 0, SEEK_END);
+	size_t fsize = ftell(readFile);
+	fseek(readFile, 0, SEEK_SET);
+	fprintf(stderr, "Reading %lu bytes\n", fsize);
+	char * data = (char*)malloc(fsize);
+	fread(data, 1, fsize, readFile);
 
 	FILE * fout = fopen(filename, "wb");
-	sendfile(fileno(fout), fileno(fread), NULL, fsize);
+	fwrite(data, 1, fsize, fout);
 	fclose(fout);
-	fclose(fread);
+	fclose(readFile);
+	free(data);
 }

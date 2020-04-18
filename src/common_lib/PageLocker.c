@@ -81,6 +81,7 @@ void PageLocker_LockMemory(PageLocker * locker) {
 			lockedPages->pages[lockPageCount] = ptrToLock;
 			lockedPages->sizes[lockPageCount] = sizeToLock;	
 			lockPageCount++;		
+			fprintf(stderr, "Succesfully locked page\n");
 		} else {
 			fprintf(stderr, "%s, %p, %"PRIu64"\n", "Could not lock pages!", pagesToLock->pages[i],  pagesToLock->sizes[i]);
 			assert(1==0);
@@ -115,6 +116,7 @@ void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index) {
 }
 
 int PageLocker_UnlockMemory(PageLocker * locker) {
+		fprintf(stderr,"In UnlockMemory\n");
 	PageMemArrays * lockedPages = locker->pagesLocked;
 	int iter = lockedPages->count;
 	int relcount = 0;

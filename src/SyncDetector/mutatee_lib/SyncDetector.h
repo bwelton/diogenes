@@ -17,6 +17,8 @@
 #include "Stackwalk.h"
 #include "StackTrie.h"
 #include "SyncdetectFilenames.h"
+#include "CaptureProcMap.h"
+
 
 typedef struct NecessarySyncs{
 	uint64_t sync;

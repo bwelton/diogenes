@@ -32,5 +32,5 @@
 #include "DyninstProcess.h"
 
 
-bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, uint64_t addr,  std::string libname, std::string entryFunc, std::string exitFunc);
+bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, std::string insertLib, uint64_t addr,  std::string wrapperLib, std::string entryFunc, std::string exitFunc);
 #endif
