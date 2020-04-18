@@ -63,6 +63,7 @@ int syncdetect_cuMemAllocHost_v2(void ** ptr, size_t size) {
 void * syncdetect_malloc(size_t size) {
 	if (pagesize == 0)
 		pagesize = getpagesize();
+	//fprintf(stderr,"IN MALLOC\n");
 	//void * ret= syncdetect_malloc_wrapper(size);
     void * ret= memalign(pagesize,size);
 /*    if(!syncdetect_exitinit)

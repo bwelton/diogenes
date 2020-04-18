@@ -1,4 +1,10 @@
-add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp" "DyninstOneTime.cpp")
+add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp" "DyninstOneTime.cpp" "DyninstEntryExit.cpp")
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/src/dyninst_common_lib/CommonDefines.h.in"
+    "${PROJECT_SOURCE_DIR}/src/dyninst_common_lib/CommonDefines.h"
+)
+
 
 INCLUDE_DIRECTORIES(DiogenesDyninstCommon ${CUDA_TOOLKIT_ROOT_DIR}/include)
 INCLUDE_DIRECTORIES(DiogenesDyninstCommon ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
@@ -14,3 +20,10 @@ target_link_libraries(DiogenesDyninstCommon DiogenesCommon)
 target_link_libraries(DiogenesDyninstCommon "-lpthread -ldl")
 target_link_libraries(DiogenesDyninstCommon ${Boost_LIBRARIES})
 target_link_libraries(DiogenesDyninstCommon ${DYNINST_LIBRARIES})
+
+
+install(TARGETS DiogenesDyninstCommon
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static
+        RUNTIME DESTINATION bin
+        PUBLIC_HEADER DESTINATION include)

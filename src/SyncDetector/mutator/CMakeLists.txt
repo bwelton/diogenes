@@ -8,3 +8,9 @@ add_dependencies(SyncDetector DiogenesDyninstCommon)
 target_link_libraries(SyncDetector DiogenesDyninstCommon)
 target_link_libraries(SyncDetector "-L${GOTCHA_INSTALL_DIR}/lib -lgotcha")
 target_link_libraries(SyncDetector "-lpthread -ldl")
+
+install(TARGETS SyncDetector
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static
+        RUNTIME DESTINATION bin
+        PUBLIC_HEADER DESTINATION include)

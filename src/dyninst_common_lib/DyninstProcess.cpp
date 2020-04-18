@@ -80,9 +80,9 @@ bool DyninstProcess::RunUntilCompleation(std::string filename) {
 		//appProc->continueExecution();
 	}
 	assert(appProc->continueExecution() == true);
-	// while(appProc->isStopped() == true && appProc->terminationStatus() == NoExit){
-	// 	appProc->continueExecution();
-	// }
+	while(appProc->isStopped() == true && appProc->terminationStatus() == NoExit){
+	 	appProc->continueExecution();
+	}
 	while(!appProc->isTerminated()) {
 		//std::cerr << "Iteration of Termination loop" << std::endl;
 		bpatch.pollForStatusChange();
@@ -141,8 +141,10 @@ BPatch_addressSpace * DyninstProcess::LaunchProcess() {
 	
 	// Setup program arguements
 	char ** argv = (char**)malloc(_argc * sizeof(char *)+ (sizeof(char*)));
-	for (int i = 0; _argc; i++) 
+	for (int i = 0; i < _argc; i++) {
+		std::cerr << "[DyninstProcess::LaunchProcess] Copying argument " << i << std::endl;
 		argv[i] =  _argv[i];
+	}
 	argv[_argc] = NULL;
 	for (int i = 0; i < _argc; i++){
 		std::cerr << "[DyninstProcess::LaunchProcess] Launch Arguments - " <<  std::string(argv[i]) << std::endl;
