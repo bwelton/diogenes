@@ -37,7 +37,7 @@ uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 		return ret;
 	}
 	for (size_t i = 0; i < ret; i++) {
-		fprintf(stderr,"RA = %llx\n", instPointerAddr[i]);
+		fprintf(stderr,"RA = %"PRIx64"\n", instPointerAddr[i]);
 	}
 	fprintf(stderr,"EndStack\n");
 	StackTrie * tree = inst->tree;

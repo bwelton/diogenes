@@ -26,10 +26,15 @@ struct SkipListHandle {
 	SkipListNode ** empty;
 	size_t empty_count;
 };
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 SkipListHandle * SkipListHandle_GetThreadSpecific();
 uint64_t SkipListHandle_FindNearestElement(uint64_t item, size_t * size);
 void SkipListHandle_AddElement(uint64_t item, size_t size);
 void SkipListHandle_RemoveElement(uint64_t item);
 void SkipListHandle_DebugPrint();
+#ifdef __cplusplus
+}
+#endif
 #endif

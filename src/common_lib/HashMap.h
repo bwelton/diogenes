@@ -40,7 +40,9 @@ struct HashMap {
 
 };
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 HashMap* HashMap_Initalize(void * (*allocator_fun)(size_t), void (*free_fun)(void *));
 bool HashMap_FindValue(HashMap * map, uint64_t key, void ** data);
 void HashMap_EraseElement(HashMap * map, uint64_t key);
@@ -49,4 +51,7 @@ void HashMap_DebugPrintBuckets(HashMap * map);
 KeyValuePair ** HashMap_DumpElements(HashMap * map, size_t * size);
 void * KeyValuePair_GetData(KeyValuePair * pair);
 uint64_t KeyValuePair_GetKey(KeyValuePair * pair);
+#ifdef __cplusplus
+}
+#endif
 #endif

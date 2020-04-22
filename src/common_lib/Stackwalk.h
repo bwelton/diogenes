@@ -18,8 +18,13 @@ typedef struct StackwalkInst{
 	uint64_t globalID;
 	StackTrie * tree;
 } StackwalkInst; 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *));
 uint64_t Stackwalk_GetStackID(StackwalkInst * swalk);
 char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size);
+#ifdef __cplusplus
+}
+#endif
 #endif

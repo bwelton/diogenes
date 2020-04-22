@@ -23,6 +23,10 @@ typedef struct PageLocker{
 	PageMemArrays * pagesToLock;
 	PageMemArrays * pagesLocked;
 } PageLocker;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 PageLocker * PageLocker_GetThreadSpecific();
 PageLocker * PageLocker_GetThreadSpecificSignalSafe();
 void PageLocker_FreeMemoryAllocation(void * mem);
@@ -34,4 +38,8 @@ void PageLocker_LockMemory(PageLocker * locker);
 int PageLocker_UnlockMemory(PageLocker * locker);
 RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint64_t size);
 void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

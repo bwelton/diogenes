@@ -22,7 +22,9 @@ typedef struct CVector {
 	void * (*allocator)(size_t);
 	void (*free)(void *);
 } CVector;
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 CVector * CVector_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *),size_t resizeSize);
 void * CVector_GetData(CVector * vec, size_t * size);
 void CVector_Destroy(CVector * vec);
@@ -31,4 +33,7 @@ void CVector_Reallocate(CVector * vec, size_t addBytes);
 void CVector_Append(CVector * vec, void * data, size_t bytes);
 void CVector_SetResize(CVector * vec, size_t bytes);
 void CVector_EraseElement(CVector * vec, size_t eraseSize);
+#ifdef __cplusplus
+}
+#endif
 #endif

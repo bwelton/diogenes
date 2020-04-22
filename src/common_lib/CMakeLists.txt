@@ -1,9 +1,11 @@
-add_library(DiogenesCommon SHARED "CaptureProcMap.c" "PageLocker.c" "SkipList.c" "StackTrie.c" "HashMap.c" "Stackwalk.c" "CVector.c" "ReadStackKeys.c")
+add_library(DiogenesCommon SHARED "CaptureProcMap.c" "PageLocker.c" "SkipList.c" "StackTrie.c" "HashMap.c" "Stackwalk.c" "CVector.c" "ReadStackKeys.c" 
+                                  "extern/procparser/pmparser.c")
 INCLUDE_DIRECTORIES(DiogenesCommon ${LIBUNWIND_INSTALL_DIR}/include)
 INCLUDE_DIRECTORIES(DiogenesCommon ${CMAKE_SOURCE_DIR}/src/dyninst_common_lib)
 INCLUDE_DIRECTORIES(DiogenesCommon ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
 INCLUDE_DIRECTORIES(DiogenesCommon ${GOTCHA_INSTALL_DIR}/include)
 INCLUDE_DIRECTORIES(DiogenesCommon ${CMAKE_SOURCE_DIR}/src/common_lib)
+INCLUDE_DIRECTORIES(DiogenesCommon ${CMAKE_SOURCE_DIR}/src/common_lib/extern/procparser)
 
 target_link_libraries(DiogenesCommon "-lpthread -ldl")
 target_link_libraries(DiogenesCommon "-L${LIBUNWIND_INSTALL_DIR}/lib -lunwind")
