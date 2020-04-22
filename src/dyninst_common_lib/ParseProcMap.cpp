@@ -1,4 +1,5 @@
 #include "ParseProcMap.h"
+#include <iostream>
 namespace DiogenesCommon{
 
 ParseProcMap::ParseProcMap(char * procfile){
@@ -14,13 +15,18 @@ ParseProcMap::ParseProcMap(char * procfile){
                 _pathnameMap[tmps] = std::shared_ptr<char>(strdup(tmps.c_str()));
         }
 	}
+    for (auto i : _maps) {
+        std::cerr << "PROCMAP DUMP - " << std::hex << i.first <<  "..." << (uint64_t)i.second.addr_end << " - " << i.second.pathname << std::endl;
+    }
     pmparser_free(parse);
 }
 bool ParseProcMap::GetLibraryAndOffset(BinaryAddress & in) {
-    auto it = _maps.lower_bound(in.processAddress);
+    auto it = _maps.upper_bound(in.processAddress);
     if (it == _maps.end())
         return false;
+    std::prev(it);
     procmaps_struct s = it->second;
+    std::cerr << "PROCADDR = " << std::hex<< in.processAddress << " MATCHED = " << std::hex<< (uint64_t)s.addr_start << std::endl;
     if ((uint64_t)s.addr_start <= in.processAddress && (uint64_t)s.addr_end >= in.processAddress){
         in.libraryOffset = (in.processAddress - (uint64_t)s.addr_start) + s.offset;
         if (strlen(s.pathname) > 0)

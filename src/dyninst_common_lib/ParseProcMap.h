@@ -1,11 +1,10 @@
 #ifndef DIOGENES_PARSEPROCMAP
 #define DIOGENES_PARSEPROCMAP 1
 #include "BinaryAddress.h"
-#include "pmparser.h"
 #include <memory>
 #include <string>
 #include <map>
-
+#include "pmparser.h"
 namespace DiogenesCommon{
     class ParseProcMap {
         public:

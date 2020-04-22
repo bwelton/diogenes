@@ -1,6 +1,8 @@
 #include "Stackwalk.h"
 #include "FPStackWalker.h"
 
+pthread_mutex_t lock; 
+
 uint64_t Stackwalk_GetStackID_GNUBtrace(StackwalkInst * inst) {
 	void * local_stack[100];
 	uint64_t data[100];
@@ -31,6 +33,7 @@ StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)
 uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 	uint64_t instPointerAddr[100];
 	uint64_t data[100];
+	memset((void *)data, '\000', sizeof(uint64_t) * 100);
 	size_t ret = FPStackWalker_GetStackFP(instPointerAddr, 100);
 	if (ret == 0){
 		fprintf(stderr, "No stack obtained\n");
@@ -49,6 +52,7 @@ uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 	{
 		fprintf(stderr, "New Stack Found!\n");
 		uint64_t insert[100];
+		memset((void *)insert, '\000', sizeof(uint64_t) * 100);
 		insert[ret-1] = inst->globalID;
 		inst->globalID++;
 		StackTrie_InsertStack(tree, instPointerAddr, (void **)insert, ret);
@@ -94,10 +98,13 @@ uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
 }
 
 uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
+	pthread_mutex_lock(&lock); 
 #ifdef USE_GNU_BACKTRACE
 	return Stackwalk_GetStackID_GNUBtrace(inst);
 #endif
-	return Stackwalk_GetStackID_FPStackWalker(inst);
+	uint64_t ret =  Stackwalk_GetStackID_FPStackWalker(inst);
+	pthread_mutex_unlock(&lock); 
+	return ret;
 	//return Stackwalk_GetStackID_libunwind(inst);
 
 }

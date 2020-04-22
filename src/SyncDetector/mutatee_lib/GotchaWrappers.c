@@ -47,6 +47,8 @@ uint64_t GetStackID() {
 }
 
 void DIOG_Synchronization_Post() {
+	if(syncdetect_exitinit)
+		return;
 	currentStackID = GetStackID();
 	PageLocker * local_locker = PageLocker_GetThreadSpecific();
 	PageLocker_LockMemory(local_locker);
