@@ -39,7 +39,9 @@ int syncdetect_cuMemcpyDtoH_v2(void* dstHost, CUdeviceptr srcDevice, size_t Byte
 int syncdetect_cuMemcpyDtoHAsync_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream);
 int syncdetect_cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount, CUstream hStream);
 int syncdetect_cuMemcpyAsync(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount, CUstream hStream);
+int syncdetect_cuMemFreeHost(void * ptr);
 void syncdetect_free(void * ptr);
+void syncdetect_WriteNecessarySync(uint64_t syncLocation, uint64_t useOfData);
 uint64_t GetStackID();
 
 // Global wrapper variables

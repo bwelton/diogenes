@@ -14,13 +14,26 @@ void syncdetect_catchSegFault(int sig, siginfo_t *siginfo, void *context) {
 	if (myid == 0)
 		return;
 
+	syncdetect_WriteNecessarySync(currentStackID, myid);
+	// uint64_t tmp[2];
+	// uint64_t data[2];	
+	// tmp[0] = currentStackID;
+	// tmp[1] = myid;
+	// data[0] = 0;
+	// data[1] = syncdetect_write_id_coll;
+	// syncdetect_write_id_coll++;
+	// if (syncdetect_necessary_syncs != NULL)
+	// 	StackTrie_InsertStack(syncdetect_necessary_syncs,tmp, (void**)data,2);
+}
+
+void syncdetect_WriteNecessarySync(uint64_t syncLocation, uint64_t useOfData) {
 	uint64_t tmp[2];
 	uint64_t data[2];	
-	tmp[0] = currentStackID;
-	tmp[1] = myid;
+	tmp[0] = syncLocation;
+	tmp[1] = useOfData;
 	data[0] = 0;
 	data[1] = syncdetect_write_id_coll;
 	syncdetect_write_id_coll++;
 	if (syncdetect_necessary_syncs != NULL)
-		StackTrie_InsertStack(syncdetect_necessary_syncs,tmp, (void**)data,2);
+		StackTrie_InsertStack(syncdetect_necessary_syncs,tmp, (void**)data,2);	
 }

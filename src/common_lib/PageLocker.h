@@ -30,12 +30,12 @@ extern "C" {
 #endif
 PageLocker * PageLocker_GetThreadSpecific();
 PageLocker * PageLocker_GetThreadSpecificSignalSafe();
-void PageLocker_FreeMemoryAllocation(void * mem);
+void PageLocker_FreeMemoryAllocation(PageLocker * locker, void * mem);
 void PageLocker_AddMemoryAllocation(void * mem, size_t size);
 void PageMemArrays_Initalize(PageMemArrays ** memArray);
 void PageLocker_Initalize(PageLocker ** locker);
 void PageLocker_AddTransferPage(PageLocker * locker, void * mem, size_t size);
-void PageLocker_LockMemory(PageLocker * locker);
+bool PageLocker_LockMemory(PageLocker * locker);
 int PageLocker_UnlockMemory(PageLocker * locker);
 RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint64_t size);
 void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index);

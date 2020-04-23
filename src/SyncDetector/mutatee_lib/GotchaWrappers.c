@@ -51,9 +51,15 @@ void DIOG_Synchronization_Post() {
 		return;
 	
 	currentStackID = GetStackID();
-	fprintf(stderr, "Inside Synchronization - ID = %"PRIu64"\n", currentStackID);
+	//fprintf(stderr, "Inside Synchronization - ID = %"PRIu64"\n", currentStackID);
 	PageLocker * local_locker = PageLocker_GetThreadSpecific();
-	PageLocker_LockMemory(local_locker);
+	if (PageLocker_LockMemory(local_locker) == false) {
+		// Assume we have an address that is unlockable, this means
+		// that we cannot detect potential uses and we should assume
+		// that the synchronization is required
+		PageLocker_UnlockMemory(local_locker);
+		syncdetect_WriteNecessarySync(currentStackID,currentStackID);
+	}
 }
 
 size_t GetPageRound(size_t size) {
@@ -65,7 +71,7 @@ size_t GetPageRound(size_t size) {
 }
 
 int syncdetect_cuMemAllocHost_v2(void ** ptr, size_t size) {
-    fprintf(stderr, "in cuMemallocHost\n");
+    //fprintf(stderr, "in cuMemallocHost\n");
     *ptr = malloc(size);
     return cuMemHostRegister(*ptr, size, 0);
 }
@@ -82,15 +88,20 @@ void * syncdetect_malloc(size_t size) {
     return ret;
 }
 
+int syncdetect_cuMemFreeHost(void * ptr) {
+	cuMemHostUnregister(ptr);
+	free(ptr);
+	return (int)CUDA_SUCCESS;
+}
+
 void syncdetect_free(void * ptr) {
-/*	if(!syncdetect_exitinit)
-		PageLocker_FreeMemoryAllocation(ptr);
-		*/
+	if(!syncdetect_exitinit)
+		PageLocker_FreeMemoryAllocation(PageLocker_GetThreadSpecific(),ptr);
     return syncdetect_free_wrapper(ptr);
 }
 
 int syncdetect_cuMemAllocManaged(void ** ptr, size_t len, unsigned int flags) {
-	fprintf(stderr , "In Malloc Managed\n");
+	//fprintf(stderr , "In Malloc Managed\n");
     return syncdetect_cuMemAllocManaged_wrapper(ptr,GetPageRound(len),flags);	    
 }
 
@@ -118,7 +129,7 @@ inline void syncdetect_LockAddress(void * memAddr, size_t size, RelockIndex inde
 
 int syncdetect_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount ) {
 	int ret;
-	fprintf(stderr, "In htod_v2\n");
+
 	RelockIndex tmp = syncdetect_Pretransfer((void*)srcHost, ByteCount);
 	ret = syncdetect_cuMemcpyHtoD_v2_wrapper(dstDevice,  srcHost, ByteCount);
 	syncdetect_LockAddress((void*)srcHost, ByteCount, tmp);

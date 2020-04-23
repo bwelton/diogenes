@@ -11,7 +11,7 @@ gotcha_wrappee_handle_t syncdetect_free_handle;
 gotcha_wrappee_handle_t syncdetect_cuMemcpyDtoHAsync_v2_handle;
 gotcha_wrappee_handle_t syncdetect_cuMemcpyHtoDAsync_v2_handle;
 gotcha_wrappee_handle_t syncdetect_cuMemcpyAsync_handle;
-
+gotcha_wrappee_handle_t syncdetect_cuMemFreeHost_handle;
 
 typeof(&syncdetect_cuMemAllocHost_v2) syncdetect_cuMemAllocHost_v2_wrapper;
 typeof(&syncdetect_malloc) syncdetect_malloc_wrapper;
@@ -22,6 +22,7 @@ typeof(&syncdetect_free) syncdetect_free_wrapper;
 typeof(&syncdetect_cuMemcpyDtoHAsync_v2) syncdetect_cuMemcpyDtoHAsync_v2_wrapper;
 typeof(&syncdetect_cuMemcpyHtoDAsync_v2) syncdetect_cuMemcpyHtoDAsync_v2_wrapper;
 typeof(&syncdetect_cuMemcpyAsync) syncdetect_cuMemcpyAsync_wrapper;
+typeof(&syncdetect_cuMemFreeHost) syncdetect_cuMemFreeHost_wrapper;
 
 /*end*/
 
@@ -34,6 +35,7 @@ struct gotcha_binding_t gotcha_Binder_Funcs[] = {{"cuMemHostAlloc",(void*)syncde
 												 {"cuMemcpyDtoHAsync_v2",(void*)syncdetect_cuMemcpyDtoHAsync_v2,&syncdetect_cuMemcpyDtoHAsync_v2_handle},
 												 {"cuMemcpyHtoDAsync_v2",(void*)syncdetect_cuMemcpyHtoDAsync_v2,&syncdetect_cuMemcpyHtoDAsync_v2_handle},
 												 {"cuMemcpyAsync",(void*)syncdetect_cuMemcpyAsync,&syncdetect_cuMemcpyAsync_handle},
+												 {"cuMemHostFree",(void*)syncdetect_cuMemFreeHost,&syncdetect_cuMemFreeHost_handle},
 												};
 void mutatee_init() {
 	//PageLocker_Initalize()
@@ -65,6 +67,7 @@ void mutatee_init() {
 	syncdetect_cuMemcpyDtoHAsync_v2_wrapper = (typeof(&syncdetect_cuMemcpyDtoHAsync_v2))dlsym(lib_libcuda,"cuMemcpyDtoHAsync_v2");
 	syncdetect_cuMemcpyHtoDAsync_v2_wrapper = (typeof(&syncdetect_cuMemcpyHtoDAsync_v2))dlsym(lib_libcuda,"cuMemcpyHtoDAsync_v2");
 	syncdetect_cuMemcpyAsync_wrapper = (typeof(&syncdetect_cuMemcpyAsync))dlsym(lib_libcuda,"cuMemcpyAsync");
+	syncdetect_cuMemFreeHost_wrapper = (typeof(&syncdetect_cuMemFreeHost))dlsym(lib_libcuda,"cuMemFreeHost");
 	gotcha_wrap(gotcha_Binder_Funcs, sizeof(gotcha_Binder_Funcs)/sizeof(struct gotcha_binding_t), "binderWrappers");
 }
 

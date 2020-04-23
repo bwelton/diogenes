@@ -1,6 +1,6 @@
 #include "PageLocker.h"
 #include <assert.h>
-#define MAX_ENTRIES 1024
+#define MAX_ENTRIES 4096
 static pthread_key_t pagelocker_key;
 static pthread_once_t pagelocker_key_once = PTHREAD_ONCE_INIT;
 
@@ -40,8 +40,38 @@ void PageLocker_AddMemoryAllocation(void * mem, size_t size) {
 	SkipListHandle_AddElement((uint64_t)mem, size);
 }
 
-void PageLocker_FreeMemoryAllocation(void * mem) {
+void PageLocker_FreeMemoryAllocation(PageLocker * locker, void * mem) {
 	SkipListHandle_RemoveElement((uint64_t)mem);
+	PageMemArrays * pagesToLock = locker->pagesToLock;
+	PageMemArrays * lockedPages = locker->pagesLocked;
+	bool moveBack = false;
+	for (int i = 0; i < lockedPages->count; i++) {
+		if (lockedPages->pages[i] == mem){
+			//mprotect(lockedPages->pages[i], lockedPages->sizes[i], PROT_READ | PROT_WRITE);
+			moveBack = true;
+		} else {
+			if(moveBack) {
+				lockedPages->pages[i-1] = lockedPages->pages[i];
+				lockedPages->sizes[i-1] = lockedPages->sizes[i];
+			}
+		}	
+	}
+	if (moveBack)
+		lockedPages->count--;
+
+	moveBack = false;
+	for (int i = 0; i < pagesToLock->count; i++) {
+		if (pagesToLock->pages[i] == mem){
+			moveBack = true;
+		} else {
+			if(moveBack) {
+				pagesToLock->pages[i-1] = pagesToLock->pages[i];
+				pagesToLock->sizes[i-1] = pagesToLock->sizes[i];
+			}
+		}	
+	}
+	if (moveBack)
+		pagesToLock->count--;
 }
 
 void PageLocker_AddTransferPage(PageLocker * locker, void * mem, size_t size) {
@@ -63,7 +93,7 @@ void PageLocker_AddTransferPage(PageLocker * locker, void * mem, size_t size) {
 	memArray->count++;
 }
 
-void PageLocker_LockMemory(PageLocker * locker) {
+bool PageLocker_LockMemory(PageLocker * locker) {
 	PageMemArrays * pagesToLock = locker->pagesToLock;
 	PageMemArrays * lockedPages = locker->pagesLocked;
 
@@ -84,12 +114,16 @@ void PageLocker_LockMemory(PageLocker * locker) {
 			if (FileIO_CheckDebug())		
 				fprintf(stderr, "[PageLocker_LockMemory] Succesfully locked page - %p %"PRIu64"\n", ptrToLock, sizeToLock);
 		} else {
-			fprintf(stderr, "%s, %p, %"PRIu64"\n", "Could not lock pages!", pagesToLock->pages[i],  pagesToLock->sizes[i]);
-			assert(1==0);
+			if (FileIO_CheckDebug())
+				fprintf(stderr, "[PageLocker_LockMemory] Could not memory at address %p with size  %"PRIu64", could be stack address (not supported)\n",  pagesToLock->pages[i],  pagesToLock->sizes[i]);
+			
+			return false;
+			//assert(1==0);
 		}
 	}
 	lockedPages->count = lockPageCount;
 	pagesToLock->count = 0;
+	return true;
 }
 
 RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint64_t size) {
@@ -123,6 +157,7 @@ void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index) {
 int PageLocker_UnlockMemory(PageLocker * locker) {
 		fprintf(stderr,"In UnlockMemory\n");
 	PageMemArrays * lockedPages = locker->pagesLocked;
+	PageMemArrays * pagesToLock = locker->pagesToLock;
 	int iter = lockedPages->count;
 	int relcount = 0;
 	for (int i = 0; i < iter; i++) {
@@ -133,6 +168,7 @@ int PageLocker_UnlockMemory(PageLocker * locker) {
 			fprintf(stderr, "%s\n", "COULD NOT UNLOCK MEMORY! COULD RESULT IN BAD BEHAVIOR!!!");
 		}
 	}
+	pagesToLock->count = 0;
 	lockedPages->count = 0;
 	return relcount;
 }
