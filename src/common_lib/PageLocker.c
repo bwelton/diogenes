@@ -80,8 +80,9 @@ void PageLocker_LockMemory(PageLocker * locker) {
 		if (ptrToLock != NULL && mprotect(ptrToLock, sizeToLock, PROT_NONE) == 0) {
 			lockedPages->pages[lockPageCount] = ptrToLock;
 			lockedPages->sizes[lockPageCount] = sizeToLock;	
-			lockPageCount++;		
-			fprintf(stderr, "Succesfully locked page\n");
+			lockPageCount++;
+			if (FileIO_CheckDebug())		
+				fprintf(stderr, "[PageLocker_LockMemory] Succesfully locked page - %p %"PRIu64"\n", ptrToLock, sizeToLock);
 		} else {
 			fprintf(stderr, "%s, %p, %"PRIu64"\n", "Could not lock pages!", pagesToLock->pages[i],  pagesToLock->sizes[i]);
 			assert(1==0);
@@ -98,6 +99,8 @@ RelockIndex PageLocker_TempUnlockAddress(PageLocker * locker, void * addr, uint6
 		uint64_t taddr = (uint64_t)lockedPages->pages[i];
 		uint64_t tsize = lockedPages->sizes[i];
 		if (taddr <= (uint64_t)addr &&  taddr + tsize >= (uint64_t)addr){
+			if (FileIO_CheckDebug())
+				fprintf(stderr, "[PageLocker_TempUnlockAddress] Temporarily Unlocked - %p %"PRIu64"\n", lockedPages->pages[i], lockedPages->sizes[i]);
 			mprotect(lockedPages->pages[i], lockedPages->sizes[i], PROT_READ|PROT_WRITE);
 			ret = i;
 			break;
@@ -112,6 +115,8 @@ void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index) {
 	PageMemArrays * lockedPages = locker->pagesLocked;
 	if (index >= lockedPages->count)
 		return;
+	if (FileIO_CheckDebug())
+		fprintf(stderr, "[PageLocker_RelockIndex] Relocking - %p %"PRIu64"\n", lockedPages->pages[index], lockedPages->sizes[index]);
 	mprotect(lockedPages->pages[index], lockedPages->sizes[index], PROT_NONE);
 }
 
@@ -122,6 +127,8 @@ int PageLocker_UnlockMemory(PageLocker * locker) {
 	int relcount = 0;
 	for (int i = 0; i < iter; i++) {
 		relcount++;
+		if (FileIO_CheckDebug())
+			fprintf(stderr, "[PageLocker_UnlockMemory] Unlocking - %p %"PRIu64"\n", lockedPages->pages[i], lockedPages->sizes[i]);
 		if (mprotect(lockedPages->pages[i], lockedPages->sizes[i], PROT_READ | PROT_WRITE) != 0) {
 			fprintf(stderr, "%s\n", "COULD NOT UNLOCK MEMORY! COULD RESULT IN BAD BEHAVIOR!!!");
 		}

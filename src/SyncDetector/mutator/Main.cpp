@@ -31,9 +31,11 @@ int main(int argc, char * argv[]) {
     proc.RunUntilCompleation(std::string(""));
     
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
+    char collisionFileName[] = "DIOG_SYNC_StackCollision.txt";
     char procMapName[] = "ProcMap.txt";
 
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> stacks = ReadStacksFromMutatee(stackFileName);
+    std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> collisions = ReadStacksFromMutatee(collisionFileName);
     DiogenesCommon::ParseProcMap pmap(procMapName);
     DiogenesCommon::AddressSymbolizer symbols;
 
@@ -46,19 +48,31 @@ int main(int argc, char * argv[]) {
                 symbols.GetSymbolAtAddress(x);
                 // for (auto n : x.symbolInfo.funcName)
                 //     std::cerr << "MAIN - " << n << std::endl;
-                std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-                std::cout << x.symbolInfo.Print(5);
+                //std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+                //std::cout << x.symbolInfo.Print(5);
             } else {
-                 std::cout << "  " << std::dec << depth << ": UNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
+                //std::cout << "  " << std::dec << depth << ": UNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
             }
             depth++;
         }
-        // std::cout << "\tStack Number: " << i.first << std::endl;
-        // for (auto & x : i.second){
-        //     if(pmap.GetLibraryAndOffset(x)) 
-        //         std::cout << "\t\t" << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-        //     else
-        //         std::cout << "\t\tUNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
-        // }
+    }
+    for (auto i : collisions) {
+        assert(i.second.size() == 2);
+        uint64_t syncRequired = i.second[0].processAddress;
+        uint64_t useOfData = i.second[1].processAddress;
+        std::cout << "REQUIRED SYNCHRONIZATION AT NUMBER: " << std::dec << syncRequired << std::endl;
+        uint64_t depth = 1;
+        for (auto & x : stacks[syncRequired]){
+            std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cout <<  x.symbolInfo.Print(5);
+            depth++;
+        }
+        depth = 1;
+        std::cout << "DATA USED AT " << std::dec << useOfData << std::endl;
+        for (auto & x : stacks[useOfData]){
+            std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cout <<  x.symbolInfo.Print(5);
+            depth++;
+        }
     }
 }

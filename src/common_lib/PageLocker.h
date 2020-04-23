@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include "FileIO.h"
 #include "SkipList.h"
 
 typedef int RelockIndex;
