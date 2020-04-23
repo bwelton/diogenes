@@ -11,6 +11,8 @@
 #include "ReadStacks.h"
 #include "BinaryAddress.h"
 #include "ParseProcMap.h"
+#include "AddressSymbolizer.h"
+#include "SymbolInfo.h"
 
 int main(int argc, char * argv[]) {
     uint64_t cudaOffset = DynHelper_GetSynchronizationOffset();
@@ -33,15 +35,30 @@ int main(int argc, char * argv[]) {
 
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> stacks = ReadStacksFromMutatee(stackFileName);
     DiogenesCommon::ParseProcMap pmap(procMapName);
+    DiogenesCommon::AddressSymbolizer symbols;
 
     std::cout << "[SyncDetector::Mutator::Main] Dumping DIOG_SYNC_StackCapture.txt...." << std::endl;
     for (auto & i : stacks) {
-        std::cout << "\tStack Number: " << i.first << std::endl;
-        for (auto & x : i.second){
-            if(pmap.GetLibraryAndOffset(x)) 
-                std::cout << "\t\t" << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            else
-                std::cout << "\t\tUNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
+        std::cout << "Stack Number: " << std::dec << i.first << std::endl;
+        uint64_t depth = 1;
+        for (auto & x : stacks[i.first]){
+            if(pmap.GetLibraryAndOffset(x)) {
+                symbols.GetSymbolAtAddress(x);
+                // for (auto n : x.symbolInfo.funcName)
+                //     std::cerr << "MAIN - " << n << std::endl;
+                std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+                std::cout << x.symbolInfo.Print(5);
+            } else {
+                 std::cout << "  " << std::dec << depth << ": UNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
+            }
+            depth++;
         }
+        // std::cout << "\tStack Number: " << i.first << std::endl;
+        // for (auto & x : i.second){
+        //     if(pmap.GetLibraryAndOffset(x)) 
+        //         std::cout << "\t\t" << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+        //     else
+        //         std::cout << "\t\tUNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
+        // }
     }
 }

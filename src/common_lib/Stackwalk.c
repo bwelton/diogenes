@@ -39,18 +39,18 @@ uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 		fprintf(stderr, "No stack obtained\n");
 		return ret;
 	}
-	for (size_t i = 0; i < ret; i++) {
-		fprintf(stderr,"RA = %"PRIx64"\n", instPointerAddr[i]);
-	}
-	fprintf(stderr,"EndStack\n");
+	// for (size_t i = 0; i < ret; i++) {
+	// 	fprintf(stderr,"RA = %"PRIx64"\n", instPointerAddr[i]);
+	// }
+	//fprintf(stderr,"EndStack\n");
 	StackTrie * tree = inst->tree;
 	if (StackTrie_LookupStack(tree, instPointerAddr, (void **)data, ret) == true){
-		fprintf(stderr, "Found previous match!\n");
+		//fprintf(stderr, "Found previous match!\n");
 		return ((uint64_t*)data)[ret - 1];
 	}
 	else
 	{
-		fprintf(stderr, "New Stack Found!\n");
+		//fprintf(stderr, "New Stack Found!\n");
 		uint64_t insert[100];
 		memset((void *)insert, '\000', sizeof(uint64_t) * 100);
 		insert[ret-1] = inst->globalID;
@@ -83,12 +83,12 @@ uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
 
   StackTrie * tree = inst->tree;
   if (StackTrie_LookupStack(tree, instPointerAddr, (void **)data, pos) == true){
-	fprintf(stderr, "Found previous match!\n");
+	//fprintf(stderr, "Found previous match!\n");
 	return ((uint64_t*)data)[pos - 1];
   }
   else
   {
-	  fprintf(stderr, "New Stack Found!\n");
+	  //fprintf(stderr, "New Stack Found!\n");
 		uint64_t insert[100];
 		insert[pos-1] = inst->globalID;
 		inst->globalID++;

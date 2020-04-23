@@ -1,5 +1,6 @@
 #include "DyninstProcess.h"
 //extern BPatch bpatch;
+BPatch bpatch;
 namespace DiogenesCommon{
 DyninstProcess::DyninstProcess(int argc, char ** argv) {
 	_argv = argv;

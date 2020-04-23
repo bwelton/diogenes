@@ -8,7 +8,7 @@ std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> ReadStacksFromMut
         std::cerr << "ERROR COULD NOT OPEN STACKFILE - " << infile << std::endl;
         exit(-1);
     }
-    std::cerr << "Building hashmap from file with filesize " << fileSize << std::endl;
+    //std::cerr << "Building hashmap from file with filesize " << fileSize << std::endl;
     HashMap * map = ReadStackKeys(malloc,free, fileData, fileSize);
 
     fileSize = 0;
@@ -27,7 +27,7 @@ std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> ReadStacksFromMut
         }
         for (uint64_t j = 0; j < stackCount; j++) {
             DiogenesCommon::BinaryAddress t;
-            std::cerr << "Entry Value: Addr = " << entries[j].addr << " libname = " << entries[j].libname << std::endl;
+            //std::cerr << "Entry Value: Addr = " << entries[j].addr << " libname = " << entries[j].libname << std::endl;
             t.libraryOffset = 0; t.processAddress = 0; t.binaryName = NULL;
             std::string entryName = std::string(entries[j].libname);
             if (entryName.find("VIRTADDR") != std::string::npos)

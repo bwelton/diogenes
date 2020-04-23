@@ -4,11 +4,15 @@
 #include <inttypes.h>
 #include <memory>
 #include <thread>
-namespace DiogenesCommon{
+
+#include "SymbolInfo.h"
+namespace DiogenesCommon {
+
 struct BinaryAddress {
     uint64_t libraryOffset;
     uint64_t processAddress;
     std::shared_ptr<char> binaryName;
+    DiogenesCommon::SymbolInfo symbolInfo;
 };
 };
 #endif

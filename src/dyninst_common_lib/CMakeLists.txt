@@ -1,4 +1,4 @@
-add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp" "DyninstOneTime.cpp" "DyninstEntryExit.cpp" "ParseProcMap.cpp" "ReadStacks.cpp")
+add_library(DiogenesDyninstCommon SHARED "DynHelper.cpp" "DyninstProcess.cpp" "DyninstBinaryEdit.cpp" "DyninstOneTime.cpp" "DyninstEntryExit.cpp" "ParseProcMap.cpp" "ReadStacks.cpp" "AddressSymbolizer.cpp" "SymbolInfo.cpp")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/dyninst_common_lib/CommonDefines.h.in"

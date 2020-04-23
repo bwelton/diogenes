@@ -60,6 +60,6 @@ private:
 	bool _insertedInit;
 	BPatch_addressSpace * _aspace;
 	bool _openInsertions;
-	BPatch bpatch;
+	
 };
 }
