@@ -30,7 +30,7 @@
 #include "dynC.h"
 #include "set"
 #include "DyninstProcess.h"
-
+#include "DyninstBinaryEdit.h"
 bool OneTime_InsertOneTimeCall(DiogenesCommon::DyninstProcess * proc, std::string libname, std::string funcName);
-
+bool OneTime_InsertOneTimeCallBinary(DiogenesCommon::DyninstBinaryEdit & proc, std::string libname, std::string funcName);
 #endif

@@ -1,4 +1,4 @@
-add_library(SyncDetectorMutatee SHARED "GotchaWrappers.c" "SignalHandler.c" "SyncDetector.c")
+add_library(SyncDetectorMutatee SHARED "GotchaWrappers.c" "SignalHandler.c" "SyncDetector.c" "CPPLocker.cpp")
 
 INCLUDE_DIRECTORIES(SyncDetectorMutatee ${CUDA_TOOLKIT_ROOT_DIR}/include)
 INCLUDE_DIRECTORIES(SyncDetectorMutatee ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)

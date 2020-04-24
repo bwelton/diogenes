@@ -8,6 +8,8 @@ DiogenesCommon::DyninstBinaryEdit::DyninstBinaryEdit(std::string binName, bool o
 }
 
 DiogenesCommon::DyninstBinaryEdit::~DyninstBinaryEdit() {
+	if (_openInsertions)
+		GetAddressSpace()->finalizeInsertionSet(true);
 	if(_output)
 		if(!_be->writeFile(_outName.c_str()))
 			std::cerr << "Could not generate output binary - " << _outName << std::endl;
@@ -19,4 +21,11 @@ BPatch_image * DiogenesCommon::DyninstBinaryEdit::GetImage() {
 
 BPatch_addressSpace * DiogenesCommon::DyninstBinaryEdit::GetAddressSpace() {
 	return _as;
+}
+
+void DiogenesCommon::DyninstBinaryEdit::BeginInsertionSet() {
+	if (_openInsertions)
+		return;
+	GetAddressSpace()->beginInsertionSet();
+	_openInsertions = true;
 }

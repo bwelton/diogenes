@@ -1,5 +1,5 @@
 #include "SyncDetector.h"
-
+#include "CPPLocker.h"
 /* Gotcha wrapper declarations */ 
 gotcha_wrappee_handle_t syncdetect_cuMemAllocHost_v2_handle;
 gotcha_wrappee_handle_t syncdetect_malloc_handle;
@@ -52,7 +52,7 @@ void mutatee_init() {
 		exit(-1);
 	}
 
-	PageLocker * local_locker = PageLocker_GetThreadSpecific();
+	CPPLocker local_locker = CPPPageLocker_GetThreadSpecific();
 	dlopen("libcudart.so",RTLD_NOW);
 	fprintf(stderr,"in Warpper Main\n");
     void * lib_libcuda = dlopen("libcuda.so", RTLD_NOW);

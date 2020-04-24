@@ -1,22 +1,28 @@
 #include "SyncDetector.h"
-
+#include "CPPLocker.h"
+#include "CPPStackTree.h"
 StackwalkInst * globalWalker = NULL;
 
 volatile bool syncdetect_disablememcapture = false;
 volatile uint64_t currentStackID = 0;
 size_t pagesize = 0;
 volatile bool syncdetect_exitinit = false;
-StackTrie * syncdetect_necessary_syncs = NULL;
+CPPStackTrie syncdetect_necessary_syncs = NULL;
 
-void WriteStacktrieToFile(const char * fname, StackTrie * write) {
+void WriteStacktrieToFile(const char * fname, CPPStackTrie write) {
 	if (write == NULL)
 		return;
 	FILE * out = fopen(fname, "wb");
+	char * ptr;
+	uint64_t size = 0;
+	CPPStackTrie_ConvertTreeToStackKey(write,&ptr, &size);
+/*
 	CVector * resultVec = CVector_Init(syncdetect_malloc_wrapper, syncdetect_free_wrapper, 100000);
 	StackTrie_ConvertTreeToStackKey(write, resultVec, NULL);
 	size_t size = 0;
 	char * ptr = (char *)CVector_GetData(resultVec,&size);
 	ptr[size] = '\000';
+*/
 	fwrite(ptr, 1, size, out);
 	fclose(out);
 }
@@ -24,6 +30,7 @@ void WriteStacktrieToFile(const char * fname, StackTrie * write) {
 
 void mutatee_exit_handler() {
 	syncdetect_exitinit = true;
+	syncdetect_disablememcapture = true;
 	CaptureProcMap_Write("ProcMap.txt");
 	WriteStacktrieToFile(SYNC_STACKCOLLISION_FILE, syncdetect_necessary_syncs);
 	if (globalWalker != NULL)
@@ -33,14 +40,14 @@ void mutatee_exit_handler() {
 }
 
 uint64_t GetStackID() {
+	syncdetect_disablememcapture = true;
 	if (syncdetect_exitinit)
 		return 0;
 	if (globalWalker == NULL){
 		globalWalker = Stackwalk_Init(syncdetect_malloc_wrapper,syncdetect_free_wrapper);
 	}
 	if (syncdetect_necessary_syncs == NULL)
-		syncdetect_necessary_syncs = StackTrie_Initalize(0, NULL, syncdetect_malloc_wrapper, syncdetect_free_wrapper);
-	syncdetect_disablememcapture = true;
+		syncdetect_necessary_syncs = CPPStackTrie_Initalize();// StackTrie_Initalize(0, NULL, syncdetect_malloc_wrapper, syncdetect_free_wrapper);
 	uint64_t ret =  Stackwalk_GetStackID(globalWalker);
 	syncdetect_disablememcapture = false;
 	return ret;
@@ -52,12 +59,13 @@ void DIOG_Synchronization_Post() {
 	
 	currentStackID = GetStackID();
 	//fprintf(stderr, "Inside Synchronization - ID = %"PRIu64"\n", currentStackID);
-	PageLocker * local_locker = PageLocker_GetThreadSpecific();
-	if (PageLocker_LockMemory(local_locker) == false) {
+	CPPLocker local_locker = CPPPageLocker_GetThreadSpecific();
+	if (CPPPageLocker_LockMemory(local_locker) == false) {
 		// Assume we have an address that is unlockable, this means
 		// that we cannot detect potential uses and we should assume
 		// that the synchronization is required
-		PageLocker_UnlockMemory(local_locker);
+		CPPPageLocker_UnlockMemory(local_locker);
+		CPPPageLocker_ClearToLockPages(local_locker);
 		syncdetect_WriteNecessarySync(currentStackID,currentStackID);
 	}
 }
@@ -79,26 +87,28 @@ void * syncdetect_malloc(size_t size) {
 	if (pagesize == 0)
 		pagesize = getpagesize();
 	//fprintf(stderr,"IN MALLOC\n");
-	if (syncdetect_disablememcapture)
+	if (syncdetect_disablememcapture){
 		return syncdetect_malloc_wrapper(size);
+	}
 	//void * ret= syncdetect_malloc_wrapper(size);
     void * ret= memalign(pagesize,GetPageRound(size));
     if(!syncdetect_exitinit)
-    	PageLocker_AddMemoryAllocation(ret, GetPageRound(size));
+    	CPPPageLocker_AddMemoryAllocation(CPPPageLocker_GetThreadSpecific(), ret, GetPageRound(size));
     return ret;
 }
 
+void syncdetect_free(void * ptr) {
+	if(!syncdetect_exitinit && syncdetect_disablememcapture == false)
+		CPPPageLocker_FreeMemoryAllocation(CPPPageLocker_GetThreadSpecific(),ptr);
+    return syncdetect_free_wrapper(ptr);
+}
 int syncdetect_cuMemFreeHost(void * ptr) {
 	cuMemHostUnregister(ptr);
-	free(ptr);
+	syncdetect_free(ptr);
 	return (int)CUDA_SUCCESS;
 }
 
-void syncdetect_free(void * ptr) {
-	if(!syncdetect_exitinit)
-		PageLocker_FreeMemoryAllocation(PageLocker_GetThreadSpecific(),ptr);
-    return syncdetect_free_wrapper(ptr);
-}
+
 
 int syncdetect_cuMemAllocManaged(void ** ptr, size_t len, unsigned int flags) {
 	//fprintf(stderr , "In Malloc Managed\n");
@@ -107,8 +117,8 @@ int syncdetect_cuMemAllocManaged(void ** ptr, size_t len, unsigned int flags) {
 
 inline RelockIndex syncdetect_Pretransfer(void * memAddr, size_t size) {
 	if (!syncdetect_exitinit){
-		PageLocker * local_locker = PageLocker_GetThreadSpecific();
-		return PageLocker_TempUnlockAddress(local_locker, memAddr,size);
+		CPPLocker local_locker = CPPPageLocker_GetThreadSpecific();
+		return CPPPageLocker_TempUnlockAddress(local_locker, memAddr,size);
 	}
 	return -1;
 }
@@ -116,12 +126,12 @@ inline RelockIndex syncdetect_Pretransfer(void * memAddr, size_t size) {
 
 inline void syncdetect_LockAddress(void * memAddr, size_t size, RelockIndex index) {
 	if (!syncdetect_exitinit) {
-		PageLocker * local_locker = PageLocker_GetThreadSpecific();
+		CPPLocker local_locker = CPPPageLocker_GetThreadSpecific();
 		if (index != -1){
-			PageLocker_RelockIndex(local_locker, index);
+			CPPPageLocker_RelockIndex(local_locker, index);
 			return;
 		} else {
-			PageLocker_AddTransferPage(local_locker,memAddr,size);
+			CPPPageLocker_AddTransferPage(local_locker,memAddr,size);
 		}
 	}
 }

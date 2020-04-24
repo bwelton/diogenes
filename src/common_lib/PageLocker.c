@@ -12,6 +12,7 @@ void PageMemArrays_Initalize(PageMemArrays ** memArray) {
 }
 
 void PageLocker_Initalize(PageLocker ** locker) {
+	fprintf(stderr, "Initing page locker\n");
 	(*locker) = (PageLocker*)valloc(sizeof(PageLocker));
 	(*locker)->pagesToLock = NULL;
 	(*locker)->pagesLocked = NULL;
@@ -155,7 +156,6 @@ void PageLocker_RelockIndex(PageLocker * locker, RelockIndex index) {
 }
 
 int PageLocker_UnlockMemory(PageLocker * locker) {
-		fprintf(stderr,"In UnlockMemory\n");
 	PageMemArrays * lockedPages = locker->pagesLocked;
 	PageMemArrays * pagesToLock = locker->pagesToLock;
 	int iter = lockedPages->count;

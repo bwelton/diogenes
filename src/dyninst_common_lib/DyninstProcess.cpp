@@ -243,17 +243,17 @@ BPatch_addressSpace * DyninstProcess::LaunchMPIProcess() {
 	return handle;
 }
 
-
+#include <sys/wait.h>
 void DyninstProcess::DetachForDebug() {
 	std::cerr << "FOR DEBUG PURPOSES ONLY!!!!!!" << std::endl;
 	std::cerr << "We will now detach from the process and spin forever.... " << std::endl;
 	if (_openInsertions)
 		_aspace->finalizeInsertionSet(false);
 	BPatch_process * appProc = dynamic_cast<BPatch_process*>(_aspace);
-	appProc->detach(false);
-	while(1) {
-		sleep(10);
-	}
+	int pid = appProc->getPid();
+	appProc->detach(true);
+	int status;
+	waitpid(pid,&status,0);
 }
 
 BPatch_addressSpace * DyninstProcess::GetAddressSpace() {

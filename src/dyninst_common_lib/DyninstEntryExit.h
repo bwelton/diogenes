@@ -30,7 +30,8 @@
 #include "dynC.h"
 #include "set"
 #include "DyninstProcess.h"
-
+#include "DyninstBinaryEdit.h"
 
 bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, std::string insertLib, uint64_t addr,  std::string wrapperLib, std::string entryFunc, std::string exitFunc);
+bool DynEntryExit_InsertAtAddrBinary(DiogenesCommon::DyninstBinaryEdit & proc, std::string insertLib, uint64_t addr,  std::string wrapperLib, std::string entryFunc, std::string exitFunc);
 #endif

@@ -18,6 +18,7 @@
 #include "StackTrie.h"
 #include "SyncdetectFilenames.h"
 #include "CaptureProcMap.h"
+#include "CPPStackTree.h"
 
 
 typedef struct NecessarySyncs{
@@ -57,5 +58,6 @@ extern typeof(&syncdetect_cuMemcpyAsync) syncdetect_cuMemcpyAsync_wrapper;
 extern StackwalkInst * globalWalker;
 extern volatile uint64_t currentStackID;
 extern volatile bool syncdetect_exitinit;
-extern StackTrie * syncdetect_necessary_syncs;
+extern CPPStackTrie syncdetect_necessary_syncs;
+extern volatile bool syncdetect_disablememcapture;
 #endif

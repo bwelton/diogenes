@@ -29,8 +29,7 @@ bool DynHelper_CheckIfFileExists (const std::string& name) {
     return f.good();
 }
 
-uint64_t DynHelper_GetSynchronizationOffset() {
-	std::string ret;
+uint64_t DynHelper_GetSynchronizationOffset(std::string & ret) {
 	return CSA_FindSyncAddress(ret);
 }
 

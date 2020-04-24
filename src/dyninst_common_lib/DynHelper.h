@@ -46,5 +46,5 @@ BPatch_function * DynHelper_GetFuncAtAddress(BPatch_addressSpace * aspace, std::
 BPatch_function * DynHelper_GetFuncByName(BPatch_addressSpace * aspace, std::string libname, std::string funcName);
 std::string DynHelper_GetInstallDirectory();
 bool DynHelper_CheckIfFileExists(const std::string& name);
-uint64_t DynHelper_GetSynchronizationOffset();
+uint64_t DynHelper_GetSynchronizationOffset(std::string & ret);
 #endif

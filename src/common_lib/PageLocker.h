@@ -30,6 +30,7 @@ extern "C" {
 #endif
 PageLocker * PageLocker_GetThreadSpecific();
 PageLocker * PageLocker_GetThreadSpecificSignalSafe();
+
 void PageLocker_FreeMemoryAllocation(PageLocker * locker, void * mem);
 void PageLocker_AddMemoryAllocation(void * mem, size_t size);
 void PageMemArrays_Initalize(PageMemArrays ** memArray);

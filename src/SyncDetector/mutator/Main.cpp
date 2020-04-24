@@ -3,6 +3,7 @@
 #include <sstream> 
 #include <iostream>  
 #include <vector>
+#include <unistd.h>
 #include <map>
 #include "DynHelper.h"
 #include "DyninstProcess.h"
@@ -13,22 +14,25 @@
 #include "ParseProcMap.h"
 #include "AddressSymbolizer.h"
 #include "SymbolInfo.h"
-
+#include "DyninstBinaryEdit.h"
 int main(int argc, char * argv[]) {
-    uint64_t cudaOffset = DynHelper_GetSynchronizationOffset();
+    std::string libcudaTest;
+    uint64_t cudaOffset = DynHelper_GetSynchronizationOffset(libcudaTest); 
     std::cout << "We found cuda offset at location: " << std::hex << cudaOffset << std::endl;
 
     if (argc < 2) {
         std::cerr << "Expected arguments  <application> <application args>" << std::endl;
         return -1;
     }
+
     DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
     proc.LaunchProcess();
     proc.LoadLibrary("libcuda.so");
     proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"));
     DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
-    proc.RunUntilCompleation(std::string(""));
+    proc.DetachForDebug();
+    //proc.RunUntilCompleation(std::string(""));
     
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
     char collisionFileName[] = "DIOG_SYNC_StackCollision.txt";
@@ -46,13 +50,7 @@ int main(int argc, char * argv[]) {
         for (auto & x : stacks[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
                 symbols.GetSymbolAtAddress(x);
-                // for (auto n : x.symbolInfo.funcName)
-                //     std::cerr << "MAIN - " << n << std::endl;
-                //std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-                //std::cout << x.symbolInfo.Print(5);
-            } else {
-                //std::cout << "  " << std::dec << depth << ": UNKNOWN_LIB@" << std::hex << x.processAddress << std::endl;
-            }
+            } 
             depth++;
         }
     }
@@ -76,3 +74,28 @@ int main(int argc, char * argv[]) {
         }
     }
 }
+    // Code for writing binaries, stackwalking just doesn't work right now though
+    // {
+    //     std::string loadingLibrary = std::string(buff);
+    //     DiogenesCommon::DyninstBinaryEdit editor(libcudaTest, true, loadingLibrary + std::string("/libcuda.so"));
+    //     loadingLibrary = DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so");
+    //     editor.GetAddressSpace()->loadLibrary(loadingLibrary.c_str());
+    //     DynEntryExit_InsertAtAddrBinary(editor,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
+    // }
+    // {
+    //     std::string loadingLibrary = std::string(buff);
+    //     DiogenesCommon::DyninstBinaryEdit editor(std::string(argv[1]), true, loadingLibrary + std::string("/inst_app"));
+    //     loadingLibrary = DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so");
+    //     std::vector<BPatch_function *> funcs;
+    //     BPatch_function * found = NULL;
+    //     editor.GetImage()->getProcedures(funcs, false);
+    //     for (auto i : funcs) {
+    //         if (i->getMangledName() == std::string("_start")){
+    //             found  = i;
+    //             break;
+    //         }
+    //     }
+    //     editor.GetAddressSpace()->loadLibrary(loadingLibrary.c_str());
+    //     DynEntryExit_InsertAtAddrBinary(editor,std::string(argv[1]), (uint64_t)found->getBaseAddr(),DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string("mutatee_init"), std::string(""));
+    // }
+    // exit(0);

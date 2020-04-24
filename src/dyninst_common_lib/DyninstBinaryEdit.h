@@ -34,13 +34,14 @@ public:
 	BPatch_image * GetImage();
 	BPatch_addressSpace * GetAddressSpace();
 	~DyninstBinaryEdit();
-
+	void BeginInsertionSet();
 private:
 	BPatch_addressSpace * _as;
 	BPatch_binaryEdit * _be;
 	std::string _binName;
 	bool _output;
 	std::string _outName;
+	bool _openInsertions;
 
 };
 };
