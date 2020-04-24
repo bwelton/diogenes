@@ -12,6 +12,8 @@ gotcha_wrappee_handle_t memgraph_cuMemcpyDtoHAsync_v2_handle;
 gotcha_wrappee_handle_t memgraph_cuMemcpyHtoDAsync_v2_handle;
 gotcha_wrappee_handle_t memgraph_cuMemcpyAsync_handle;
 gotcha_wrappee_handle_t memgraph_cuMemFreeHost_handle;
+gotcha_wrappee_handle_t memgraph_cuMemAlloc_handle;
+gotcha_wrappee_handle_t memgraph_cuMemFree_handle;
 
 typeof(&memgraph_cuMemAllocHost_v2) memgraph_cuMemAllocHost_v2_wrapper;
 typeof(&memgraph_malloc) memgraph_malloc_wrapper;
@@ -23,7 +25,8 @@ typeof(&memgraph_cuMemcpyDtoHAsync_v2) memgraph_cuMemcpyDtoHAsync_v2_wrapper;
 typeof(&memgraph_cuMemcpyHtoDAsync_v2) memgraph_cuMemcpyHtoDAsync_v2_wrapper;
 typeof(&memgraph_cuMemcpyAsync) memgraph_cuMemcpyAsync_wrapper;
 typeof(&memgraph_cuMemFreeHost) memgraph_cuMemFreeHost_wrapper;
-
+typeof(&memgraph_cuMemAlloc) memgraph_cuMemAlloc_wrapper;
+typeof(&memgraph_cuMemFree) memgraph_cuMemFree_wrapper;
 /*end*/
 
 struct gotcha_binding_t gotcha_Binder_Funcs[] = {{"cuMemHostAlloc",(void*)memgraph_cuMemAllocHost_v2,&memgraph_cuMemAllocHost_v2_handle},
@@ -36,6 +39,8 @@ struct gotcha_binding_t gotcha_Binder_Funcs[] = {{"cuMemHostAlloc",(void*)memgra
 												 {"cuMemcpyHtoDAsync_v2",(void*)memgraph_cuMemcpyHtoDAsync_v2,&memgraph_cuMemcpyHtoDAsync_v2_handle},
 												 {"cuMemcpyAsync",(void*)memgraph_cuMemcpyAsync,&memgraph_cuMemcpyAsync_handle},
 												 {"cuMemHostFree",(void*)memgraph_cuMemFreeHost,&memgraph_cuMemFreeHost_handle},
+												 {"cuMemAlloc_v2",(void*)memgraph_cuMemAlloc,&memgraph_cuMemAlloc_handle},
+												 {"cuMemFree_v2",(void*)memgraph_cuMemFree,&memgraph_cuMemFree_handle},
 												};
 void mutatee_init() {
 	//PageLocker_Initalize()
@@ -56,5 +61,7 @@ void mutatee_init() {
 	memgraph_cuMemcpyHtoDAsync_v2_wrapper = (typeof(&memgraph_cuMemcpyHtoDAsync_v2))dlsym(lib_libcuda,"cuMemcpyHtoDAsync_v2");
 	memgraph_cuMemcpyAsync_wrapper = (typeof(&memgraph_cuMemcpyAsync))dlsym(lib_libcuda,"cuMemcpyAsync");
 	memgraph_cuMemFreeHost_wrapper = (typeof(&memgraph_cuMemFreeHost))dlsym(lib_libcuda,"cuMemFreeHost");
+	memgraph_cuMemAlloc_wrapper = (typeof(&memgraph_cuMemAlloc))dlsym(lib_libcuda,"cuMemAlloc_v2");
+	memgraph_cuMemFree_wrapper = (typeof(&memgraph_cuMemFree))dlsym(lib_libcuda,"cuMemFree_v2");
 	gotcha_wrap(gotcha_Binder_Funcs, sizeof(gotcha_Binder_Funcs)/sizeof(struct gotcha_binding_t), "binderWrappers");
 }

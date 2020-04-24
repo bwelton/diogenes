@@ -39,6 +39,8 @@ int memgraph_cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void* srcHost, si
 int memgraph_cuMemcpyAsync(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount, CUstream hStream);
 int memgraph_cuMemFreeHost(void * ptr);
 void memgraph_free(void * ptr);
+int memgraph_cuMemAlloc(void ** ptr, size_t size) ;
+int memgraph_cuMemFree(void* ptr);
 uint64_t GetStackID();
 
 // Global wrapper variables
@@ -52,6 +54,8 @@ extern typeof(&memgraph_cuMemcpyDtoHAsync_v2) memgraph_cuMemcpyDtoHAsync_v2_wrap
 extern typeof(&memgraph_cuMemcpyHtoDAsync_v2) memgraph_cuMemcpyHtoDAsync_v2_wrapper;
 extern typeof(&memgraph_cuMemcpyAsync) memgraph_cuMemcpyAsync_wrapper;
 extern typeof(&memgraph_cuMemFreeHost) memgraph_cuMemFreeHost_wrapper;
+extern typeof(&memgraph_cuMemAlloc) memgraph_cuMemAlloc_wrapper;
+extern typeof(&memgraph_cuMemFree) memgraph_cuMemFree_wrapper;
 extern StackwalkInst * memgraph_globalWalker;
 extern volatile uint64_t currentStackID;
 extern volatile bool memgraph_exitinit;

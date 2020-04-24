@@ -110,7 +110,12 @@ int memgraph_cuMemAllocHost_v2(void ** ptr, size_t size) {
 		memgraph_handleallocation((uint64_t)(*ptr), size);
 	return ret;
 }
-
+int memgraph_cuMemAlloc(void ** ptr, size_t size) {
+	int ret = memgraph_cuMemAlloc_wrapper(ptr,size);
+	if (*ptr != NULL)
+		memgraph_handleallocation((uint64_t)(*ptr), size);
+	return ret;
+}
 int memgraph_cuMemFreeHost(void * ptr) {
 	if(ptr!=NULL)
 		memgraph_handlefree((uint64_t)ptr);
@@ -122,6 +127,13 @@ void memgraph_free(void * ptr) {
 		memgraph_handlefree((uint64_t)ptr);
 	memgraph_free_wrapper(ptr);
 	return;
+}
+
+int memgraph_cuMemFree(void * ptr) {
+	if(ptr!=NULL)
+		memgraph_handlefree((uint64_t)ptr);
+	int ret = memgraph_cuMemFree_wrapper(ptr);
+	return ret;
 }
 
 int memgraph_cuMemAllocManaged(void ** ptr, size_t len, unsigned int flags) {
