@@ -25,6 +25,7 @@ StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)
 uint64_t Stackwalk_GetStackID(StackwalkInst * swalk);
 uint64_t Stackwalk_GetStackIDLibunwind(StackwalkInst * inst);
 char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size);
+uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst);
 #ifdef __cplusplus
 }
 #endif

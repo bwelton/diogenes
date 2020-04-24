@@ -1,16 +1,16 @@
-add_library(MemGraphBuildMutatee SHARED "GotchaWrappers.c" "SignalHandler.c" "SyncDetector.c")
+add_library(MemGraphMutateeLib SHARED "AllocationTracker.cpp" "GotchaWrappers.cpp" "MemGraph.cpp")
 
-INCLUDE_DIRECTORIES(MemGraphBuildMutatee ${CUDA_TOOLKIT_ROOT_DIR}/include)
-INCLUDE_DIRECTORIES(MemGraphBuildMutatee ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
-INCLUDE_DIRECTORIES(MemGraphBuildMutatee ${GOTCHA_INSTALL_DIR}/include)
-INCLUDE_DIRECTORIES(MemGraphBuildMutatee ${CMAKE_SOURCE_DIR}/src/common_lib)
-INCLUDE_DIRECTORIES(MemGraphBuildMutatee ${CMAKE_SOURCE_DIR}/src/SyncDetector/common)
-add_dependencies(MemGraphBuildMutatee DiogenesCommon)
-target_link_libraries(MemGraphBuildMutatee DiogenesCommon)
-target_link_libraries(MemGraphBuildMutatee "-L${GOTCHA_INSTALL_DIR}/lib -lgotcha")
-target_link_libraries(MemGraphBuildMutatee "-lpthread -ldl")
+INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CUDA_TOOLKIT_ROOT_DIR}/include)
+INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)
+INCLUDE_DIRECTORIES(MemGraphMutateeLib ${GOTCHA_INSTALL_DIR}/include)
+INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CMAKE_SOURCE_DIR}/src/common_lib)
+INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CMAKE_SOURCE_DIR}/src/MemGraph/common)
+add_dependencies(MemGraphMutateeLib DiogenesCommon)
+target_link_libraries(MemGraphMutateeLib DiogenesCommon)
+target_link_libraries(MemGraphMutateeLib "-L${GOTCHA_INSTALL_DIR}/lib -lgotcha")
+target_link_libraries(MemGraphMutateeLib "-lpthread -ldl")
 
-install(TARGETS MemGraphBuildMutatee
+install(TARGETS MemGraphMutateeLib
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib/static
         RUNTIME DESTINATION bin

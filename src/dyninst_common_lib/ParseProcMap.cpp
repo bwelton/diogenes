@@ -32,8 +32,10 @@ bool ParseProcMap::GetLibraryAndOffset(BinaryAddress & in) {
         in.libraryOffset = (in.processAddress - (uint64_t)s.addr_start) + s.offset;
         if (strlen(s.pathname) > 0)
             in.binaryName = _pathnameMap[std::string(s.pathname)];
-        else
+        else {
             in.binaryName = NULL;
+            return false;
+        }
         return true;
     }
     return false;

@@ -156,6 +156,8 @@ std::vector<std::string> DiogenesCommon::SymbolStorage::GetFunctionAtOffset(uint
 }
 
 void DiogenesCommon::AddressSymbolizer::GetSymbolAtAddress(BinaryAddress & addr) {
+    if (addr.binaryName == NULL)
+        return;
     std::string libname = std::string(addr.binaryName.get());
     if (libname.find("VIRTADDR") != std::string::npos)
         return;

@@ -13,10 +13,11 @@
 #include <string.h>
 #include <malloc.h>
 #include <execinfo.h>
+#include "AllocationTracker.h"
 #include "PageLocker.h"
 #include "Stackwalk.h"
 #include "StackTrie.h"
-#include "SyncdetectFilenames.h"
+#include "MemGraphFilenames.h"
 #include "CaptureProcMap.h"
 
 
@@ -50,7 +51,8 @@ extern typeof(&memgraph_free) memgraph_free_wrapper;
 extern typeof(&memgraph_cuMemcpyDtoHAsync_v2) memgraph_cuMemcpyDtoHAsync_v2_wrapper;
 extern typeof(&memgraph_cuMemcpyHtoDAsync_v2) memgraph_cuMemcpyHtoDAsync_v2_wrapper;
 extern typeof(&memgraph_cuMemcpyAsync) memgraph_cuMemcpyAsync_wrapper;
-extern StackwalkInst * globalWalker;
+extern typeof(&memgraph_cuMemFreeHost) memgraph_cuMemFreeHost_wrapper;
+extern StackwalkInst * memgraph_globalWalker;
 extern volatile uint64_t currentStackID;
 extern volatile bool memgraph_exitinit;
 extern StackTrie * memgraph_necessary_syncs;

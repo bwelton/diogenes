@@ -33,7 +33,9 @@ StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)
 uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 	uint64_t instPointerAddr[100];
 	uint64_t data = 0;
+	//puts("Getting Stackwalk...");
 	size_t ret = FPStackWalker_GetStackFP(instPointerAddr, 100);
+	//puts("Got Stackwalk...");
 	if (ret == 0){
 		fprintf(stderr, "No stack obtained\n");
 		return ret;
@@ -58,40 +60,43 @@ uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 
 
 uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
-//   unw_cursor_t cursor; unw_context_t uc;
-//   unw_word_t ip, sp;
+  unw_cursor_t cursor; unw_context_t uc;
+  unw_word_t ip, sp;
 
-//   uint64_t instPointerAddr[100];
-//   uint64_t data[100];
-//   size_t pos = 0;
-//   unw_getcontext(&uc);
-//   unw_init_local(&cursor, &uc);
-//   while (unw_step(&cursor) > 0) {
-//     unw_get_reg(&cursor, UNW_REG_IP, &ip);
-// 	if (ip == 0)
-// 		continue;
-// 	instPointerAddr[pos] = (uint64_t)ip;
-// 	pos++;
-// 	if (pos >= 100)
-// 		assert(1 == 0);
-//     fprintf(stdout,"[Stackwalk_GetStackID_libunwind] ip = %lx\n", (long) ip);
-//   }
+  uint64_t instPointerAddr[100];
+  uint64_t data;
+  size_t pos = 0;
+  unw_getcontext(&uc);
+  unw_init_local(&cursor, &uc);
+  while (unw_step(&cursor) > 0) {
+    unw_get_reg(&cursor, UNW_REG_IP, &ip);
+	if (ip == 0)
+		continue;
+	instPointerAddr[pos] = (uint64_t)ip;
+	pos++;
+	if (pos >= 100)
+		assert(1 == 0);
+    //fprintf(stdout,"[Stackwalk_GetStackID_libunwind] ip = %lx\n", (long) ip);
+  }
 
-//   StackTrie * tree = inst->tree;
-//   if (StackTrie_LookupStack(tree, instPointerAddr, (void **)data, pos) == true){
-// 	return ((uint64_t*)data)[pos - 1];
-//   }
-//   else
-//   {
-// 		uint64_t insert[100];
-// 		memset((void *)insert, '\000', sizeof(uint64_t) * 100);
-// 		insert[pos-1] = inst->globalID;
-// 		inst->globalID++;
-// 		StackTrie_InsertStack(tree, instPointerAddr, (void **)insert, pos);
-// 		return insert[pos-1];	  
-//   }
+  StackTrie * tree = inst->tree;
+  if (CPPStackTrie_LookupStack(tree, instPointerAddr, &data, pos) == true){
+	return data;
+  }
+  else
+  {
+		data = inst->globalID;
+		inst->globalID++;
+		CPPStackTrie_InsertStack(tree, instPointerAddr, &data, pos);
+		return data;	  
+  }
 }
-
+uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst) {
+	pthread_mutex_lock(&lock); 
+	uint64_t ret =  Stackwalk_GetStackID_libunwind(inst);
+	pthread_mutex_unlock(&lock); 
+	return ret;
+}
 uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
 	pthread_mutex_lock(&lock); 
 #ifdef USE_GNU_BACKTRACE

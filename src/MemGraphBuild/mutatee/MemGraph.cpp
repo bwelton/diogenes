@@ -1,4 +1,4 @@
-#include "SyncDetector.h"
+#include "MemGraph.h"
 
 /* Gotcha wrapper declarations */ 
 gotcha_wrappee_handle_t memgraph_cuMemAllocHost_v2_handle;
@@ -39,6 +39,7 @@ struct gotcha_binding_t gotcha_Binder_Funcs[] = {{"cuMemHostAlloc",(void*)memgra
 												};
 void mutatee_init() {
 	//PageLocker_Initalize()
+	memgraph_globalWalker = Stackwalk_Init(malloc,free);
 	atexit(mutatee_exit_handler);
 	dlopen("libcudart.so",RTLD_NOW);
 	fprintf(stderr,"in Warpper Main\n");
