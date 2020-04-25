@@ -106,6 +106,87 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> NormalizeMemGraph(
 }
 
 
+std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessaryCudaFreeSyncs(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& syncStacks,
+                                                                                         std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& syncCollisions, 
+                                                                                         std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& memgraphStacks) {
+    std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> ret;
+    std::set<uint64_t> requiredSyncs;
+    for (auto i : syncCollisions) {
+        assert(i.second.size() == 2);
+        requiredSyncs.insert(i.second[0].processAddress);
+    }
+    DiogenesCommon::BinaryAddress empty;
+    DiogenesCommon::BinaryAddressTree buildUniqueIdentiferTree(empty, false);
+    
+    std::set<uint64_t> syncs = DiogenesCommon::FindSynchronizations(syncStacks);
+    std::map<uint64_t, std::shared_ptr<std::set<uint64_t>> > aliasMap;
+    aliasMap.clear();
+    for(auto i : syncs) {
+        aliasMap[i] = std::shared_ptr<std::set<uint64_t>>(new std::set<uint64_t>());
+        aliasMap[i]->insert(i);
+    }
+
+    std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> normalizedSync = NormalizeSyncStacks( syncStacks,syncs);
+    for (auto t : normalizedSync) {
+        uint64_t i = t.first;
+        uint64_t existing = buildUniqueIdentiferTree.InsertElement(t.second, t.first, 0);
+        if (i != existing) {
+            if (aliasMap[i] != aliasMap[existing]) {
+                aliasMap[i]->insert(aliasMap[existing]->begin(), aliasMap[existing]->end());
+                aliasMap[i]->insert(i);
+                aliasMap[i]->insert(existing);
+                aliasMap[existing] = aliasMap[i];
+            }
+        }
+    }
+    std::set<uint64_t> tmpRequired = requiredSyncs;
+    for (auto i : tmpRequired) {
+        requiredSyncs.insert(aliasMap[i]->begin(), aliasMap[i]->end());
+    }
+    std::set<uint64_t> libcFreeCalls = DiogenesCommon::FindFree(memgraphStacks);
+    std::set<uint64_t> libcMemoryAllocs = DiogenesCommon::FindMalloc(memgraphStacks);
+    libcMemoryAllocs.insert(libcFreeCalls.begin(), libcFreeCalls.end());
+    std::set<uint64_t> tmpFree = DiogenesCommon::FindCudaFree(memgraphStacks);
+    
+    // libc free can take place in a transfer call, we want transfers only
+    std::set<uint64_t> cudaFreeOps = tmpFree;
+    for (auto i : libcMemoryAllocs) {
+        if (cudaFreeOps.find(i) != cudaFreeOps.end())
+            cudaFreeOps.erase(i);
+    }
+    std::set<uint64_t> cudaFreeToCorrect;
+    std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> normalizedMG =  NormalizeMemGraph( memgraphStacks,cudaFreeOps);    
+     for(auto i : cudaFreeOps) {
+        if (normalizedMG.find(i) == normalizedMG.end())
+            continue;
+        std::vector<DiogenesCommon::BinaryAddress> cur = normalizedMG[i];
+        std::cout << "NEW STACK START" << std::endl;
+        for (auto & x : cur){
+            std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cout <<  x.symbolInfo.Print(5);
+        }
+        uint64_t syncStackID = 0;
+        for(auto x : buildUniqueIdentiferTree._children){
+            if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
+                if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
+                    std::cout << "FOUND MATCH " << std::endl;
+                    syncStackID = x->FindElement(cur, 1);
+                    break;
+                }
+            }
+        }
+        std::cout << "Matched - MemGraph Stack " << std::dec << i  << " with SyncDetect Stack " << syncStackID << std::endl;
+        if (requiredSyncs.find(syncStackID) == requiredSyncs.end() && syncStackID != 0){
+            std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
+            cudaFreeToCorrect.insert(i);
+        }
+    }
+    for (auto i : cudaFreeToCorrect) {
+        ret[i]=normalizedMG[i];
+    }
+    return ret;
+}
+
 std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySyncTrans(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& syncStacks,
                                                                       std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& syncCollisions, 
                                                                       std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>>& memgraphStacks){
@@ -140,7 +221,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
                 aliasMap[existing] = aliasMap[i];
             }
         }
-        std::cout << "NEW STACK START With ID " << std::dec << existing << std::endl;
+        //std::cout << "NEW STACK START With ID " << std::dec << existing << std::endl;
         for (auto & x : t.second){
             std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
             std::cout <<  x.symbolInfo.Print(5);
@@ -155,7 +236,9 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
     for(auto x : buildUniqueIdentiferTree._children){
         std::cout << x->_binAddr.symbolInfo.Print(4) << std::endl;
     }
+    std::set<uint64_t> libcFreeCalls = DiogenesCommon::FindFree(memgraphStacks);
     std::set<uint64_t> libcMemoryAllocs = DiogenesCommon::FindMalloc(memgraphStacks);
+    libcMemoryAllocs.insert(libcFreeCalls.begin(), libcFreeCalls.end());
     std::set<uint64_t> tempTrans = DiogenesCommon::FindTransfers(memgraphStacks);
     
     // libc malloc can take place in a transfer call, we want transfers only
@@ -167,53 +250,6 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
     }
     
     transfers.insert(transfersVec.begin(), transfersVec.end());
-
-    // for(auto i : syncs) {
-    //     aliasMap[i] = std::shared_ptr<std::set<uint64_t>>(new std::set<uint64_t>());
-    //     aliasMap[i]->insert(i);
-    // }
-
- 
-
-
-    // for (auto i : syncs) {
-    //     std::vector<DiogenesCommon::BinaryAddress> cur;
-    //     for (auto entry : syncStacks[i]) {
-    //         bool skip = false;
-    //         if (cur.size() > 0) {
-    //             if (cur.back().binaryName.get() != NULL && entry.binaryName.get() != NULL){
-    //                 std::string tmpStr = std::string(cur.back().binaryName.get());
-    //                 std::string tmpStr2 = std::string(entry.binaryName.get());
-    //                 if (tmpStr2.find("libcuda.so") != std::string::npos && 
-    //                     tmpStr.find("libcuda.so") != std::string::npos) {
-    //                     cur.clear();
-    //                 }
-    //             }
-    //             if (entry.binaryName.get() != NULL) {
-    //                 std::string tmpStr2 = std::string(entry.binaryName.get());
-    //                 if (tmpStr2.find(installDirectory) != std::string::npos)
-    //                     skip = true;
-    //             }
-    //         }
-    //         if(!skip)
-    //             cur.push_back(entry);
-    //     }
-    //     std::cout << "Inserting stack of size " << cur.size() << std::endl;
-    //     uint64_t existing = buildUniqueIdentiferTree.InsertElement(cur, i, 0);
-    //     if (i != existing) {
-    //         if (aliasMap[i] != aliasMap[existing]) {
-    //             aliasMap[i]->insert(aliasMap[existing]->begin(), aliasMap[existing]->end());
-    //             aliasMap[i]->insert(i);
-    //             aliasMap[i]->insert(existing);
-    //             aliasMap[existing] = aliasMap[i];
-    //         }
-    //     }
-    //     std::cout << "NEW STACK START With ID " << std::dec << existing << std::endl;
-    //     for (auto & x : cur){
-    //         std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-    //         std::cout <<  x.symbolInfo.Print(5);
-    //     }
-    // }
 
     std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> normalizedMG =  NormalizeMemGraph( memgraphStacks,transfers);
     std::set<uint64_t> transToCorrect;
@@ -237,7 +273,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
             }
         }
         std::cout << "Matched - MemGraph Stack " << std::dec << i  << " with SyncDetect Stack " << syncStackID << std::endl;
-        if (requiredSyncs.find(syncStackID) == requiredSyncs.end()){
+        if (requiredSyncs.find(syncStackID) == requiredSyncs.end() && syncStackID != 0){
             std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
             transToCorrect.insert(i);
         }
@@ -246,58 +282,6 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         ret[i]=normalizedMG[i];
     }
 
-    // std::map<std::string, std::string> memGraphTranslate = {{"memgraph_cuMemAllocHost_v2","cuMemAllocHost_v2"},
-    //                                                         {"memgraph_malloc","malloc"},
-    //                                                         {"memgraph_cuMemAllocManaged","cuMemAllocManaged"},
-    //                                                         {"memgraph_cuMemcpyHtoD_v2","cuMemcpyHtoD_v2"},
-    //                                                         {"memgraph_cuMemcpyDtoH_v2","cuMemcpyDtoH_v2"},
-    //                                                         {"memgraph_cuMemcpyDtoHAsync_v2","cuMemcpyDtoHAsync_v2"},
-    //                                                         {"memgraph_cuMemcpyHtoDAsync_v2","cuMemcpyHtoDAsync_v2"},
-    //                                                         {"memgraph_cuMemcpyAsync","cuMemcpyAsync"},
-    //                                                         {"memgraph_cuMemFreeHost","cuMemFreeHost"},
-    //                                                         {"memgraph_free","free"},
-    //                                                         {"memgraph_cuMemAlloc","cuMemAlloc_v2"},
-    //                                                         {"memgraph_cuMemFree","cuMemFree_v2"}};
-    // std::set<uint64_t> transToCorrect;
-    // for(auto i : transfers) {
-    //     std::vector<DiogenesCommon::BinaryAddress> cur;
-    //     for (auto entry : memgraphStacks[i]) {
-    //         bool found = false;
-    //         std::string newFunc;
-    //         for(auto fname : entry.symbolInfo.funcName) {
-    //             if (memGraphTranslate.find(fname) != memGraphTranslate.end()){
-    //                 cur.clear();
-    //                 newFunc=memGraphTranslate[fname];
-    //                 found = true;
-    //             }
-    //         }
-    //         if (found) {
-    //             entry.symbolInfo.funcName.clear();
-    //             entry.symbolInfo.funcName.push_back(newFunc);
-    //         }
-    //         cur.push_back(entry);
-    //     }
-    //     std::cout << "NEW STACK START" << std::endl;
-    //     for (auto & x : cur){
-    //         std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-    //         std::cout <<  x.symbolInfo.Print(5);
-    //     }
-    //     uint64_t syncStackID = 0;
-    //     for(auto x : buildUniqueIdentiferTree._children){
-    //         if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
-    //             if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
-    //                 std::cout << "FOUND MATCH " << std::endl;
-    //                 syncStackID = x->FindElement(cur, 1);
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     std::cout << "Matched - MemGraph Stack " << std::dec << i  << " with SyncDetect Stack " << syncStackID << std::endl;
-    //     if (requiredSyncs.find(syncStackID) == requiredSyncs.end()){
-    //         std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
-    //         transToCorrect.insert(i);
-    //     }
-    // }
     return ret;
 }
 
@@ -326,6 +310,7 @@ void GenerateAutocorrection() {
     //GetSymbolsForStacks(symbols, syncPMap, syncCollisions);
     GetSymbolsForStacks(symbols, memGraphPMap, memgraphStacks);
     auto tmp2 = GetUnnecessarySyncTrans(syncStacks,syncCollisions,memgraphStacks);
+    auto tmp3 = GetUnnecessaryCudaFreeSyncs(syncStacks,syncCollisions,memgraphStacks);
     // std::set<uint64_t> requiredSyncs;
     // for (auto i : syncCollisions) {
     //     assert(i.second.size() == 2);
