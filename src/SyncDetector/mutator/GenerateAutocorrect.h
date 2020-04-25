@@ -11,6 +11,16 @@
 #include "SymbolInfo.h"
 
 namespace DiogenesCommon {
+    class BinaryAddressTree {
+        public: 
+            BinaryAddressTree(DiogenesCommon::BinaryAddress addr, bool isMemGraph);
+            uint64_t InsertElement(std::vector<DiogenesCommon::BinaryAddress> & stacks, uint64_t stackID, uint64_t pos);
+            uint64_t FindElement(std::vector<DiogenesCommon::BinaryAddress> & stacks, uint64_t pos);
+            bool _isMemGraph;
+            uint64_t _stackID;
+            DiogenesCommon::BinaryAddress _binAddr;
+            std::vector<BinaryAddressTree*> _children;
+    };
     bool CompareStacks(std::vector<DiogenesCommon::BinaryAddress> & s1, std::vector<DiogenesCommon::BinaryAddress> & s2);
     void NormalizeStack(std::vector<DiogenesCommon::BinaryAddress> & s1);
     bool IsTransferCall(std::vector<std::string> & fnames);

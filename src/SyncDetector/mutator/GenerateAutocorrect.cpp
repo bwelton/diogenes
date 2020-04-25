@@ -16,6 +16,39 @@ bool operator!= (const DiogenesCommon::BinaryAddress &c1, const DiogenesCommon::
     return !(c1== c2);
 }
 
+DiogenesCommon::BinaryAddressTree::BinaryAddressTree(DiogenesCommon::BinaryAddress addr, bool isMemGraph) : _binAddr(addr), _isMemGraph(isMemGraph), _stackID(0) {}
+
+uint64_t DiogenesCommon::BinaryAddressTree::InsertElement(std::vector<DiogenesCommon::BinaryAddress> & stacks, uint64_t stackID, uint64_t pos) {
+    if (pos == stacks.size()) {
+        if (_stackID != 0)
+            return _stackID;
+        _stackID = stackID;
+        return stackID;
+    }
+    for(auto y : _children) {
+        if ( y->_binAddr == stacks[pos]) {
+            return y->InsertElement(stacks, stackID, pos+1);
+        }
+    }
+
+    DiogenesCommon::BinaryAddressTree * nAddr = new DiogenesCommon::BinaryAddressTree(stacks[pos],_isMemGraph);
+    _children.push_back(nAddr);
+    return nAddr->InsertElement(stacks, stackID, pos+1);
+}
+
+uint64_t DiogenesCommon::BinaryAddressTree::FindElement(std::vector<DiogenesCommon::BinaryAddress> & stacks, uint64_t pos){
+    if (pos == stacks.size())
+        return _stackID;
+    for(auto y : _children) {
+        if ( y->_binAddr == stacks[pos]) {
+            return y->FindElement(stacks, pos+1);
+        }
+    }    
+    return 0;
+}
+
+
+
 bool DiogenesCommon::CompareStacks(std::vector<DiogenesCommon::BinaryAddress> & s1, std::vector<DiogenesCommon::BinaryAddress> & s2) {
     if (s1.size() != s2.size())
         return false;
