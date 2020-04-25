@@ -5,6 +5,8 @@
 #include <vector>
 #include <unistd.h>
 #include <map>
+#include <stdio.h>
+#include <stdlib.h>
 #include <algorithm>  
 #include "DynHelper.h"
 #include "DyninstProcess.h"
@@ -20,6 +22,7 @@
 #include "SyncdetectFilenames.h"
 #include "AutocorrectFilenames.h"
 #include "MemGraphFilenames.h"
+#include "AllocationTracker.h"
 
 void GetSymbolsForStacks(DiogenesCommon::AddressSymbolizer & sym, DiogenesCommon::ParseProcMap & pmap,
                          std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & s) {
@@ -311,6 +314,22 @@ void GenerateAutocorrection() {
     GetSymbolsForStacks(symbols, memGraphPMap, memgraphStacks);
     auto tmp2 = GetUnnecessarySyncTrans(syncStacks,syncCollisions,memgraphStacks);
     auto tmp3 = GetUnnecessaryCudaFreeSyncs(syncStacks,syncCollisions,memgraphStacks);
+
+
+    FILE *f = fopen(memoryGraphData, "rb");
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);  
+    char *dataRead = (char*) malloc(fsize);
+    fread(dataRead, 1, fsize, f);
+    fclose(f);
+
+    MemGraphBuild::AllocationTracker track;
+    track.DeSerializeData(dataRead, fsize);
+
+    std::stringstream syncTransUnnecessary;
+    
+
     // std::set<uint64_t> requiredSyncs;
     // for (auto i : syncCollisions) {
     //     assert(i.second.size() == 2);

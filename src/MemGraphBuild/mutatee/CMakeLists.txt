@@ -1,4 +1,4 @@
-add_library(MemGraphMutateeLib SHARED "AllocationTracker.cpp" "GotchaWrappers.cpp" "MemGraph.cpp")
+add_library(MemGraphMutateeLib SHARED "GotchaWrappers.cpp" "MemGraph.cpp")
 
 INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CUDA_TOOLKIT_ROOT_DIR}/include)
 INCLUDE_DIRECTORIES(MemGraphMutateeLib ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)

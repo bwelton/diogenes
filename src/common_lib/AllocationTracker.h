@@ -5,7 +5,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
-
+#include <set>
+#include <vector>
 namespace MemGraphBuild{
     class AllocationSite;
     class FreeSite;
@@ -15,6 +16,25 @@ namespace MemGraphBuild{
     typedef std::shared_ptr<AllocationSite> AllocSitePtr;
     typedef std::shared_ptr<TransferSite> TransSitePtr;
     typedef std::shared_ptr<AllocationTracker> AllocTrackPtr;
+    class TransferMap {
+        public:
+            uint64_t stackID;
+            std::set<uint64_t> allocSites;
+            std::set<uint64_t> freeSites;
+            uint64_t unknownAllocations;
+            TransferMap(uint64_t s) : stackID(s) {
+                unknownAllocations = 0;
+            };
+    };
+    class FreeMap {
+        public:
+            uint64_t stackID;
+            std::set<uint64_t> allocSites;
+            uint64_t unknownAlloc;
+            FreeMap(uint64_t s) : stackID(s) {
+                unknownAlloc = 0;
+            };
+    };
     class AllocationSite {
         public:
             uint64_t stackID;
@@ -59,7 +79,10 @@ namespace MemGraphBuild{
             void HandleFree(uint64_t stackAddr, uint64_t memAddr);
             void HandleTransfer(uint64_t stackAddr, uint64_t cpuAddress, uint64_t size);
             char * SerializeData(uint64_t & size);
+            void DeSerializeData(char * data, uint64_t size);
 
+            FreeMap GetFreeMapForID(uint64_t stackID);
+            TransferMap GetTransferMapForID(uint64_t stackID);
         private:
             std::map<uint64_t, std::pair<uint64_t, AllocSitePtr>> _addrToAlloc;
             std::unordered_map<uint64_t, AllocSitePtr> _stackToAlloc;
@@ -70,4 +93,6 @@ namespace MemGraphBuild{
     AllocTrackPtr GetGlobalTracker();
 
 };
+
+
 #endif
