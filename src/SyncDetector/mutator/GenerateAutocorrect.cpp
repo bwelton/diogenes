@@ -105,8 +105,9 @@ bool DiogenesCommon::IsCudaAllocation(std::vector<std::string> & fnames) {
     return false;
 }
 
-std::set<std::string> cudaHostAllocators = {"cuMemHostAlloc"};
-std::map<std::string, std::string> cudaHostDiog = {{"memgraph_cuMemAllocHost_v2", "cuMemHostAlloc"}};
+std::set<std::string> cudaHostAllocators = {"cuMemHostAlloc","cuMemFreeHost"};
+std::map<std::string, std::string> cudaHostDiog = {{"memgraph_cuMemAllocHost_v2", "cuMemHostAlloc"},
+                                                    {"memgraph_cuMemFreeHost", "cuMemFreeHost"}};
 bool DiogenesCommon::IsCudaHostAlloc(std::vector<std::string> & fnames) {
     for(auto funcName : fnames)
         if (cudaHostAllocators.find(funcName) != cudaHostAllocators.end() || cudaHostDiog.find(funcName) != cudaHostDiog.end()) {
@@ -220,6 +221,18 @@ std::set<uint64_t> DiogenesCommon::FindSynchronizations(std::map<uint64_t, std::
     for (auto i : stacks) {
         for (auto x : i.second) {
             if (DiogenesCommon::IsSynchronization(x.symbolInfo.funcName)) {
+                ret.insert(i.first);
+                break;
+            }
+        }
+    }
+    return ret;
+}
+std::set<uint64_t> DiogenesCommon::FindCudaHostAllocs(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & stacks){
+    std::set<uint64_t> ret;
+    for (auto i : stacks) {
+        for (auto x : i.second) {
+            if (DiogenesCommon::IsCudaHostAlloc(x.symbolInfo.funcName)) {
                 ret.insert(i.first);
                 break;
             }

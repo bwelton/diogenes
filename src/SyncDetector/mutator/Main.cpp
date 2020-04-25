@@ -7,7 +7,8 @@
 #include <map>
 #include <stdio.h>
 #include <stdlib.h>
-#include <algorithm>  
+#include <algorithm>
+#include <fstream>  
 #include "DynHelper.h"
 #include "DyninstProcess.h"
 #include "DyninstOneTime.h"
@@ -100,6 +101,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> NormalizeMemGraph(
             if (found) {
                 entry.symbolInfo.funcName.clear();
                 entry.symbolInfo.funcName.push_back(newFunc);
+                entry.binaryName = std::shared_ptr<char>(strdup(newFunc.c_str()));
             }
             cur.push_back(entry);
         }
@@ -324,12 +326,100 @@ void GenerateAutocorrection() {
     fread(dataRead, 1, fsize, f);
     fclose(f);
 
+    std::ofstream outputToAC;
+    outputToAC.open(AUTOCORRECT_STACKFILE);
+    uint64_t globalOutCount = 1;
+
     MemGraphBuild::AllocationTracker track;
     track.DeSerializeData(dataRead, fsize);
-
+    std::set<uint64_t> cudaHostAllocs = DiogenesCommon::FindCudaHostAllocs(memgraphStacks);
     std::stringstream syncTransUnnecessary;
-    
+    for (auto i : tmp2) {
+        MemGraphBuild::TransferMap tmap = track.GetTransferMapForID(i.first);
+        if (tmap.unknownAllocations == 0)
+            syncTransUnnecessary << "[AUTOCORR] Unnecessary Synchronous Transfer At...." << std::endl;
+        else
+            syncTransUnnecessary << "[MANUAL] Unnecessary Synchronous Transfer At...." << std::endl;
+        for (auto & x : i.second){
+            syncTransUnnecessary << "    " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            syncTransUnnecessary << x.symbolInfo.Print(4);
+        }        
+        syncTransUnnecessary << "  Non-CUDA Managed Memory Allocated At...." << std::endl;
+        for (auto y : tmap.allocSites) {
+            if (cudaHostAllocs.find(y) != cudaHostAllocs.end())
+                continue;
+            for (auto & x : memgraphStacks[y]) {
+                syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+                syncTransUnnecessary << x.symbolInfo.Print(6);
+            }
+        }
+        syncTransUnnecessary << "  Non-CUDA Managed Memory Freed At...." << std::endl;
+        for (auto y : tmap.freeSites) {
+            if (cudaHostAllocs.find(y) != cudaHostAllocs.end())
+                continue;
+            for (auto & x : memgraphStacks[y]) {
+                syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+                syncTransUnnecessary << x.symbolInfo.Print(6);
+            }
+        }
+        if (tmap.unknownAllocations == 0) {
+            outputToAC << std::dec << globalOutCount << "$";
+            globalOutCount++;
+            bool first = true;
+            for (auto & x : i.second){
+                if (first)
+                    outputToAC << x.binaryName << "@" << std::hex << x.libraryOffset;
+                else
+                    outputToAC << "," << x.binaryName << "@" << std::hex << x.libraryOffset;
+                first = false;
+            }
+            outputToAC<< std::endl;                
+        }
+    }
 
+    //    class FreeMap {
+    //     public:
+    //         uint64_t stackID;
+    //         std::set<uint64_t> allocSites;
+    //         uint64_t unknownAlloc;
+    //         FreeMap(uint64_t s) : stackID(s) {
+    //             unknownAlloc = 0;
+    //         };
+    // };
+    for (auto i : tmp3) {
+        MemGraphBuild::FreeMap mfree = track.GetFreeMapForID(i.first);
+         if (mfree.unknownAlloc == 0)
+            syncTransUnnecessary << "[AUTOCORR] Unnecessary cudaFree Synchronization at...." << std::endl;
+        else
+            syncTransUnnecessary << "[MANUAL] Unnecessary cudaFree Synchronization at...." << std::endl;
+        for (auto & x : i.second){
+            syncTransUnnecessary << "    " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            syncTransUnnecessary << x.symbolInfo.Print(4);
+        }
+        syncTransUnnecessary << "  Memory Allocated At...." << std::endl;
+        for (auto y : mfree.allocSites) {
+            for (auto & x : memgraphStacks[y]) {
+                syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+                syncTransUnnecessary << x.symbolInfo.Print(6);
+            }
+        }
+        if (mfree.unknownAlloc == 0) {
+            outputToAC << std::dec << globalOutCount << "$";
+            globalOutCount++;
+            bool first = true;
+            for (auto & x : i.second){
+                if (first)
+                    outputToAC << x.binaryName << "@" << std::hex << x.libraryOffset;
+                else
+                    outputToAC << "," << x.binaryName << "@" << std::hex << x.libraryOffset;
+                first = false;
+            }
+            outputToAC<< std::endl;                
+        }               
+    }
+    std::cout << "[BEGIN_FINAL_OUTPUT]" << std::endl;
+    std::cout << syncTransUnnecessary.str()  << std::endl;
+    outputToAC.close();
     // std::set<uint64_t> requiredSyncs;
     // for (auto i : syncCollisions) {
     //     assert(i.second.size() == 2);

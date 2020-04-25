@@ -30,6 +30,7 @@ namespace DiogenesCommon {
     bool IsFree(std::vector<std::string> & fnames);
     bool IsMalloc(std::vector<std::string> & fnames);
     bool IsSynchronization(std::vector<std::string> & fnames);
+    std::set<uint64_t> FindCudaHostAllocs(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & stacks);
     std::set<uint64_t> FindTransfers(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & stacks);
     std::set<uint64_t> FindCudaAllocators(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & stacks);
     std::set<uint64_t> FindCudaFree(std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & stacks);
