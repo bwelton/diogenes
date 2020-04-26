@@ -54,6 +54,9 @@ bool ParseProcMap::GetLibraryAndOffset(BinaryAddress & in) {
     // std::cerr << "PROCADDR = " << std::hex<< in.processAddress << " MATCHED = " << std::hex<< (uint64_t)s.addr_start << std::endl;
     if ((uint64_t)s.addr_start <= in.processAddress && (uint64_t)s.addr_end >= in.processAddress){
         std::string checkForPic = std::string(s.pathname);
+	assert(checkForPic != std::string(""));
+	if (_isPIC.find(checkForPic) == _isPIC.end())
+		return false;
         if(_isPIC[checkForPic] == false)
             in.libraryOffset = (in.processAddress);
         else
