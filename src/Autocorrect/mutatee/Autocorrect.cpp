@@ -46,6 +46,7 @@ void ac_mutatee_init() {
 	autocorr_GlobalStacktree = new FastStackTree(0);
 	std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> stackEntries =ReadStacksFromMutatee(autocorrFilename);
 	for(auto & i : stackEntries) {
+		assert(i.second[0].binaryName != NULL);
 		i.second[0].libraryOffset = autocorr_GMap[std::string(i.second[0].binaryName.get())];
 		autocorr_GlobalStacktree->InsertStack(i.second);
 	}

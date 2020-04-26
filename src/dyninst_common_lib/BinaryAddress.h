@@ -14,6 +14,7 @@ struct BinaryAddress {
     uint64_t processAddress;
     std::shared_ptr<char> binaryName;
     DiogenesCommon::SymbolInfo symbolInfo;
+    BinaryAddress() : binaryName(NULL), libraryOffset(0), processAddress(0) {};
 };
 
 };

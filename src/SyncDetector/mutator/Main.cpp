@@ -341,6 +341,7 @@ void GenerateAutocorrection() {
         else
             syncTransUnnecessary << "[MANUAL] Unnecessary Synchronous Transfer At...." << std::endl;
         for (auto & x : i.second){
+            assert(x.binaryName != NULL);
             syncTransUnnecessary << "    " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
             syncTransUnnecessary << x.symbolInfo.Print(4);
         }        
@@ -349,6 +350,7 @@ void GenerateAutocorrection() {
             if (cudaHostAllocs.find(y) != cudaHostAllocs.end())
                 continue;
             for (auto & x : memgraphStacks[y]) {
+                assert(x.binaryName != NULL);
                 syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
                 syncTransUnnecessary << x.symbolInfo.Print(6);
             }
@@ -358,6 +360,7 @@ void GenerateAutocorrection() {
             if (cudaHostAllocs.find(y) != cudaHostAllocs.end())
                 continue;
             for (auto & x : memgraphStacks[y]) {
+                assert(x.binaryName != NULL);
                 syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
                 syncTransUnnecessary << x.symbolInfo.Print(6);
             }
@@ -367,6 +370,7 @@ void GenerateAutocorrection() {
             globalOutCount++;
             bool first = true;
             for (auto & x : i.second){
+                assert(x.binaryName != NULL);
                 if (first)
                     outputToAC << x.binaryName << "@" << std::hex << x.libraryOffset;
                 else
@@ -393,12 +397,14 @@ void GenerateAutocorrection() {
         else
             syncTransUnnecessary << "[MANUAL] Unnecessary cudaFree Synchronization at...." << std::endl;
         for (auto & x : i.second){
+            assert(x.binaryName != NULL);
             syncTransUnnecessary << "    " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
             syncTransUnnecessary << x.symbolInfo.Print(4);
         }
         syncTransUnnecessary << "  Memory Allocated At...." << std::endl;
         for (auto y : mfree.allocSites) {
             for (auto & x : memgraphStacks[y]) {
+                assert(x.binaryName != NULL);
                 syncTransUnnecessary << "      " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
                 syncTransUnnecessary << x.symbolInfo.Print(6);
             }
@@ -408,6 +414,7 @@ void GenerateAutocorrection() {
             globalOutCount++;
             bool first = true;
             for (auto & x : i.second){
+                assert(x.binaryName != NULL);
                 if (first)
                     outputToAC << x.binaryName << "@" << std::hex << x.libraryOffset;
                 else
@@ -584,7 +591,7 @@ int main(int argc, char * argv[]) {
         std::cerr << "Expected arguments  <application> <application args>" << std::endl;
         return -1;
     }
-/*
+
     DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
     proc.LaunchProcess();
     proc.LoadLibrary("libcuda.so");
@@ -593,14 +600,13 @@ int main(int argc, char * argv[]) {
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
     proc.DetachForDebug();
     //proc.RunUntilCompleation(std::string(""));
-  */  
+    
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
     char collisionFileName[] = "DIOG_SYNC_StackCollision.txt";
     char procMapName[] = "ProcMap.txt";
 
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> stacks = ReadStacksFromMutatee(stackFileName);
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> collisions = ReadStacksFromMutatee(collisionFileName);
-    assert(collisions.size() > 0);
     DiogenesCommon::ParseProcMap pmap(procMapName);
     DiogenesCommon::AddressSymbolizer symbols;
 
@@ -611,9 +617,9 @@ int main(int argc, char * argv[]) {
         for (auto & x : stacks[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
                 symbols.GetSymbolAtAddress(x);
-		assert(x.binaryName != NULL);
+		        assert(x.binaryName != NULL);
                 std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-	        std::cout <<  x.symbolInfo.Print(5);
+	            std::cout <<  x.symbolInfo.Print(5);
             } 
             depth++;
         }
@@ -639,9 +645,9 @@ int main(int argc, char * argv[]) {
             depth++;
         }
     }
-//    std::cout << std::flush;
-    //GenerateAutocorrection();
-    return 0;
+    std::cout << std::flush;
+    GenerateAutocorrection();
+    return  -1;
 }
 
 

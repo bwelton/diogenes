@@ -1,10 +1,18 @@
 #include "DyninstBinaryEdit.h"
+#include <fstream>
 extern 	BPatch bpatch; // Defined in DyninstProcess
 DiogenesCommon::DyninstBinaryEdit::DyninstBinaryEdit(std::string binName, bool output, std::string outName)  :
 	_binName(binName), _output(output), _outName(outName) {
-	_as = bpatch.openBinary(_binName.c_str(), false);
-	assert(_as != NULL);
-	_be = dynamic_cast<BPatch_binaryEdit*>(_as);
+	std::ifstream f(_binName.c_str());
+    if(f.good()) {
+		f.close();
+		_as = bpatch.openBinary(_binName.c_str(), false);
+		assert(_as != NULL);
+		_be = dynamic_cast<BPatch_binaryEdit*>(_as);
+	} else {
+		_as == NULL;
+		_be == NULL;
+	}
 }
 
 DiogenesCommon::DyninstBinaryEdit::~DyninstBinaryEdit() {
