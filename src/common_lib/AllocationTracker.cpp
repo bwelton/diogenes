@@ -238,7 +238,7 @@ MemGraphBuild::TransferMap MemGraphBuild::AllocationTracker::GetTransferMapForID
 MemGraphBuild::AllocTrackPtr MemGraphBuild_globalAllocPointer;
 MemGraphBuild::AllocTrackPtr MemGraphBuild::GetGlobalTracker() {
     if (MemGraphBuild_globalAllocPointer == NULL){
-        MemGraphBuild_globalAllocPointer = std::shared_ptr<AllocationTracker>(new AllocationTracker());
+        MemGraphBuild_globalAllocPointer = new AllocationTracker();
     }
     return MemGraphBuild_globalAllocPointer;
 }

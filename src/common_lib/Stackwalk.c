@@ -1,7 +1,7 @@
 #include "Stackwalk.h"
 #include "FPStackWalker.h"
 
-pthread_mutex_t lock; 
+
 
 uint64_t Stackwalk_GetStackID_GNUBtrace(StackwalkInst * inst) {
 	// void * local_stack[100];
@@ -108,30 +108,55 @@ uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
 		return data;	  
   }
 }
-uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst) {
-	pthread_mutex_lock(&lock); 
-	uint64_t ret =  Stackwalk_GetStackID_libunwind(inst);
-	pthread_mutex_unlock(&lock); 
-	return ret;
-}
-uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
-	pthread_mutex_lock(&lock); 
-#ifdef USE_GNU_BACKTRACE
-	return Stackwalk_GetStackID_GNUBtrace(inst);
-#endif
-	//uint64_t ret =  Stackwalk_GetStackID_libunwind(inst);
+
+// uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
+// 	if(inWalker == 1)
+// 		return 0;
+// 	pthread_mutex_lock(&GetStackID_Lock); 
+// 	inWalker = 1;
+// 	uint64_t ret =  Stackwalk_GetStackID_libunwind(inst);
+// 	inWalker = 0;
+// 	pthread_mutex_unlock(&GetStackID_Lock); 
+// 	return ret;
+// 	//return Stackwalk_GetStackID_libunwind(inst);
+// }
+int inWalkerSWLock = 0;
+pthread_mutex_t GetStackID_SWLock; 
+uint64_t Stackwalk_GetStackIDSWLock(StackwalkInst * inst) {
+	if(inWalkerSWLock == 1)
+		return 0;
+	pthread_mutex_lock(&GetStackID_SWLock); 
+	inWalkerSWLock = 1;
 	uint64_t ret =  Stackwalk_GetStackID_FPStackWalker(inst);
-	pthread_mutex_unlock(&lock); 
+	inWalkerSWLock = 0;
+	pthread_mutex_unlock(&GetStackID_SWLock); 
 	return ret;
 	//return Stackwalk_GetStackID_libunwind(inst);
 
 }
-
+int inWalkerBacktracesLock = 0;
+pthread_mutex_t GetStackID_BacktracesLock; 
 uint64_t Stackwalk_GetStackIDBacktracesLock(StackwalkInst * inst) {
-	pthread_mutex_lock(&lock); 
+	if (inWalkerBacktracesLock!=0)
+		return 0;
+	pthread_mutex_lock(&GetStackID_BacktracesLock); 
+	inWalkerBacktracesLock = 1;
 	uint64_t ret = Stackwalk_GetStackID_GNUBtrace(inst);
-	pthread_mutex_unlock(&lock); 
+	inWalkerBacktracesLock = 0;
+	pthread_mutex_unlock(&GetStackID_BacktracesLock); 
 	return ret;	
+}
+int inWalkerLockUnwind = 0;
+pthread_mutex_t GetStackID_LockUnwind;
+uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst) {
+	if(inWalkerLockUnwind != 0)
+		return 0;
+	pthread_mutex_lock(&GetStackID_LockUnwind); 
+	inWalkerLockUnwind = 1;
+	uint64_t ret =  Stackwalk_GetStackID_libunwind(inst);
+	inWalkerLockUnwind = 0;
+	pthread_mutex_unlock(&GetStackID_LockUnwind); 
+	return ret;
 }
 
 uint64_t Stackwalk_GetStackIDLibunwind(StackwalkInst * inst) {

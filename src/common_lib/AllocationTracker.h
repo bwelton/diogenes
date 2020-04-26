@@ -15,7 +15,7 @@ namespace MemGraphBuild{
     typedef std::shared_ptr<FreeSite> FreeSitePtr;
     typedef std::shared_ptr<AllocationSite> AllocSitePtr;
     typedef std::shared_ptr<TransferSite> TransSitePtr;
-    typedef std::shared_ptr<AllocationTracker> AllocTrackPtr;
+    typedef AllocationTracker * AllocTrackPtr;
     class TransferMap {
         public:
             uint64_t stackID;

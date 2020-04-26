@@ -50,6 +50,7 @@ public:
 	BPatch_object * LoadLibrary(std::string library);
 	void BeginInsertionSet();
 	void DetachForDebug();
+	void BreakAtMain();
 private:
 	bool IsMPIProgram();
 	BPatch_addressSpace * LaunchMPIProcess();

@@ -2,9 +2,11 @@
 #include <atomic> 
 
 StackwalkInst * memgraph_globalWalker = NULL;
-std::atomic<int> memgraph_disablememcapture(0);
+int memgraph_disablememcapture = 0;
 volatile bool memgraph_exitinit = false;
 volatile bool memgraph_ingetstack = false;
+pthread_mutex_t memgraph_memmutex; 
+volatile int memgraph_mutexStaus = 0;
 void Memgraph_WriteStacktrieToFile(const char * fname, CPPStackTrie write) {
 	if (write == NULL)
 		return;
@@ -49,57 +51,75 @@ void mutatee_exit_handler() {
 }
 
 
-uint64_t memgraph_GetStackID() {
+uint64_t memgraph_GetStackID(bool useStackwalker) {
 	if (memgraph_exitinit || memgraph_ingetstack)
 		return 0;
-	memgraph_IncrementMemProtection();
 	memgraph_ingetstack = true;
 	if (memgraph_globalWalker == NULL){
+		return 0;
 		memgraph_globalWalker = Stackwalk_Init(malloc,free);
 	}
 	// puts("Getting Stackwalk!");
-	uint64_t ret =  Stackwalk_GetStackID(memgraph_globalWalker);//Stackwalk_GetStackIDLockUnwind(memgraph_globalWalker);
+	uint64_t ret = 0;
+	if(useStackwalker) 
+		ret = Stackwalk_GetStackIDSWLock(memgraph_globalWalker);
+	else 
+		ret = Stackwalk_GetStackIDLockUnwind(memgraph_globalWalker);
+	//uint64_t ret =  Stackwalk_GetStackID(memgraph_globalWalker);//Stackwalk_GetStackIDLockUnwind(memgraph_globalWalker);
 	// puts("Finished Stackwalk!");
 	memgraph_ingetstack = false;
-	memgraph_DecrementMemProtection();
 	return ret;
 }
 
 
 void memgraph_handletransfer(uint64_t cpuAddress, uint64_t size) {
-	if (memgraph_CheckMemProtection()>0 || memgraph_exitinit ==true)
+	if ( memgraph_exitinit ==true)
 		return;
 	memgraph_IncrementMemProtection();
 	auto tracker = MemGraphBuild::GetGlobalTracker();
-	uint64_t stackId = memgraph_GetStackID();
+	uint64_t stackId = memgraph_GetStackID(true);
+	if(stackId == 0)
+		return;
 	tracker->HandleTransfer(stackId, cpuAddress, size);
 	memgraph_DecrementMemProtection();
 }
 
-void memgraph_handleallocation(uint64_t memaddr, uint64_t size) {
-	if(memgraph_CheckMemProtection()>0 || memgraph_exitinit ==true)
+void memgraph_handleallocation(uint64_t memaddr, uint64_t size, bool useSW) {
+	if( memgraph_exitinit ==true)
 		return;
-	memgraph_IncrementMemProtection();
+	if (memgraph_mutexStaus != 0)
+		return;
+	pthread_mutex_lock(&memgraph_memmutex);
+	memgraph_mutexStaus = 1;
 	auto tracker = MemGraphBuild::GetGlobalTracker();
-	uint64_t stackId = memgraph_GetStackID();
-	tracker->HandleAllocation(stackId, memaddr, size);	
-	memgraph_DecrementMemProtection();
+	uint64_t stackId = memgraph_GetStackID(useSW);
+	if(stackId != 0)
+		tracker->HandleAllocation(stackId, memaddr, size);	
+	memgraph_mutexStaus = 0;
+	pthread_mutex_unlock(&memgraph_memmutex);
 }
 
-void memgraph_handlefree(uint64_t memaddr) {
-	if (memgraph_CheckMemProtection()>0 || memgraph_exitinit == true)
+void memgraph_handlefree(uint64_t memaddr, bool useSW) {
+	if ( memgraph_exitinit == true )
 		return;
-	memgraph_IncrementMemProtection();
+	if (memgraph_mutexStaus != 0)
+		return;
+	pthread_mutex_lock(&memgraph_memmutex);
+	memgraph_mutexStaus = 1;
 	auto tracker = MemGraphBuild::GetGlobalTracker();
-	uint64_t stackId = memgraph_GetStackID();
-	tracker->HandleFree(stackId, memaddr);	
-	memgraph_DecrementMemProtection();	
+	uint64_t stackId = memgraph_GetStackID(useSW);
+	if(stackId != 0)
+		tracker->HandleFree(stackId, memaddr);	
+	memgraph_mutexStaus = 0;
+	pthread_mutex_unlock(&memgraph_memmutex);
+	//memgraph_DecrementMemProtection();	
 }
 
 void * memgraph_malloc(size_t size) {
 	void * ret = memgraph_malloc_wrapper(size);
-	if (ret != NULL)
-		memgraph_handleallocation((uint64_t)ret, size);
+	if (ret != NULL){
+		memgraph_handleallocation((uint64_t)ret, size, false);
+	}
 	return ret;
 }
 
@@ -107,31 +127,31 @@ void * memgraph_malloc(size_t size) {
 int memgraph_cuMemAllocHost_v2(void ** ptr, size_t size) {
 	int ret = memgraph_cuMemAllocHost_v2_wrapper(ptr,size);
 	if (*ptr != NULL)
-		memgraph_handleallocation((uint64_t)(*ptr), size);
+		memgraph_handleallocation((uint64_t)(*ptr), size, true);
 	return ret;
 }
 int memgraph_cuMemAlloc(void ** ptr, size_t size) {
 	int ret = memgraph_cuMemAlloc_wrapper(ptr,size);
 	if (*ptr != NULL)
-		memgraph_handleallocation((uint64_t)(*ptr), size);
+		memgraph_handleallocation((uint64_t)(*ptr), size, true);
 	return ret;
 }
 int memgraph_cuMemFreeHost(void * ptr) {
 	if(ptr!=NULL)
-		memgraph_handlefree((uint64_t)ptr);
+		memgraph_handlefree((uint64_t)ptr,true);
 	return memgraph_cuMemFreeHost_wrapper(ptr);
 }
 
 void memgraph_free(void * ptr) {
 	if(ptr!=NULL)
-		memgraph_handlefree((uint64_t)ptr);
+		memgraph_handlefree((uint64_t)ptr,false);
 	memgraph_free_wrapper(ptr);
 	return;
 }
 
 int memgraph_cuMemFree(void * ptr) {
 	if(ptr!=NULL)
-		memgraph_handlefree((uint64_t)ptr);
+		memgraph_handlefree((uint64_t)ptr, true);
 	int ret = memgraph_cuMemFree_wrapper(ptr);
 	return ret;
 }
@@ -139,7 +159,7 @@ int memgraph_cuMemFree(void * ptr) {
 int memgraph_cuMemAllocManaged(void ** ptr, size_t len, unsigned int flags) {
 	int ret = memgraph_cuMemAllocManaged_wrapper(ptr,len,flags);
 	if (*ptr != NULL)
-		memgraph_handleallocation((uint64_t)(*ptr), len);
+		memgraph_handleallocation((uint64_t)(*ptr), len, true);
 	return ret;
 }
 

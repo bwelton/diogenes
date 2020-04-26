@@ -42,9 +42,13 @@ struct gotcha_binding_t gotcha_Binder_Funcs[] = {{"cuMemHostAlloc",(void*)memgra
 												 {"cuMemAlloc_v2",(void*)memgraph_cuMemAlloc,&memgraph_cuMemAlloc_handle},
 												 {"cuMemFree_v2",(void*)memgraph_cuMemFree,&memgraph_cuMemFree_handle},
 												};
+pthread_t memgraph_doInst = 0;
 void mutatee_init() {
 	//PageLocker_Initalize()
+
+	pthread_t backup = pthread_self();
 	memgraph_globalWalker = Stackwalk_Init(malloc,free);
+	MemGraphBuild::GetGlobalTracker();
 	atexit(mutatee_exit_handler);
 	dlopen("libcudart.so",RTLD_NOW);
 	fprintf(stderr,"in Warpper Main\n");
@@ -64,4 +68,5 @@ void mutatee_init() {
 	memgraph_cuMemAlloc_wrapper = (typeof(&memgraph_cuMemAlloc))dlsym(lib_libcuda,"cuMemAlloc_v2");
 	memgraph_cuMemFree_wrapper = (typeof(&memgraph_cuMemFree))dlsym(lib_libcuda,"cuMemFree_v2");
 	gotcha_wrap(gotcha_Binder_Funcs, sizeof(gotcha_Binder_Funcs)/sizeof(struct gotcha_binding_t), "binderWrappers");
+	memgraph_doInst = backup;
 }

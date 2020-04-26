@@ -22,11 +22,12 @@ typedef struct StackwalkInst{
 extern "C" {
 #endif
 StackwalkInst * Stackwalk_Init(void * (*allocator_fun)(size_t), void (*free_fun)(void *));
-uint64_t Stackwalk_GetStackID(StackwalkInst * swalk);
+//uint64_t Stackwalk_GetStackID(StackwalkInst * swalk);
 uint64_t Stackwalk_GetStackIDLibunwind(StackwalkInst * inst);
 char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size);
 uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst);
 uint64_t Stackwalk_GetStackIDBacktracesLock(StackwalkInst * inst);
+uint64_t Stackwalk_GetStackIDSWLock(StackwalkInst * inst);
 uint64_t Stackwalk_GetStackLibUnwind(uint64_t * store, uint64_t maxSize);
 #ifdef __cplusplus
 }

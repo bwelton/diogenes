@@ -5,35 +5,12 @@ StackwalkInst * autocorr_globalWalker = NULL;
 std::atomic<int> autocorr_disablememcapture(0);
 volatile bool autocorr_exitinit = false;
 volatile bool autocorr_ingetstack = false;
+pthread_mutex_t simpleGPUMemLock; 
+thread_local SimpleGPUMallocMap * local_SimpleGPUMap = NULL;
+CPUMemoryLocation * local_CPUMEMLOCATION = NULL;
+
 void autocorr_mutatee_exit_handler() {
 	autocorr_exitinit = true;	
-}
-pthread_mutex_t simpleGPUMemLock; 
-thread_local SimpleGPUMallocMap * local_SimpleGPUMap;
-
-void * SimpleGPUMallocMap::GetAllocation(uint64_t size) {
-	//pthread_mutex_lock(&simpleGPUMemLock); 
-	void * ret;
-	auto it = _sizeToAddress.find(size);
-	if (it == _sizeToAddress.end()) {
-		autocorr_cuMemAlloc_wrapper(&ret, size);
-		_addrToSize[ret] = size;
-	} else {
-		ret = it->second;
-		_sizeToAddress.erase(it);
-	}
-	//pthread_mutex_unlock(&simpleGPUMemLock); 
-	return ret;
-}
-void SimpleGPUMallocMap::FreeAllocation(void * addr) {
-	//pthread_mutex_lock(&simpleGPUMemLock); 
-	if (_addrToSize.find(addr) != _addrToSize.end())
-		_sizeToAddress.insert(std::make_pair(_addrToSize[addr], addr));
-	else {
-		std::cerr << "Could not find allocation!" << std::endl;
-		autocorr_cuMemFree22_wrapper(addr);
-	}
-	//pthread_mutex_unlock(&simpleGPUMemLock); 	
 }
 
 
@@ -43,47 +20,62 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 	uint64_t store[100];
 	uint64_t stackSize = Stackwalk_GetStackLibUnwind(store, 100);
 
+#ifdef defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
+	// Dyninst's stack frame will appear on PPC, we must skip it
+	store[2] = callerID;
+	return autocorr_GlobalStacktree->Lookup(&(store[2]), stackSize - 2);
+#else
 	// insert caller id at top of stack, which is at 2 accounting for
 	// our caller.
 	store[1] = callerID;
 	return autocorr_GlobalStacktree->Lookup(&(store[1]), stackSize - 1);
+#endif
 }
-
 
 int autocorr_cuMemAllocHost_v2(void ** ptr, size_t size) {
 	int ret = autocorr_cuMemAllocHost_v2_wrapper(ptr,size);
+	if(local_CPUMEMLOCATION == NULL)
+		local_CPUMEMLOCATION = new CPUMemoryLocation();
+	
+	local_CPUMEMLOCATION->RegisterAllocation(*ptr, size, true);
 	return ret;
 }
 int autocorr_cuMemAlloc(void ** ptr, size_t size) {
-	if(autocorr_exitinit)
-		return autocorr_cuMemAlloc_wrapper(ptr,size);
+	return autocorr_cuMemAlloc_wrapper(ptr,size);
+	// if(autocorr_exitinit)
+	// 	return autocorr_cuMemAlloc_wrapper(ptr,size);
 
-	if(local_SimpleGPUMap == NULL)
-		local_SimpleGPUMap = new SimpleGPUMallocMap();
-	*ptr = local_SimpleGPUMap->GetAllocation(size);
+	// if(local_SimpleGPUMap == NULL)
+	// 	local_SimpleGPUMap = new SimpleGPUMallocMap();
+	// *ptr = local_SimpleGPUMap->GetAllocation(size);
 	return (int)CUDA_SUCCESS;
 }
+
+
 int autocorr_cuMemFreeHost(void * ptr) {
+	if(local_CPUMEMLOCATION == NULL)
+		local_CPUMEMLOCATION = new CPUMemoryLocation();
+	
+	local_CPUMEMLOCATION->UnregisterAllocation(ptr);
 	return autocorr_cuMemFreeHost_wrapper(ptr);
 }
-
 
 int autocorr_synchronize_device()  {
 	return autocorr_ctxSynchronize_wrapper();
 }
 int autocorr_cuMemFree22(void * ptr) {
-	if(autocorr_exitinit)
-		return autocorr_cuMemFree22_wrapper(ptr);
+	// if(autocorr_exitinit)
+	// 	return autocorr_cuMemFree22_wrapper(ptr);
 
-	if(local_SimpleGPUMap == NULL)
-		local_SimpleGPUMap = new SimpleGPUMallocMap();
+	// if(local_SimpleGPUMap == NULL)
+	// 	local_SimpleGPUMap = new SimpleGPUMallocMap();
 
-	local_SimpleGPUMap->FreeAllocation(ptr);
+	// local_SimpleGPUMap->FreeAllocation(ptr);
 	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemFree_v2)) {
 		std::cerr << "Cuda free synchronization necessary!" << std::endl;
-		return autocorr_synchronize_device();
+		//return autocorr_synchronize_device();
 	} 
-	return (int)CUDA_SUCCESS;
+	return autocorr_cuMemFree22_wrapper(ptr);
 	// if (autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemFree_v2))
 	// 	std::cerr << "Cuda free synchronization unnecessary" << std::endl;
 	// else 
@@ -92,12 +84,40 @@ int autocorr_cuMemFree22(void * ptr) {
 	
 }
 
+// #define AUTOCORR_CALLID_cuMemcpyDtoHAsync_v2 1
+// #define AUTOCORR_CALLID_cuMemcpyHtoDAsync_v2 2
+// #define AUTOCORR_CALLID_cuMemcpyHtoD_v2 3
+// #define AUTOCORR_CALLID_cuMemcpyDtoH_v2 4
+// #define AUTOCORR_CALLID_cuMemFree_v2 5
 int autocorr_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount ) {
-	return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
+	if(local_CPUMEMLOCATION == NULL)
+		local_CPUMEMLOCATION = new CPUMemoryLocation();
+	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyHtoD_v2)) {
+		//std::cerr << "cuMemcpyHtoD synchronization is required" << std::endl;
+		return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
+	} else {
+		//std::cerr << "cuMemcpyHtoD synchronization is NOT required" << std::endl;
+		return autocorr_cuMemcpyHtoDAsync_v2_wrapper(dstDevice, srcHost, ByteCount,0);
+	}
+	//return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
 }
-
+	// void * GetAllocation(void * cpuDestAddr,uint64_t size, bool toDevice);
+	// void RegisterAllocation(void * ptr, uint64_t size, bool appAllocated);
+	// void FreeAllocation(void * ptr);
+	// void CopyToDestination();
+	// void UnregisterAllocation(void * ptr, uint64_t size);
 int autocorr_cuMemcpyDtoH_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount) {
-	return autocorr_cuMemcpyDtoH_v2_wrapper(dstHost, srcDevice, ByteCount);
+	if(local_CPUMEMLOCATION == NULL)
+		local_CPUMEMLOCATION = new CPUMemoryLocation();
+
+	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyDtoH_v2)) {
+		//std::cerr << "cuMemcpyDtoH synchronization is required" << std::endl;
+		return autocorr_cuMemcpyDtoH_v2_wrapper(dstHost, srcDevice, ByteCount);
+	} else {
+		//std::cerr << "cuMemcpyDotH synchronization is NOT required" << std::endl;
+		return autocorr_cuMemcpyDtoHAsync_v2_wrapper(dstHost, srcDevice, ByteCount,0);
+	}
+	//return autocorr_cuMemcpyDtoH_v2_wrapper(dstHost, srcDevice, ByteCount);
 }
 
 int autocorr_cuMemcpyDtoHAsync_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream) {

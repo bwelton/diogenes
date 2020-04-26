@@ -1,5 +1,7 @@
 #ifndef SYNCDETECTOR_MUTATEE_HEADER
 #define SYNCDETECTOR_MUTATEE_HEADER 1
+#include <sys/types.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -60,4 +62,6 @@ extern StackwalkInst * memgraph_globalWalker;
 extern volatile uint64_t currentStackID;
 extern volatile bool memgraph_exitinit;
 extern StackTrie * memgraph_necessary_syncs;
+
+extern pthread_t memgraph_doInst;
 #endif

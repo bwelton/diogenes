@@ -7,6 +7,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <unordered_map>
+#include <map>
 #include "gotcha/gotcha.h"
 #include <pthread.h> 
 #include <cuda.h>
@@ -27,6 +28,35 @@
 #define AUTOCORR_CALLID_cuMemcpyDtoH_v2 4
 #define AUTOCORR_CALLID_cuMemFree_v2 5
 
+struct CPUAddressPair {
+	void * origCPUAddr;
+	void * pinnedCPUAddr;
+	bool toDevice;
+	uint64_t size;
+	CPUAddressPair(void * c, void * p, uint64_t s, bool dev);
+	inline void * GetOverlap(void * c, uint64_t s);
+};
+
+struct CPUMemoryAllocation {
+	void * ptr;
+	uint64_t size;
+	bool appallocated; 
+	CPUMemoryAllocation(void * p, uint64_t s, bool appAlloc);
+};
+class CPUMemoryLocation {
+public:
+	//void * GetAllocation(void * ptr, uint64_t size);
+	void * GetAllocation(void * cpuDestAddr,uint64_t size, bool toDevice);
+	void RegisterAllocation(void * ptr, uint64_t size, bool appAllocated);
+	void FreeAllocation(void * ptr);
+	void CopyToDestination();
+	void UnregisterAllocation(void * ptr);
+	std::unordered_multimap<uint64_t, void*> _freeMemory;
+	std::map<void *, CPUAddressPair> _currentCPUTransfers;
+	std::map<void *, CPUMemoryAllocation> _activeTransfers;
+	std::map<void *, CPUMemoryAllocation> _allocationMap;
+	std::map<void *, CPUMemoryAllocation> _activeAllocations;
+};
 
 // Exit handlers
 void autocorr_mutatee_exit_handler();

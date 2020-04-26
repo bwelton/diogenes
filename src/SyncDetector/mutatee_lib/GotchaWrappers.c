@@ -48,7 +48,7 @@ uint64_t GetStackID() {
 	}
 	if (syncdetect_necessary_syncs == NULL)
 		syncdetect_necessary_syncs = CPPStackTrie_Initalize();// StackTrie_Initalize(0, NULL, syncdetect_malloc_wrapper, syncdetect_free_wrapper);
-	uint64_t ret =  Stackwalk_GetStackID(globalWalker);
+	uint64_t ret =  Stackwalk_GetStackIDSWLock(globalWalker);
 	syncdetect_disablememcapture = false;
 	return ret;
 }

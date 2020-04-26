@@ -1,4 +1,4 @@
-add_library(AutocorrectLibrary SHARED "GotchaWrappers.cpp" "Autocorrect.cpp" "FastStackTree.cpp")
+add_library(AutocorrectLibrary SHARED "GotchaWrappers.cpp" "Autocorrect.cpp" "FastStackTree.cpp" "CPUMemorLocation.cpp" "SimpleGPUMallocMap.cpp")
 
 INCLUDE_DIRECTORIES(AutocorrectLibrary ${CUDA_TOOLKIT_ROOT_DIR}/include)
 INCLUDE_DIRECTORIES(AutocorrectLibrary ${CUDA_TOOLKIT_ROOT_DIR}/extras/CUPTI/include)

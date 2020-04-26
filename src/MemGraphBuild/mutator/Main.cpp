@@ -30,6 +30,7 @@ int main(int argc, char * argv[]) {
     proc.LoadLibrary("libcuda.so");
     proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libMemGraphMutateeLib.so"));
     //DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libMemGraphMutateeLib.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
+    //proc.BreakAtMain();
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libMemGraphMutateeLib.so") ,std::string("mutatee_init"));
     //proc.RunUntilCompleation(std::string(""));
     proc.DetachForDebug();

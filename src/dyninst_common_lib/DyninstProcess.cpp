@@ -251,9 +251,47 @@ void DyninstProcess::DetachForDebug() {
 		_aspace->finalizeInsertionSet(false);
 	BPatch_process * appProc = dynamic_cast<BPatch_process*>(_aspace);
 	int pid = appProc->getPid();
-	appProc->detach(false);
+	appProc->detach(true);
 	int status;
 	waitpid(pid,&status,0);
+}
+
+void DyninstProcess::BreakAtMain() {
+	std::vector<BPatch_function*> funcs;
+	//bool getProcedures(BPatch_Vector<BPatch_function*> &procs, bool incUninstrumentable = false);
+	GetAddressSpace()->getImage()->getProcedures(funcs);
+	BPatch_function * found = NULL;
+	for (auto i : funcs){
+		if(i->getMangledName() == std::string("main")) {
+			if (found != NULL) 
+				assert(found == NULL);
+			found = i;
+		}
+	}
+	assert(found != NULL);
+	std::vector<BPatch_point*> * entryPoints = found->findPoint(BPatch_locEntry);
+    BPatchSnippetHandle * handle = GetAddressSpace()->insertSnippet(BPatch_breakPointExpr(),*entryPoints);
+	assert(handle != NULL);
+	BPatch_process * appProc = dynamic_cast<BPatch_process*>(_aspace);
+
+	RunUntilCompleation(std::string(""));
+	// assert(appProc->continueExecution() == true);	
+	// while(!appProc->isStopped()) {
+
+	// }
+	// assert(appProc->continueExecution() == true);
+	// assert(appProc->continueExecution() == true);
+	// // while(appProc->isStopped() == true && appProc->terminationStatus() == NoExit){
+	// //  	appProc->continueExecution();
+	// // }
+	// while (!appProc->isTerminated()) {
+	// 	if(appProc->isStopped())
+	// 		break;
+	// 	sleep(1);
+	// 	bpatch.pollForStatusChange();
+	// }
+	std::cerr << "Finished waiting, removing BP"<<std::endl;
+	GetAddressSpace()->deleteSnippet(handle);
 }
 
 BPatch_addressSpace * DyninstProcess::GetAddressSpace() {
