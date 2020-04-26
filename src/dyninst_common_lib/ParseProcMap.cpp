@@ -8,13 +8,13 @@ ParseProcMap::ParseProcMap(char * procfile){
 	procmaps_struct* tmp=NULL;
     bool foundHeap = false;
 	while( (tmp = pmparser_next(parse)) != NULL){
-        if (tmp->is_x == false)
+        if (tmp->is_x == false || tmp == NULL)
             continue;
         _maps[(uint64_t)tmp->addr_start] = *tmp;
         if (strlen(tmp->pathname) > 0) {
             std::string tmps = std::string(tmp->pathname);
-	    if (tmps.find("[vdso]") != std::string::npos)
-		    continue;
+            if (tmps.find("[vdso]") != std::string::npos)
+                continue;
             if (_pathnameMap.find(tmps) == _pathnameMap.end()){
                 _pathnameMap[tmps] = std::shared_ptr<char>(strdup(tmps.c_str()));
                 std::cerr << "Checking if file " << tmps << " is PIC/PIE" << std::endl;
