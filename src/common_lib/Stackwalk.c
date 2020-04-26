@@ -126,6 +126,14 @@ uint64_t Stackwalk_GetStackID(StackwalkInst * inst) {
 	//return Stackwalk_GetStackID_libunwind(inst);
 
 }
+
+uint64_t Stackwalk_GetStackIDBacktracesLock(StackwalkInst * inst) {
+	pthread_mutex_lock(&lock); 
+	uint64_t ret = Stackwalk_GetStackID_GNUBtrace(inst);
+	pthread_mutex_unlock(&lock); 
+	return ret;	
+}
+
 uint64_t Stackwalk_GetStackIDLibunwind(StackwalkInst * inst) {
 	return Stackwalk_GetStackID_libunwind(inst);
 }
