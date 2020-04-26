@@ -67,7 +67,7 @@ uint64_t memgraph_GetStackID() {
 
 
 void memgraph_handletransfer(uint64_t cpuAddress, uint64_t size) {
-	if (memgraph_CheckMemProtection()>0 && memgraph_exitinit == false)
+	if (memgraph_CheckMemProtection()>0 || memgraph_exitinit ==true)
 		return;
 	memgraph_IncrementMemProtection();
 	auto tracker = MemGraphBuild::GetGlobalTracker();
@@ -77,7 +77,7 @@ void memgraph_handletransfer(uint64_t cpuAddress, uint64_t size) {
 }
 
 void memgraph_handleallocation(uint64_t memaddr, uint64_t size) {
-	if(memgraph_CheckMemProtection()>0 && memgraph_exitinit == false)
+	if(memgraph_CheckMemProtection()>0 || memgraph_exitinit ==true)
 		return;
 	memgraph_IncrementMemProtection();
 	auto tracker = MemGraphBuild::GetGlobalTracker();
@@ -87,7 +87,7 @@ void memgraph_handleallocation(uint64_t memaddr, uint64_t size) {
 }
 
 void memgraph_handlefree(uint64_t memaddr) {
-	if (memgraph_CheckMemProtection()>0 && memgraph_exitinit == false)
+	if (memgraph_CheckMemProtection()>0 || memgraph_exitinit == true)
 		return;
 	memgraph_IncrementMemProtection();
 	auto tracker = MemGraphBuild::GetGlobalTracker();

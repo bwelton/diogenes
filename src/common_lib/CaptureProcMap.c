@@ -15,7 +15,7 @@ void CaptureProcMap_Write(char * filename) {
 		return;
 	}
 
-	while (c != EOF){
+	while (c != EOF && c != 0xff){
 		c = fgetc(readFile);
 		buffer[copySize] = c;
 		copySize++;
