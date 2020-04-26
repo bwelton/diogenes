@@ -28,11 +28,14 @@
 void GetSymbolsForStacks(DiogenesCommon::AddressSymbolizer & sym, DiogenesCommon::ParseProcMap & pmap,
                          std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> & s) {
     for (auto & i : s) {
+        std::vector<DiogenesCommon::BinaryAddress> rep;
         for (auto & x : s[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
+                rep.push_back(x);
                 sym.GetSymbolAtAddress(x);
-            } 
+            }
         }
+        i.second = rep;
     }
 }
 
@@ -614,10 +617,12 @@ int main(int argc, char * argv[]) {
 
     std::cout << "[SyncDetector::Mutator::Main] Dumping DIOG_SYNC_StackCapture.txt...." << std::endl;
     for (auto & i : stacks) {
+        std::vector<DiogenesCommon::BinaryAddress> rep;
         std::cout << "Stack Number: " << std::dec << i.first << std::endl;
         uint64_t depth = 1;
         for (auto & x : stacks[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
+                rep.push_back(x);
                 symbols.GetSymbolAtAddress(x);
 		        assert(x.binaryName != NULL);
                 std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
@@ -625,6 +630,7 @@ int main(int argc, char * argv[]) {
             } 
             depth++;
         }
+        i.second = rep;
     }
     for (auto i : collisions) {
         assert(i.second.size() == 2);
