@@ -58,6 +58,23 @@ uint64_t Stackwalk_GetStackID_FPStackWalker(StackwalkInst * inst) {
 	}
 }
 
+uint64_t Stackwalk_GetStackLibUnwind(uint64_t * store, uint64_t maxSize) {
+	unw_cursor_t cursor; unw_context_t uc;
+	unw_word_t ip, sp;
+	uint64_t pos = 0;
+	unw_getcontext(&uc);
+	unw_init_local(&cursor, &uc);
+	while (unw_step(&cursor) > 0) {
+		unw_get_reg(&cursor, UNW_REG_IP, &ip);
+		if (ip == 0)
+			continue;
+		store[pos] = (uint64_t)ip;
+		pos++;
+		if (pos >= maxSize)
+			assert(1 == 0);
+	}
+	return pos;
+}
 
 uint64_t Stackwalk_GetStackID_libunwind(StackwalkInst * inst) {
   unw_cursor_t cursor; unw_context_t uc;

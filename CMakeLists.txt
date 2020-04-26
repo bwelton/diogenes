@@ -26,6 +26,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/common_lib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/SyncDetector)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/dyninst_common_lib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/MemGraphBuild)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/Autocorrect)
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/inst_lib)
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/src/deduplicate)

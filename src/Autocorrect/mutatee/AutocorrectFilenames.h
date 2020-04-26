@@ -2,5 +2,5 @@
 #define DIOGENES_AUTOCORRECT_FNAMES 1
 
 #define AUTOCORRECT_STACKFILE "DIOG_AC_Autocorrect.txt"
-
+#define AUTOCORRECT_BINARYFILE "DIOG_AC_BinaryStacks.txt"
 #endif

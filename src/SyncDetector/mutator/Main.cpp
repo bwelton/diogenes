@@ -165,16 +165,16 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessaryCuda
         if (normalizedMG.find(i) == normalizedMG.end())
             continue;
         std::vector<DiogenesCommon::BinaryAddress> cur = normalizedMG[i];
-        std::cout << "NEW STACK START" << std::endl;
-        for (auto & x : cur){
-            std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            std::cout <<  x.symbolInfo.Print(5);
-        }
+        // std::cout << "NEW STACK START" << std::endl;
+        // for (auto & x : cur){
+        //     std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+        //     std::cout <<  x.symbolInfo.Print(5);
+        // }
         uint64_t syncStackID = 0;
         for(auto x : buildUniqueIdentiferTree._children){
             if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
                 if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
-                    std::cout << "FOUND MATCH " << std::endl;
+                    //std::cout << "FOUND MATCH " << std::endl;
                     syncStackID = x->FindElement(cur, 1);
                     break;
                 }
@@ -182,7 +182,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessaryCuda
         }
         std::cout << "Matched - MemGraph Stack " << std::dec << i  << " with SyncDetect Stack " << syncStackID << std::endl;
         if (requiredSyncs.find(syncStackID) == requiredSyncs.end() && syncStackID != 0){
-            std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
+            //std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
             cudaFreeToCorrect.insert(i);
         }
     }
@@ -227,10 +227,10 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
             }
         }
         //std::cout << "NEW STACK START With ID " << std::dec << existing << std::endl;
-        for (auto & x : t.second){
-            std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            std::cout <<  x.symbolInfo.Print(5);
-        }     
+        // for (auto & x : t.second){
+        //     std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+        //     std::cout <<  x.symbolInfo.Print(5);
+        // }     
     }
 
     std::set<uint64_t> tmpRequired = requiredSyncs;
@@ -262,16 +262,16 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         if (normalizedMG.find(i) == normalizedMG.end())
             continue;
         std::vector<DiogenesCommon::BinaryAddress> cur = normalizedMG[i];
-        std::cout << "NEW STACK START" << std::endl;
-        for (auto & x : cur){
-            std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            std::cout <<  x.symbolInfo.Print(5);
-        }
+        // std::cout << "NEW STACK START" << std::endl;
+        // for (auto & x : cur){
+        //     std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+        //     std::cout <<  x.symbolInfo.Print(5);
+        // }
         uint64_t syncStackID = 0;
         for(auto x : buildUniqueIdentiferTree._children){
             if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
                 if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
-                    std::cout << "FOUND MATCH " << std::endl;
+                    //std::cout << "FOUND MATCH " << std::endl;
                     syncStackID = x->FindElement(cur, 1);
                     break;
                 }
@@ -279,7 +279,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         }
         std::cout << "Matched - MemGraph Stack " << std::dec << i  << " with SyncDetect Stack " << syncStackID << std::endl;
         if (requiredSyncs.find(syncStackID) == requiredSyncs.end() && syncStackID != 0){
-            std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
+            //std::cout << "UNNECESSARY SYNCHRONIZATION AT " << i << std::endl;
             transToCorrect.insert(i);
         }
     }
@@ -576,8 +576,7 @@ void GenerateAutocorrection() {
 
 int main(int argc, char * argv[]) {
     std::string libcudaTest;
-    GenerateAutocorrection();
-    return  -1;
+
     uint64_t cudaOffset = DynHelper_GetSynchronizationOffset(libcudaTest); 
     std::cout << "We found cuda offset at location: " << std::hex << cudaOffset << std::endl;
 
@@ -634,6 +633,8 @@ int main(int argc, char * argv[]) {
             depth++;
         }
     }
+    GenerateAutocorrection();
+    return  -1;
 }
 
 
