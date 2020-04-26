@@ -3,6 +3,8 @@
 bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, std::string insertLib, uint64_t addr,  std::string wrapperLib, std::string entryFunc, std::string exitFunc) {
     BPatch_function * entry = NULL;
     BPatch_function * exit = NULL;
+    BPatch_object * libLoaded = proc.GetAddressSpace()->loadLibrary(wrapperLib.c_str());
+
 
     BPatch_function * toWrap =  DynHelper_GetFuncAtAddress(proc.GetAddressSpace(), insertLib, addr);
     if (toWrap == NULL){
@@ -11,7 +13,11 @@ bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, std::strin
     }
 
     if (entryFunc.size() != 0) {
-        entry = DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, entryFunc);
+        std::vector<BPatch_function *> ret;
+	    libLoaded->findFunction(entryFunc, ret);    
+        assert(ret.size() > 0);
+        entry = ret[0];
+        //entry = DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, entryFunc);
         if(entry == NULL) {
             std::cerr << "[DynEntryExit_InsertAtAddr] could not find function with name " << entryFunc << " in libname " << wrapperLib << std::endl;
             return false;
@@ -19,7 +25,11 @@ bool DynEntryExit_InsertAtAddr(DiogenesCommon::DyninstProcess & proc, std::strin
     }
 
     if (exitFunc.size() != 0) {
-        exit =  DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, exitFunc);
+        std::vector<BPatch_function *> ret;
+	    libLoaded->findFunction(exitFunc, ret);    
+        assert(ret.size() > 0);
+        exit = ret[0];
+        //exit =  DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, exitFunc);
         if(exit == NULL) {
             std::cerr << "[DynEntryExit_InsertAtAddr] could not find function with name " << exitFunc << " in libname " << wrapperLib << std::endl;
             return false;
@@ -45,6 +55,7 @@ bool DynEntryExit_InsertAtAddrBinary(DiogenesCommon::DyninstBinaryEdit & proc, s
     BPatch_function * entry = NULL;
     BPatch_function * exit = NULL;
 
+    BPatch_object * libLoaded = proc.GetAddressSpace()->loadLibrary(wrapperLib.c_str());
     BPatch_function * toWrap =  DynHelper_GetFuncAtAddress(proc.GetAddressSpace(), insertLib, addr);
     if (toWrap == NULL){
         std::cerr << "[DynEntryExit_InsertAtAddr] could not find function at address " << std::hex << addr << " in libname " << insertLib << std::endl;
@@ -52,7 +63,11 @@ bool DynEntryExit_InsertAtAddrBinary(DiogenesCommon::DyninstBinaryEdit & proc, s
     }
 
     if (entryFunc.size() != 0) {
-        entry = DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, entryFunc);
+        std::vector<BPatch_function *> ret;
+	    libLoaded->findFunction(entryFunc, ret);    
+        assert(ret.size() > 0);
+        entry = ret[0];
+//        entry = DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, entryFunc);
         if(entry == NULL) {
             std::cerr << "[DynEntryExit_InsertAtAddr] could not find function with name " << entryFunc << " in libname " << wrapperLib << std::endl;
             return false;
@@ -60,7 +75,11 @@ bool DynEntryExit_InsertAtAddrBinary(DiogenesCommon::DyninstBinaryEdit & proc, s
     }
 
     if (exitFunc.size() != 0) {
-        exit =  DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, exitFunc);
+        std::vector<BPatch_function *> ret;
+	    libLoaded->findFunction(exitFunc, ret);    
+        assert(ret.size() > 0);
+        exit = ret[0];
+        //exit =  DynHelper_GetFuncByName(proc.GetAddressSpace(), wrapperLib, exitFunc);
         if(exit == NULL) {
             std::cerr << "[DynEntryExit_InsertAtAddr] could not find function with name " << exitFunc << " in libname " << wrapperLib << std::endl;
             return false;

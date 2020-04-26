@@ -588,7 +588,7 @@ int main(int argc, char * argv[]) {
     DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
     proc.LaunchProcess();
     proc.LoadLibrary("libcuda.so");
-    proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"));
+    assert(proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so")) != NULL);
     DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
     proc.DetachForDebug();
