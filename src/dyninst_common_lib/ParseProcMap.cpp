@@ -1,16 +1,20 @@
 #include "ParseProcMap.h"
 #include <iostream>
 #include <dlfcn.h>
+#include <string.h>
 namespace DiogenesCommon{
 
 ParseProcMap::ParseProcMap(char * procfile){
     procmaps_iterator* parse = pmparser_parse(procfile);
 	procmaps_struct* tmp=NULL;
+    _pathnameMap[std::string("EMPTY")] = std::shared_ptr<char>(strdup(std::string("UNKNOWN").c_str()));
+
     bool foundHeap = false;
 	while( (tmp = pmparser_next(parse)) != NULL){
         if (tmp->is_x == false || tmp == NULL)
             continue;
         _maps[(uint64_t)tmp->addr_start] = *tmp;
+	memcpy(_maps[(uint64_t)tmp->addr_start].pathname, tmp->pathname, 600);
         if (strlen(tmp->pathname) > 0) {
             std::string tmps = std::string(tmp->pathname);
             if (tmps.find("[vdso]") != std::string::npos)
@@ -71,7 +75,7 @@ bool ParseProcMap::GetLibraryAndOffset(BinaryAddress & in) {
         if (strlen(s.pathname) > 0)
             in.binaryName = _pathnameMap[std::string(s.pathname)];
         else {
-            in.binaryName = NULL;
+            in.binaryName = _pathnameMap[std::string("EMPTY")];
             return false;
         }
         return true;

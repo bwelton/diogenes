@@ -22,13 +22,16 @@ HashMap * ReadStackKeys(void * (*allocator_fun)(size_t), void (*free_fun)(void *
 			char * save4 = NULL;
 			StackKeyEntry e;
 			char * strN = strtok_r(element, "@", &save4);
-			e.libname = (char*)allocator_fun(strlen(strN));
-			strcpy(e.libname, strN);
-			e.addr = 0;
-			save4 =  strtok_r(NULL, "@", &save4);
-			sscanf(save4, "%"PRIx64"", &(e.addr));
-			//fprintf(stderr,"Address= %"PRIu64"\n", e.addr);
-			CVector_Append(data, &e, sizeof(StackKeyEntry));
+			if(strN != NULL) {
+				e.libname = (char*)allocator_fun(strlen(strN));
+				strncpy(e.libname, strN,strlen(strN));
+				e.addr = 0;
+				save4 =  strtok_r(NULL, "@", &save4);
+				assert(save4 != NULL);
+				sscanf(save4, "%"PRIx64"", &(e.addr));
+				//fprintf(stderr,"Address= %"PRIu64"\n", e.addr);
+				CVector_Append(data, &e, sizeof(StackKeyEntry));
+			}
 			element = strtok_r(NULL, ",", &save3);
 		}
 		ptr = strtok_r(NULL, "\n", &save1);

@@ -584,7 +584,7 @@ int main(int argc, char * argv[]) {
         std::cerr << "Expected arguments  <application> <application args>" << std::endl;
         return -1;
     }
-
+/*
     DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
     proc.LaunchProcess();
     proc.LoadLibrary("libcuda.so");
@@ -593,13 +593,14 @@ int main(int argc, char * argv[]) {
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
     proc.DetachForDebug();
     //proc.RunUntilCompleation(std::string(""));
-    
+  */  
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
     char collisionFileName[] = "DIOG_SYNC_StackCollision.txt";
     char procMapName[] = "ProcMap.txt";
 
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> stacks = ReadStacksFromMutatee(stackFileName);
     std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> collisions = ReadStacksFromMutatee(collisionFileName);
+    assert(collisions.size() > 0);
     DiogenesCommon::ParseProcMap pmap(procMapName);
     DiogenesCommon::AddressSymbolizer symbols;
 
@@ -638,9 +639,9 @@ int main(int argc, char * argv[]) {
             depth++;
         }
     }
-    std::cout << std::flush;
-    GenerateAutocorrection();
-    return  -1;
+//    std::cout << std::flush;
+    //GenerateAutocorrection();
+    return 0;
 }
 
 
