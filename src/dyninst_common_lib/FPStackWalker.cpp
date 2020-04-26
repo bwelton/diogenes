@@ -37,15 +37,31 @@ extern "C" {
 
     size_t FPStackWalker_GetStackFP(uint64_t * items, size_t maxSize) {
         FPStackWalker_Init();
-		stackwalk_vector.clear();
-		if(local_walker->walkStack(stackwalk_vector) == false) {
-			return 0;
-		}
+        Frame curFrame;
+        Frame next;
         size_t ret = 0;
-        for (auto i : stackwalk_vector) {
-            items[ret] = (uint64_t)i.getRA();
+        if(local_walker->getInitialFrame(curFrame) == false)
+            return 0;
+        items[ret] = (uint64_t)curFrame.getRA();
+        ret++;
+        while (local_walker->walkSingleFrame(curFrame,next)) {
+            items[ret] = (uint64_t)next.getRA();
+            fprintf(stderr,"Frame RA: %lx, FP: %lx, SP: %lx\n",(uint64_t)next.getRA(),(uint64_t)next.getFP(), (uint64_t)next.getSP());
             ret++;
+            curFrame = next;
         }
+		//stackwalk_vector.clear();
+
+        // getInitialFrame
+
+		// if(local_walker->walkStack(stackwalk_vector) == false) {
+		// 	return 0;
+		// }
+
+        // for (auto i : stackwalk_vector) {
+        //     items[ret] = (uint64_t)i.getRA();
+        //     ret++;
+        // }
         return ret;
     }
 
