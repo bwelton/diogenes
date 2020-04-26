@@ -25,7 +25,7 @@ std::map<uint64_t, std::vector<DiogenesCommon::BinaryAddress>> ReadStacksFromMut
             } else {
                 address = line.substr(firstElement+1,endSecond - firstElement - 1);
             }
-            std::cerr << "PATHNAME=" << pathname << "    " << "ADDRESS="<< address << std::endl;
+            //std::cerr << "PATHNAME=" << pathname << "    " << "ADDRESS="<< address << std::endl;
             tmp.binaryName.reset(strdup(pathname.c_str()));
             if (pathname.find("VIRTADDR") == std::string::npos){
                 tmp.libraryOffset = std::stoull(address,0,16);

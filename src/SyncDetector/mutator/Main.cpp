@@ -31,8 +31,9 @@ void GetSymbolsForStacks(DiogenesCommon::AddressSymbolizer & sym, DiogenesCommon
         std::vector<DiogenesCommon::BinaryAddress> rep;
         for (auto & x : s[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
-                rep.push_back(x);
                 sym.GetSymbolAtAddress(x);
+
+                rep.push_back(x);
             }
         }
         i.second = rep;
@@ -242,6 +243,9 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
     for (auto i : tmpRequired) {
         requiredSyncs.insert(aliasMap[i]->begin(), aliasMap[i]->end());
     }
+    for (auto i : requiredSyncs)
+	    std::cout << "Sync " << i << " is required" << std::endl;
+
     std::cout << "Printing first level of unique tree " << std::endl;
     for(auto x : buildUniqueIdentiferTree._children){
         std::cout << x->_binAddr.symbolInfo.Print(4) << std::endl;
@@ -276,7 +280,8 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         for(auto x : buildUniqueIdentiferTree._children){
             if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
                 if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
-                    //std::cout << "FOUND MATCH " << std::endl;
+		
+                    std::cout << "FOUND MATCH " << std::endl;
                     syncStackID = x->FindElement(cur, 1);
                     break;
                 }
@@ -597,13 +602,13 @@ int main(int argc, char * argv[]) {
         return -1;
     }
 
-    // DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
-    // proc.LaunchProcess();
-    // proc.LoadLibrary("libcuda.so");
-    // assert(proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so")) != NULL);
-    // DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
-    // OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
-    // proc.DetachForDebug();
+     DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
+     proc.LaunchProcess();
+     proc.LoadLibrary("libcuda.so");
+     assert(proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so")) != NULL);
+     DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
+     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
+     proc.DetachForDebug();
     //proc.RunUntilCompleation(std::string(""));
     
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
@@ -622,12 +627,19 @@ int main(int argc, char * argv[]) {
         uint64_t depth = 1;
         for (auto & x : stacks[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
-                rep.push_back(x);
                 symbols.GetSymbolAtAddress(x);
+
+                rep.push_back(x);
 		        assert(x.binaryName != NULL);
                 std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
 	            std::cout <<  x.symbolInfo.Print(5);
             } 
+            depth++;
+        }
+
+        for (auto & x : rep){
+	    std::cerr << "REP" << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cerr <<  x.symbolInfo.Print(5);
             depth++;
         }
         i.second = rep;
@@ -636,20 +648,20 @@ int main(int argc, char * argv[]) {
         assert(i.second.size() == 2);
         uint64_t syncRequired = i.second[0].processAddress;
         uint64_t useOfData = i.second[1].processAddress;
-        std::cout << "REQUIRED SYNCHRONIZATION AT NUMBER: " << std::dec << syncRequired << std::endl;
+        std::cerr << "REQUIRED SYNCHRONIZATION AT NUMBER: " << std::dec << syncRequired << std::endl;
         uint64_t depth = 1;
         for (auto & x : stacks[syncRequired]){
             
 	    assert(x.binaryName != NULL);
-	    std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            std::cout <<  x.symbolInfo.Print(5);
+	    std::cerr << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cerr <<  x.symbolInfo.Print(5);
             depth++;
         }
         depth = 1;
-        std::cout << "DATA USED AT " << std::dec << useOfData << std::endl;
+        std::cerr << "DATA USED AT " << std::dec << useOfData << std::endl;
         for (auto & x : stacks[useOfData]){
-            std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-            std::cout <<  x.symbolInfo.Print(5);
+            std::cerr << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cerr <<  x.symbolInfo.Print(5);
             depth++;
         }
     }

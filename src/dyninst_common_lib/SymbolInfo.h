@@ -21,7 +21,9 @@ struct LineMap{
 
 struct SymbolInfo {
     std::vector<std::string> funcName;
-    std::vector<LineMap> lineinfo; 
+    std::vector<LineMap> lineinfo;
+    SymbolInfo() {};
+    SymbolInfo(const SymbolInfo &p2) : funcName(p2.funcName), lineinfo(p2.lineinfo) {};
     std::string Print(uint64_t spaceLength);
 };
 

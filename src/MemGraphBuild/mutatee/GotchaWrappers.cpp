@@ -58,7 +58,7 @@ uint64_t memgraph_GetStackID() {
 		memgraph_globalWalker = Stackwalk_Init(malloc,free);
 	}
 	// puts("Getting Stackwalk!");
-	uint64_t ret =  Stackwalk_GetStackIDLockUnwind(memgraph_globalWalker);
+	uint64_t ret =  Stackwalk_GetStackID(memgraph_globalWalker);//Stackwalk_GetStackIDLockUnwind(memgraph_globalWalker);
 	// puts("Finished Stackwalk!");
 	memgraph_ingetstack = false;
 	memgraph_DecrementMemProtection();

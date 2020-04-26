@@ -44,12 +44,16 @@ extern "C" {
             return 0;
         items[ret] = (uint64_t)curFrame.getRA();
         ret++;
+	fprintf(stderr, "STarting stack\n");
         while (local_walker->walkSingleFrame(curFrame,next)) {
             items[ret] = (uint64_t)next.getRA();
             fprintf(stderr,"Frame RA: %lx, FP: %lx, SP: %lx\n",(uint64_t)next.getRA(),(uint64_t)next.getFP(), (uint64_t)next.getSP());
             ret++;
+	    if (next.getSP() > curFrame.getSP())
+		    break;
             curFrame = next;
         }
+	fprintf(stderr, "Ending stack\n");
 		//stackwalk_vector.clear();
 
         // getInitialFrame
