@@ -610,6 +610,9 @@ int main(int argc, char * argv[]) {
         for (auto & x : stacks[i.first]){
             if(pmap.GetLibraryAndOffset(x)) {
                 symbols.GetSymbolAtAddress(x);
+		assert(x.binaryName != NULL);
+                std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+	        std::cout <<  x.symbolInfo.Print(5);
             } 
             depth++;
         }
@@ -621,7 +624,9 @@ int main(int argc, char * argv[]) {
         std::cout << "REQUIRED SYNCHRONIZATION AT NUMBER: " << std::dec << syncRequired << std::endl;
         uint64_t depth = 1;
         for (auto & x : stacks[syncRequired]){
-            std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            
+	    assert(x.binaryName != NULL);
+	    std::cout << "  " << std::dec << depth << ": " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
             std::cout <<  x.symbolInfo.Print(5);
             depth++;
         }
@@ -633,6 +638,7 @@ int main(int argc, char * argv[]) {
             depth++;
         }
     }
+    std::cout << std::flush;
     GenerateAutocorrection();
     return  -1;
 }

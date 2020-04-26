@@ -159,7 +159,7 @@ void DiogenesCommon::AddressSymbolizer::GetSymbolAtAddress(BinaryAddress & addr)
     if (addr.binaryName == NULL)
         return;
     std::string libname = std::string(addr.binaryName.get());
-    if (libname.find("VIRTADDR") != std::string::npos)
+    if (libname.find("VIRTADDR") != std::string::npos || libname.find("[vdso]") != std::string::npos || libname.find("[heap]") != std::string::npos)
         return;
     if(_symbolMap.find(libname) == _symbolMap.end()) {
         // Symtab * tmpObj;

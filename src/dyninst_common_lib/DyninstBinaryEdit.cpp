@@ -16,6 +16,8 @@ DiogenesCommon::DyninstBinaryEdit::~DyninstBinaryEdit() {
 }
 
 BPatch_image * DiogenesCommon::DyninstBinaryEdit::GetImage() {
+	if (_be == NULL)
+		return NULL;
 	return _be->getImage();
 }
 
