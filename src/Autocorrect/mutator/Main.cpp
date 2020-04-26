@@ -18,6 +18,8 @@
 #include "ReadStacks.h"
 
 int main(int argc, char * argv[]) {
+    std::string libcudaTest;
+    uint64_t cudaOffset = DynHelper_GetSynchronizationOffset(libcudaTest); 
    char unnecessarySyncs[] = AUTOCORRECT_STACKFILE;
    char binarySyncFile[] = AUTOCORRECT_BINARYFILE;
    if (argc < 2) {
@@ -72,7 +74,7 @@ int main(int argc, char * argv[]) {
     outFile.close();
     proc.LoadLibrary("libcuda.so");
     proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so"));
-    //DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libMemGraphMutateeLib.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
+    DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so"), std::string(""), std::string("AUTOCORR_SYNC_FINISHED"));
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so") ,std::string("ac_mutatee_init"));
     proc.RunUntilCompleation(std::string(""));
     //proc.DetachForDebug();

@@ -2,14 +2,25 @@
 void * SimpleGPUMallocMap::GetAllocation(uint64_t size) {
 	//pthread_mutex_lock(&simpleGPUMemLock); 
 	void * ret;
-	auto it = _sizeToAddress.find(size);
-	if (it == _sizeToAddress.end()) {
-		autocorr_cuMemAlloc_wrapper(&ret, size);
-		_addrToSize[ret] = size;
-	} else {
-		ret = it->second;
-		_sizeToAddress.erase(it);
-	}
+
+    auto it = _sizeToAddress.lower_bound(size);
+    if (it == _sizeToAddress.end()){
+        autocorr_cuMemAlloc_wrapper(&ret, size);
+        _addrToSize[ret] = size;
+    } else {
+        ret = it->second;
+        _addrToSize[ret] = it->first;
+        _sizeToAddress.erase(it);
+
+    }
+	// auto it = _sizeToAddress.find(size);
+	// if (it == _sizeToAddress.end()) {
+	// 	autocorr_cuMemAlloc_wrapper(&ret, size);
+	// 	_addrToSize[ret] = size;
+	// } else {
+	// 	ret = it->second;
+	// 	_sizeToAddress.erase(it);
+	// }
 	//pthread_mutex_unlock(&simpleGPUMemLock); 
 	return ret;
 }

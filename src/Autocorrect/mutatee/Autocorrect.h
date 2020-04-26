@@ -63,19 +63,20 @@ void autocorr_mutatee_exit_handler();
 // Wrappers
 int autocorr_cuMemAllocHost_v2(void ** ptr, size_t size);
 int autocorr_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount);
-int autocorr_cuMemcpyDtoH_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount);
+int autocorr_cuMemcpyDtoH_v222(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount);
 int autocorr_cuMemcpyDtoHAsync_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream);
 int autocorr_cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount, CUstream hStream);
 int autocorr_cuMemFreeHost(void * ptr);
 int autocorr_cuMemAlloc(void ** ptr, size_t size) ;
 int autocorr_cuMemFree22(void* ptr);
 int autocorr_synchronize_device();
-
+void AUTOCORR_SYNC_FINISHED();
 //uint64_t GetStackID();
 
 
 struct SimpleGPUMallocMap {
-	std::unordered_multimap<uint64_t, void*> _sizeToAddress;
+	std::multimap<uint64_t, void*> _sizeToAddress;
+	//std::unordered_multimap<uint64_t, void*> _sizeToAddress;
 	std::unordered_map<void*, uint64_t> _addrToSize;
 	void * GetAllocation(uint64_t size);
 	void FreeAllocation(void * addr);
@@ -83,7 +84,7 @@ struct SimpleGPUMallocMap {
 // Global wrapper variables
 extern typeof(&autocorr_cuMemAllocHost_v2) autocorr_cuMemAllocHost_v2_wrapper;
 extern typeof(&autocorr_cuMemcpyHtoD_v2) autocorr_cuMemcpyHtoD_v2_wrapper;
-extern typeof(&autocorr_cuMemcpyDtoH_v2) autocorr_cuMemcpyDtoH_v2_wrapper;
+extern typeof(&autocorr_cuMemcpyDtoH_v222) autocorr_cuMemcpyDtoH_v222_wrapper;
 extern typeof(&autocorr_cuMemcpyDtoHAsync_v2) autocorr_cuMemcpyDtoHAsync_v2_wrapper;
 extern typeof(&autocorr_cuMemcpyHtoDAsync_v2) autocorr_cuMemcpyHtoDAsync_v2_wrapper;
 extern typeof(&autocorr_cuMemFreeHost) autocorr_cuMemFreeHost_wrapper;

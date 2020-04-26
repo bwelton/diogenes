@@ -10,13 +10,14 @@ inline void * CPUAddressPair::GetOverlap(void * c, uint64_t s) {
 }
 void CPUMemoryLocation::CopyToDestination() {
 	for(auto i : _currentCPUTransfers) {
-		if (i.second.toDevice == true){
+		if (i.second.toDevice == false){
 			memcpy(i.second.origCPUAddr, i.second.pinnedCPUAddr, i.second.size);
 		}
 		FreeAllocation(i.second.pinnedCPUAddr);
 	}
 	_currentCPUTransfers.clear();
 }
+
 void * CPUMemoryLocation::GetAllocation(void * cpuDestAddr,uint64_t size, bool toDevice){
 	auto it = _allocationMap.lower_bound(cpuDestAddr);
 	if (it != _allocationMap.end()) {
@@ -32,7 +33,7 @@ void * CPUMemoryLocation::GetAllocation(void * cpuDestAddr,uint64_t size, bool t
 		bool sync = false;
 		void * overlap = it2->second.GetOverlap(cpuDestAddr,size);
 		if (overlap == cpuDestAddr){
-			if(it2->second.toDevice == false)
+			if(it2->second.toDevice == true)
 				it2->second.toDevice = toDevice;
 			return it2->second.pinnedCPUAddr;
 		}else if (overlap != NULL) {
@@ -64,6 +65,8 @@ void * CPUMemoryLocation::GetAllocation(void * cpuDestAddr,uint64_t size, bool t
 
 	_currentCPUTransfers.emplace(cpuDestAddr, CPUAddressPair(cpuDestAddr,it4->second,size,toDevice));
 	void * ret = it4->second;
+    if(toDevice)
+        memcpy(ret, cpuDestAddr, size);
 	_freeMemory.erase(it4);
 	return ret;
 }
