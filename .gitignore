@@ -9,3 +9,4 @@ procmapdump2.txt
 procmapdump.txt
 install/bin/SyncDetector
 pmaps
+src/dyninst_common_lib/CommonDefines.h
