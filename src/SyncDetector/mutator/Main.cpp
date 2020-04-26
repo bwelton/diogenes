@@ -219,6 +219,8 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         uint64_t i = t.first;
         uint64_t existing = buildUniqueIdentiferTree.InsertElement(t.second, t.first, 0);
         if (i != existing) {
+            assert(aliasMap[i] != NULL);
+            assert( aliasMap[existing] != NULL);
             if (aliasMap[i] != aliasMap[existing]) {
                 aliasMap[i]->insert(aliasMap[existing]->begin(), aliasMap[existing]->end());
                 aliasMap[i]->insert(i);
@@ -592,13 +594,13 @@ int main(int argc, char * argv[]) {
         return -1;
     }
 
-    DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
-    proc.LaunchProcess();
-    proc.LoadLibrary("libcuda.so");
-    assert(proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so")) != NULL);
-    DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
-    OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
-    proc.DetachForDebug();
+    // DiogenesCommon::DyninstProcess proc(argc - 1, &(argv[1]));
+    // proc.LaunchProcess();
+    // proc.LoadLibrary("libcuda.so");
+    // assert(proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so")) != NULL);
+    // DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so"), std::string(""), std::string("DIOG_Synchronization_Post"));
+    // OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libSyncDetectorMutatee.so") ,std::string("mutatee_init"));
+    // proc.DetachForDebug();
     //proc.RunUntilCompleation(std::string(""));
     
     char stackFileName[] = "DIOG_SYNC_StackCapture.txt";
