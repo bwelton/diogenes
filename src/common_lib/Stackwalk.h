@@ -28,6 +28,7 @@ char * Stackwalk_PrintStack(StackwalkInst * inst, size_t * size);
 uint64_t Stackwalk_GetStackIDLockUnwind(StackwalkInst * inst);
 uint64_t Stackwalk_GetStackIDBacktracesLock(StackwalkInst * inst);
 uint64_t Stackwalk_GetStackIDSWLock(StackwalkInst * inst);
+uint64_t Stackwalk_GetStackID_GetGNUBtrace(uint64_t * store, uint64_t maxSize);
 uint64_t Stackwalk_GetStackLibUnwind(uint64_t * store, uint64_t maxSize);
 #ifdef __cplusplus
 }

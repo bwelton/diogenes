@@ -24,10 +24,11 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 	if (autocorr_exitinit || autocorr_GlobalStacktree == NULL)
 		return 0;
 	uint64_t store[100];
-	uint64_t stackSize = Stackwalk_GetStackLibUnwind(store, 100);
+	
 
 #if defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
 	// Dyninst's stack frame will appear on PPC, we must skip it
+	uint64_t stackSize = Stackwalk_GetStackID_GetGNUBtrace(store, 100);
 	store[2] = callerID;
 	std::cerr << "Start stack" << std::endl;
 	for (int i = 2; i < stackSize; i++)
@@ -37,6 +38,7 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 #else
 	// insert caller id at top of stack, which is at 2 accounting for
 	// our caller.
+	uint64_t stackSize = Stackwalk_GetStackLibUnwind(store, 100);
 	store[1] = callerID;
 	return autocorr_GlobalStacktree->Lookup(&(store[1]), stackSize - 1);
 #endif

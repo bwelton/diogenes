@@ -1,7 +1,9 @@
 #include "Stackwalk.h"
 #include "FPStackWalker.h"
 
-
+uint64_t Stackwalk_GetStackID_GetGNUBtrace(uint64_t * store, uint64_t maxSize) {
+	return backtrace((void*)store, maxSize);
+}
 
 uint64_t Stackwalk_GetStackID_GNUBtrace(StackwalkInst * inst) {
 	// void * local_stack[100];
