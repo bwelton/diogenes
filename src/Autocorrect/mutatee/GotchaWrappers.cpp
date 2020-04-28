@@ -29,6 +29,9 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 #if defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
 	// Dyninst's stack frame will appear on PPC, we must skip it
 	store[2] = callerID;
+	std::cerr << "Start stack" << std::endl;
+	for (int i = 2; i < stackSize; i++)
+		std::cerr << std::hex << store[i] << std::endl;
 	std::cerr << "IN PPC FILE" << std::endl;
 	return autocorr_GlobalStacktree->Lookup(&(store[2]), stackSize - 2);
 #else
