@@ -57,7 +57,7 @@ void * CPUMemoryLocation::GetAllocation(void * cpuDestAddr,uint64_t size, bool t
 	auto it4 = _freeMemory.find(size);
 	if (it4 == _freeMemory.end()) {
 		void * ptr = NULL;
-		autocorr_cuMemAllocHost_v2_wrapper(&ptr, size);
+		autocorr_cuMemAllocHost222_v2_wrapper(&ptr, size);
 		_freeMemory.insert(std::make_pair(size,ptr));
         RegisterAllocation(ptr, size, false);
 		it4 = _freeMemory.find(size);

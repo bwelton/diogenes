@@ -39,9 +39,9 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 #endif
 }
 
-int autocorr_cuMemAllocHost_v2(void ** ptr, size_t size) {
+int autocorr_cuMemAllocHost222_v2(void ** ptr, size_t size) {
 	//std::cerr << "in memallochost" <<std::endl;
-	int ret = autocorr_cuMemAllocHost_v2_wrapper(ptr,size);
+	int ret = autocorr_cuMemAllocHost222_v2_wrapper(ptr,size);
 	if(local_CPUMEMLOCATION == NULL)
 		local_CPUMEMLOCATION = new CPUMemoryLocation();
 	

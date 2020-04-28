@@ -3,7 +3,7 @@
 
 FastStackTree * autocorr_GlobalStacktree;
 /* Gotcha wrapper declarations */ 
-gotcha_wrappee_handle_t autocorr_cuMemAllocHost_v2_handle;
+gotcha_wrappee_handle_t autocorr_cuMemAllocHost222_v2_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyHtoD_v2_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyDtoH_v222_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyDtoHAsync_v2_handle;
@@ -13,7 +13,7 @@ gotcha_wrappee_handle_t autocorr_cuMemAlloc_handle;
 gotcha_wrappee_handle_t autocorr_cuMemFree22_handle;
 
 
-typeof(&autocorr_cuMemAllocHost_v2) autocorr_cuMemAllocHost_v2_wrapper;
+typeof(&autocorr_cuMemAllocHost222_v2) autocorr_cuMemAllocHost222_v2_wrapper;
 typeof(&autocorr_cuMemcpyHtoD_v2) autocorr_cuMemcpyHtoD_v2_wrapper;
 typeof(&autocorr_cuMemcpyDtoH_v222) autocorr_cuMemcpyDtoH_v222_wrapper;
 typeof(&autocorr_cuMemcpyDtoHAsync_v2) autocorr_cuMemcpyDtoHAsync_v2_wrapper;
@@ -25,7 +25,7 @@ typeof(&autocorr_cuMemFree22) autocorr_cuMemFree22_wrapper;
 typeof(&autocorr_synchronize_device) autocorr_ctxSynchronize_wrapper;
 /*end*/
 // int autocorr_cuMemcpyDtoH_v222(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount)
-struct gotcha_binding_t gotcha_Binder_Funcs22[] = {{"cuMemHostAlloc",(void*)autocorr_cuMemAllocHost_v2,&autocorr_cuMemAllocHost_v2_handle},
+struct gotcha_binding_t gotcha_Binder_Funcs22[] = {{"cuMemHostAlloc",(void*)autocorr_cuMemAllocHost222_v2,&autocorr_cuMemAllocHost222_v2_handle},
 												// {"cuMemcpyHtoD_v2",(void*)autocorr_cuMemcpyHtoD_v2,&autocorr_cuMemcpyHtoD_v2_handle},
 												 //{"cuMemcpyDtoH_v2",(void*)autocorr_cuMemcpyDtoH_v222,&autocorr_cuMemcpyDtoH_v222_handle},
 												 {"cuMemFree_v2",(void*)autocorr_cuMemFree22,&autocorr_cuMemFree22_handle},
@@ -56,7 +56,7 @@ void ac_mutatee_init() {
 	fprintf(stderr,"in Warpper AC Main\n");
     void * lib_libcuda = dlopen("libcuda.so", RTLD_NOW);
 	((void(*)(void))dlsym(lib_libcuda, "cuInit"))();
-	autocorr_cuMemAllocHost_v2_wrapper = (typeof(&autocorr_cuMemAllocHost_v2))dlsym(lib_libcuda,"cuMemHostAlloc");
+	autocorr_cuMemAllocHost222_v2_wrapper = (typeof(&autocorr_cuMemAllocHost222_v2))dlsym(lib_libcuda,"cuMemHostAlloc");
     void * lib_libc = dlopen("libc.so", RTLD_NOW);
     autocorr_cuMemcpyHtoD_v2_wrapper = (typeof(&autocorr_cuMemcpyHtoD_v2))dlsym(lib_libcuda,"cuMemcpyHtoD_v2");
     autocorr_cuMemcpyDtoH_v222_wrapper = (typeof(&autocorr_cuMemcpyDtoH_v222))dlsym(lib_libcuda,"cuMemcpyDtoH_v2");
