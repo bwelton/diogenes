@@ -31,7 +31,7 @@ struct gotcha_binding_t gotcha_Binder_Funcs22[] = {{"cuMemHostAlloc",(void*)auto
 												 {"cuMemFree_v2",(void*)autocorr_cuMemFree22,&autocorr_cuMemFree22_handle},
 												 //{"cuMemcpyDtoHAsync_v2",(void*)autocorr_cuMemcpyDtoHAsync_v2,&autocorr_cuMemcpyDtoHAsync_v2_handle},
 												 //{"cuMemcpyHtoDAsync_v2",(void*)autocorr_cuMemcpyHtoDAsync_v2,&autocorr_cuMemcpyHtoDAsync_v2_handle},
-												 //{"cuMemHostFree",(void*)autocorr_cuMemFreeHost,&autocorr_cuMemFreeHost_handle},
+												 {"cuMemHostFree",(void*)autocorr_cuMemFreeHost,&autocorr_cuMemFreeHost_handle},
 												 {"cuMemAlloc_v2",(void*)autocorr_cuMemAlloc,&autocorr_cuMemAlloc_handle},};
 // {"cuMemFree_v2",(void*)autocorr_cuMemFree,&autocorr_cuMemFree_handle}
 std::unordered_map<std::string, uint64_t> autocorr_GMap = {{"cuMemcpyDtoHAsync_v2",AUTOCORR_CALLID_cuMemcpyDtoHAsync_v2},
