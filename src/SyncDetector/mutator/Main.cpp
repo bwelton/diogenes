@@ -262,8 +262,6 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         if (transfers.find(i) != transfers.end())
             transfers.erase(i);
     }
-    
-    transfers.insert(transfersVec.begin(), transfersVec.end());
 
     std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> normalizedMG =  NormalizeMemGraph( memgraphStacks,transfers);
     std::set<uint64_t> transToCorrect;
@@ -271,16 +269,19 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
         if (normalizedMG.find(i) == normalizedMG.end())
             continue;
         std::vector<DiogenesCommon::BinaryAddress> cur = normalizedMG[i];
-        // std::cout << "NEW STACK START" << std::endl;
-        // for (auto & x : cur){
-        //     std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-        //     std::cout <<  x.symbolInfo.Print(5);
-        // }
+        std::cout << "NORMALIZED TRANSFER FROM MEMGRAPH:" << std::endl;
+        for (auto & x : cur){
+            if (x.binaryName == NULL){
+                std::cerr << "BINARY NAME EQUAL TO NULL LEAVING!" << std::endl;
+                exit(-1);
+            }
+            std::cout << "  : " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cout <<  x.symbolInfo.Print(5);
+        }
         uint64_t syncStackID = 0;
         for(auto x : buildUniqueIdentiferTree._children){
             if (x->_binAddr.symbolInfo.funcName.size() > 0 && cur.size() > 0 && cur[0].symbolInfo.funcName.size() > 0) {
                 if (x->_binAddr.symbolInfo.funcName[0] == cur[0].symbolInfo.funcName[0]){
-		
                     std::cout << "FOUND MATCH " << std::endl;
                     syncStackID = x->FindElement(cur, 1);
                     break;
