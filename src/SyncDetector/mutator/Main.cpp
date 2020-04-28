@@ -232,11 +232,11 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> GetUnnecessarySync
                 aliasMap[existing] = aliasMap[i];
             }
         }
-        //std::cout << "NEW STACK START With ID " << std::dec << existing << std::endl;
-        // for (auto & x : t.second){
-        //     std::cout << "  TESTDUMP: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
-        //     std::cout <<  x.symbolInfo.Print(5);
-        // }     
+        std::cout << "NORMALIZED SYNC STACKS: " << std::dec << existing << std::endl;
+        for (auto & x : t.second){
+            std::cout << "  NS: " << x.binaryName << "@" << std::hex << x.libraryOffset << std::endl;
+            std::cout <<  x.symbolInfo.Print(5);
+        }     
     }
 
     std::set<uint64_t> tmpRequired = requiredSyncs;
