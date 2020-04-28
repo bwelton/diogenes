@@ -26,7 +26,7 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 	uint64_t store[100];
 	uint64_t stackSize = Stackwalk_GetStackLibUnwind(store, 100);
 
-#ifdef defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
+#if defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
 	// Dyninst's stack frame will appear on PPC, we must skip it
 	store[2] = callerID;
 	std::cerr << "IN PPC FILE" << std::endl;
