@@ -76,6 +76,6 @@ int main(int argc, char * argv[]) {
     proc.LoadLibrary(DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so"));
     DynEntryExit_InsertAtAddr(proc,std::string("libcuda.so"), cudaOffset,DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so"), std::string(""), std::string("AUTOCORR_SYNC_FINISHED"));
     OneTime_InsertOneTimeCall(&proc,DynHelper_GetInstallDirectory() +std::string("/lib/libAutocorrectLibrary.so") ,std::string("ac_mutatee_init"));
-    proc.RunUntilCompleation(std::string(""));
-    //proc.DetachForDebug();
+    //proc.RunUntilCompleation(std::string(""));
+    proc.DetachForDebug();
 }
