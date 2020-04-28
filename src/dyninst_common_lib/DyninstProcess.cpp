@@ -251,7 +251,7 @@ void DyninstProcess::DetachForDebug() {
 		_aspace->finalizeInsertionSet(false);
 	BPatch_process * appProc = dynamic_cast<BPatch_process*>(_aspace);
 	int pid = appProc->getPid();
-	appProc->detach(false);
+	appProc->detach(true);
 	int status;
 	waitpid(pid,&status,0);
 }
