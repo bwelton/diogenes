@@ -29,6 +29,7 @@ bool autocorr_IsUnnecessary(uint64_t callerID) {
 #ifdef defined(__powerpc64__) || defined(__POWERPC__) || defined(_ARCH_PPC64) || defined(_ARCH_PPC) || defined(__powerpc__) || defined(__powerpc)
 	// Dyninst's stack frame will appear on PPC, we must skip it
 	store[2] = callerID;
+	std::cerr << "IN PPC FILE" << std::endl;
 	return autocorr_GlobalStacktree->Lookup(&(store[2]), stackSize - 2);
 #else
 	// insert caller id at top of stack, which is at 2 accounting for
@@ -60,13 +61,13 @@ int autocorr_cuMemAlloc(void ** ptr, size_t size) {
 }
 
 
-int autocorr_cuMemFreeHost(void * ptr) {
+int autocorr_cuMemFreeHost222(void * ptr) {
 	//std::cerr << "in memfreehost" <<std::endl;
 	if(local_CPUMEMLOCATION == NULL)
 		local_CPUMEMLOCATION = new CPUMemoryLocation();
 	
 	local_CPUMEMLOCATION->UnregisterAllocation(ptr);
-	return autocorr_cuMemFreeHost_wrapper(ptr);
+	return autocorr_cuMemFreeHost222_wrapper(ptr);
 }
 
 int autocorr_synchronize_device()  {

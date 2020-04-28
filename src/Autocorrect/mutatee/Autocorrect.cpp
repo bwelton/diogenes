@@ -8,7 +8,7 @@ gotcha_wrappee_handle_t autocorr_cuMemcpyHtoD_v2_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyDtoH_v222_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyDtoHAsync_v2_handle;
 gotcha_wrappee_handle_t autocorr_cuMemcpyHtoDAsync_v2_handle;
-gotcha_wrappee_handle_t autocorr_cuMemFreeHost_handle;
+gotcha_wrappee_handle_t autocorr_cuMemFreeHost222_handle;
 gotcha_wrappee_handle_t autocorr_cuMemAlloc_handle;
 gotcha_wrappee_handle_t autocorr_cuMemFree22_handle;
 
@@ -18,7 +18,7 @@ typeof(&autocorr_cuMemcpyHtoD_v2) autocorr_cuMemcpyHtoD_v2_wrapper;
 typeof(&autocorr_cuMemcpyDtoH_v222) autocorr_cuMemcpyDtoH_v222_wrapper;
 typeof(&autocorr_cuMemcpyDtoHAsync_v2) autocorr_cuMemcpyDtoHAsync_v2_wrapper;
 typeof(&autocorr_cuMemcpyHtoDAsync_v2) autocorr_cuMemcpyHtoDAsync_v2_wrapper;
-typeof(&autocorr_cuMemFreeHost) autocorr_cuMemFreeHost_wrapper;
+typeof(&autocorr_cuMemFreeHost222) autocorr_cuMemFreeHost222_wrapper;
 typeof(&autocorr_cuMemAlloc) autocorr_cuMemAlloc_wrapper;
 typeof(&autocorr_cuMemFree22) autocorr_cuMemFree22_wrapper;
 
@@ -31,7 +31,7 @@ struct gotcha_binding_t gotcha_Binder_Funcs22[] = {{"cuMemHostAlloc",(void*)auto
 												 {"cuMemFree_v2",(void*)autocorr_cuMemFree22,&autocorr_cuMemFree22_handle},
 												 //{"cuMemcpyDtoHAsync_v2",(void*)autocorr_cuMemcpyDtoHAsync_v2,&autocorr_cuMemcpyDtoHAsync_v2_handle},
 												 //{"cuMemcpyHtoDAsync_v2",(void*)autocorr_cuMemcpyHtoDAsync_v2,&autocorr_cuMemcpyHtoDAsync_v2_handle},
-												 {"cuMemHostFree",(void*)autocorr_cuMemFreeHost,&autocorr_cuMemFreeHost_handle},
+												 {"cuMemHostFree",(void*)autocorr_cuMemFreeHost222,&autocorr_cuMemFreeHost222_handle},
 												 {"cuMemAlloc_v2",(void*)autocorr_cuMemAlloc,&autocorr_cuMemAlloc_handle},};
 // {"cuMemFree_v2",(void*)autocorr_cuMemFree,&autocorr_cuMemFree_handle}
 std::unordered_map<std::string, uint64_t> autocorr_GMap = {{"cuMemcpyDtoHAsync_v2",AUTOCORR_CALLID_cuMemcpyDtoHAsync_v2},
@@ -63,7 +63,7 @@ void ac_mutatee_init() {
 	assert(autocorr_cuMemcpyDtoH_v222_wrapper != NULL);
 	autocorr_cuMemcpyDtoHAsync_v2_wrapper = (typeof(&autocorr_cuMemcpyDtoHAsync_v2))dlsym(lib_libcuda,"cuMemcpyDtoHAsync_v2");
 	autocorr_cuMemcpyHtoDAsync_v2_wrapper = (typeof(&autocorr_cuMemcpyHtoDAsync_v2))dlsym(lib_libcuda,"cuMemcpyHtoDAsync_v2");
-	autocorr_cuMemFreeHost_wrapper = (typeof(&autocorr_cuMemFreeHost))dlsym(lib_libcuda,"cuMemFreeHost");
+	autocorr_cuMemFreeHost222_wrapper = (typeof(&autocorr_cuMemFreeHost222))dlsym(lib_libcuda,"cuMemFreeHost");
 	autocorr_cuMemAlloc_wrapper = (typeof(&autocorr_cuMemAlloc))dlsym(lib_libcuda,"cuMemAlloc_v2");
 	autocorr_cuMemFree22_wrapper = (typeof(&autocorr_cuMemFree22))dlsym(lib_libcuda,"cuMemFree_v2");
 

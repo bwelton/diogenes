@@ -66,7 +66,7 @@ int autocorr_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t 
 int autocorr_cuMemcpyDtoH_v222(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount);
 int autocorr_cuMemcpyDtoHAsync_v2(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream);
 int autocorr_cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount, CUstream hStream);
-int autocorr_cuMemFreeHost(void * ptr);
+int autocorr_cuMemFreeHost222(void * ptr);
 int autocorr_cuMemAlloc(void ** ptr, size_t size) ;
 int autocorr_cuMemFree22(void* ptr);
 int autocorr_synchronize_device();
@@ -87,7 +87,7 @@ extern typeof(&autocorr_cuMemcpyHtoD_v2) autocorr_cuMemcpyHtoD_v2_wrapper;
 extern typeof(&autocorr_cuMemcpyDtoH_v222) autocorr_cuMemcpyDtoH_v222_wrapper;
 extern typeof(&autocorr_cuMemcpyDtoHAsync_v2) autocorr_cuMemcpyDtoHAsync_v2_wrapper;
 extern typeof(&autocorr_cuMemcpyHtoDAsync_v2) autocorr_cuMemcpyHtoDAsync_v2_wrapper;
-extern typeof(&autocorr_cuMemFreeHost) autocorr_cuMemFreeHost_wrapper;
+extern typeof(&autocorr_cuMemFreeHost222) autocorr_cuMemFreeHost222_wrapper;
 extern typeof(&autocorr_cuMemAlloc) autocorr_cuMemAlloc_wrapper;
 extern typeof(&autocorr_cuMemFree22) autocorr_cuMemFree22_wrapper;
 extern typeof(&autocorr_synchronize_device) autocorr_ctxSynchronize_wrapper;
