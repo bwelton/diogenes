@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <limits>
 #include <unordered_map>
 #include <string>
 #include <sstream> 
@@ -56,7 +57,7 @@ int main(int argc, char * argv[]) {
         bool first = true;
         for (auto z : i.second){
             if (first) {
-                outFile << z.binaryName.get() << "@0,";
+                outFile << z.binaryName.get() << "@0";
                 first = false;
             } else {
                 auto it = offsetMap.find(stringConversion[z.binaryName.get()]);
@@ -66,7 +67,14 @@ int main(int argc, char * argv[]) {
                     offsetMap[tobj->pathName()] = tobj;
                     it = offsetMap.find(stringConversion[z.binaryName.get()]);
                 }
-                outFile << "," << z.binaryName.get() << "@" << std::hex << it->second->fileOffsetToAddr(z.libraryOffset);
+                if (it->second->fileOffsetToAddr(z.libraryOffset) == std::numeric_limits<uint64_t>::max() || it->second->fileOffsetToAddr(z.libraryOffset)  == 0)
+                {
+                    std::cerr << "Warning, could not convert " << z.binaryName.get() << "@" <<  std::hex << z.libraryOffset << " to process address" << std::endl;
+                    std::cerr << "   If non PIC/PIE binary, this is expected behavior"<<std::endl;
+                    outFile << "," << z.binaryName.get() << "@" << std::hex << z.libraryOffset;
+                }
+                else
+                    outFile << "," << z.binaryName.get() << "@" << std::hex << it->second->fileOffsetToAddr(z.libraryOffset);
             }
         }
         outFile << std::endl;
