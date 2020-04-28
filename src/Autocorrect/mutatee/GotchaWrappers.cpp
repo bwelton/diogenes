@@ -82,7 +82,7 @@ int autocorr_cuMemFree22(void * ptr) {
 
 	local_SimpleGPUMap->FreeAllocation(ptr);
 	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemFree_v2)) {
-		//std::cerr << "Cuda free synchronization necessary!" << std::endl;
+		std::cerr << "Cuda free synchronization necessary!" << std::endl;
 		return autocorr_synchronize_device();
 	} 
 	return (int)CUDA_SUCCESS;
@@ -102,15 +102,16 @@ int autocorr_cuMemFree22(void * ptr) {
 int autocorr_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount ) {
 	if(local_CPUMEMLOCATION == NULL)
 		local_CPUMEMLOCATION = new CPUMemoryLocation();
-	void * cpuPtr = local_CPUMEMLOCATION->GetAllocation((void*)srcHost,ByteCount,true);
+	//void * cpuPtr = local_CPUMEMLOCATION->GetAllocation((void*)srcHost,ByteCount,true);
+	autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount)
 	//std::cerr << "CPUPTR TO SEND: " << std::hex << cpuPtr << " ORIGINAL: " << std::hex << srcHost << std::endl;
-	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyHtoD_v2)) {
-		//std::cerr << "cuMemcpyHtoD synchronization is required" << std::endl;
-		return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
-	} else {
-		//std::cerr << "cuMemcpyHtoD synchronization is NOT required" << std::endl;
-		return autocorr_cuMemcpyHtoDAsync_v2_wrapper(dstDevice, srcHost, ByteCount,0);
-	}
+	// if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyHtoD_v2)) {
+	// 	//std::cerr << "cuMemcpyHtoD synchronization is required" << std::endl;
+	// 	return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, cpuPtr, ByteCount);
+	// } else {
+	// 	//std::cerr << "cuMemcpyHtoD synchronization is NOT required" << std::endl;
+	// 	return autocorr_cuMemcpyHtoDAsync_v2_wrapper(dstDevice, cpuPtr, ByteCount,0);
+	// }
 	//return autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
 }
 	// void * GetAllocation(void * cpuDestAddr,uint64_t size, bool toDevice);
@@ -122,13 +123,13 @@ int autocorr_cuMemcpyDtoH_v222(void* dstHost, CUdeviceptr srcDevice, size_t Byte
 	if(local_CPUMEMLOCATION == NULL)
 		local_CPUMEMLOCATION = new CPUMemoryLocation();
 
-	if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyDtoH_v2)) {
+	//if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyDtoH_v2)) {
 		//std::cerr << "cuMemcpyDtoH synchronization is required" << std::endl;
 		return autocorr_cuMemcpyDtoH_v222_wrapper(dstHost, srcDevice, ByteCount);
-	} else {
+	//} else {
 		//std::cerr << "cuMemcpyDotH synchronization is NOT required" << std::endl;
-		return autocorr_cuMemcpyDtoHAsync_v2_wrapper(dstHost, srcDevice, ByteCount,0);
-	}
+		//return autocorr_cuMemcpyDtoHAsync_v2_wrapper(dstHost, srcDevice, ByteCount,0);
+	//}
 	//return autocorr_cuMemcpyDtoH_v2_wrapper(dstHost, srcDevice, ByteCount);
 }
 
