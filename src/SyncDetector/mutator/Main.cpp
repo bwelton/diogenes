@@ -63,7 +63,7 @@ std::map<uint64_t,std::vector<DiogenesCommon::BinaryAddress>> NormalizeSyncStack
                 }
                 if (entry.binaryName.get() != NULL) {
                     std::string tmpStr2 = std::string(entry.binaryName.get());
-                    if (tmpStr2.find(installDirectory) != std::string::npos)
+                    if (tmpStr2.find(installDirectory) != std::string::npos || tmpStr2.find("libSyncDetectorMutatee") != std::string::npos)
                         skip = true;
                 }
             }
