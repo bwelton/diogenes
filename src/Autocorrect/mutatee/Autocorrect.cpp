@@ -26,11 +26,11 @@ typeof(&autocorr_synchronize_device) autocorr_ctxSynchronize_wrapper;
 /*end*/
 // int autocorr_cuMemcpyDtoH_v222(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount)
 struct gotcha_binding_t gotcha_Binder_Funcs22[] = {{"cuMemHostAlloc",(void*)autocorr_cuMemAllocHost_v2,&autocorr_cuMemAllocHost_v2_handle},
-												 {"cuMemcpyHtoD_v2",(void*)autocorr_cuMemcpyHtoD_v2,&autocorr_cuMemcpyHtoD_v2_handle},
-												 {"cuMemcpyDtoH_v2",(void*)autocorr_cuMemcpyDtoH_v222,&autocorr_cuMemcpyDtoH_v222_handle},
+												// {"cuMemcpyHtoD_v2",(void*)autocorr_cuMemcpyHtoD_v2,&autocorr_cuMemcpyHtoD_v2_handle},
+												 //{"cuMemcpyDtoH_v2",(void*)autocorr_cuMemcpyDtoH_v222,&autocorr_cuMemcpyDtoH_v222_handle},
 												 {"cuMemFree_v2",(void*)autocorr_cuMemFree22,&autocorr_cuMemFree22_handle},
-												 {"cuMemcpyDtoHAsync_v2",(void*)autocorr_cuMemcpyDtoHAsync_v2,&autocorr_cuMemcpyDtoHAsync_v2_handle},
-												 {"cuMemcpyHtoDAsync_v2",(void*)autocorr_cuMemcpyHtoDAsync_v2,&autocorr_cuMemcpyHtoDAsync_v2_handle},
+												 //{"cuMemcpyDtoHAsync_v2",(void*)autocorr_cuMemcpyDtoHAsync_v2,&autocorr_cuMemcpyDtoHAsync_v2_handle},
+												 //{"cuMemcpyHtoDAsync_v2",(void*)autocorr_cuMemcpyHtoDAsync_v2,&autocorr_cuMemcpyHtoDAsync_v2_handle},
 												 {"cuMemHostFree",(void*)autocorr_cuMemFreeHost,&autocorr_cuMemFreeHost_handle},
 												 {"cuMemAlloc_v2",(void*)autocorr_cuMemAlloc,&autocorr_cuMemAlloc_handle},};
 // {"cuMemFree_v2",(void*)autocorr_cuMemFree,&autocorr_cuMemFree_handle}
