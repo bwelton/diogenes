@@ -103,7 +103,7 @@ int autocorr_cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void* srcHost, size_t 
 	if(local_CPUMEMLOCATION == NULL)
 		local_CPUMEMLOCATION = new CPUMemoryLocation();
 	//void * cpuPtr = local_CPUMEMLOCATION->GetAllocation((void*)srcHost,ByteCount,true);
-	autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount)
+	autocorr_cuMemcpyHtoD_v2_wrapper(dstDevice, srcHost, ByteCount);
 	//std::cerr << "CPUPTR TO SEND: " << std::hex << cpuPtr << " ORIGINAL: " << std::hex << srcHost << std::endl;
 	// if (!autocorr_IsUnnecessary(AUTOCORR_CALLID_cuMemcpyHtoD_v2)) {
 	// 	//std::cerr << "cuMemcpyHtoD synchronization is required" << std::endl;
