@@ -11,6 +11,8 @@
 #include <memory>
 #include <algorithm>
 #include <sys/types.h>
+#include <unordered_map>
+#include <unordered_set>
 #include <unistd.h>
 #include "APICaptureInstrimentation.h"
 
@@ -218,8 +220,8 @@ struct MemGraph {
 				if (dAlreadySeen.find(n) != dAlreadySeen.end())
 					continue;
 				dAlreadySeen.insert(n);
-				if (n->HasUnknownChild() != 0)
-					continue;
+				//if (n->HasUnknownChild() != 0)
+				//	continue;
 				dlist.push_back(n);
 				cn.insert(cn.end(), n->GetStart(), n->GetEnd());
 			}
@@ -229,7 +231,7 @@ struct MemGraph {
 	void CheckForExitFrees() {
 		// Checks for the presence of exit frees
 		// If the number of frees at exit == unknown frees, remove free[-1].
-		FILE * fp = fopen("DIOGENES_UnknownWriteCount.bin", "rb");
+		/*FILE * fp = fopen("DIOGENES_UnknownWriteCount.bin", "rb");
 		if (fp == NULL)
 			return;
 		fseek(fp, 0, SEEK_END);
@@ -256,7 +258,7 @@ struct MemGraph {
 			fsite->parents.clear();
 
 			//fsite->Remove(fsite);
-		}
+		}*/
 	};
 
 	FreeSitePtr GetFreeSite(int64_t id) {
@@ -311,6 +313,13 @@ struct TransferGraph {
 		emptyMalloc.reset(new MallocSite(-1,p));
 	}
 
+
+	TransferPointPtr ReturnTransfer(int64_t id) {
+		if (transfers.find(id) != transfers.end())
+			return transfers[id];
+		return NULL;
+	};
+	
 	void AddTransfer(int64_t id, int64_t mallocID, int64_t count, MemGraph & cpuGraph, std::map<int64_t, StackPoint> & idPoints) {
 		MallocPtr tmp = cpuGraph.GetMallocSite(mallocID);
 		TransferPointPtr tpoint;
@@ -349,7 +358,18 @@ struct LSStackGraph {
 	bool _required;
 	LSStackGraph(std::vector<StackPoint> points, uint64_t oID) : _points(points), _oID(oID), _idPointID(-1),_found(false), _required(false) {
 		bool tmpFound = false;
-		for(int i = _points.size() - 1; i >= 0; i--) {
+
+		for (int i = 0; i < _points.size(); i++) {
+			if (_points[i].IsDriverAPI() || _points[i].IsRuntimeAPI()) {
+				if (i - 1 >= 0) {
+					_beforeLibcuda = _points[i-1];
+					_found = true;					
+				}
+				return;
+			}
+		}
+
+/*		for(int i = _points.size() - 1; i >= 0; i--) {
 			if (_points[i].libname.find("libcudart") != std::string::npos) {
 				tmpFound = true;
 			} else if (tmpFound == true) {
@@ -358,10 +378,137 @@ struct LSStackGraph {
 				break;
 			}
 		}
+*/
 	};
 };
 
 typedef std::vector<LSStackGraph> LSStackGraphVec;
+
+struct MatchLoadStoreStacksRecursive {
+	std::unordered_map<std::string, MatchLoadStoreStacksRecursive *> _libmap; 
+
+	uint64_t myId;
+	MatchLoadStoreStacksRecursive() : myId(0) {};
+
+	void InsertEntry(std::vector<StackPoint> & points, int pos, int stackID) {
+		if(points.size() == 0)
+			return;
+
+		if (points.size() <= pos){
+			myId = stackID;
+			return;
+		}
+
+		std::stringstream ss;
+		boost::filesystem::path p(points[pos].libname);
+		std::string tmpfilename = p.stem().string();
+		if (tmpfilename.find('.') != std::string::npos) {
+			tmpfilename = tmpfilename.substr(0, tmpfilename.find('.'));
+		}
+		ss << tmpfilename << "@" << std::hex << points[pos].libOffset;
+		std::string tmp = ss.str();
+		std::cerr << "Inserting entry: " << tmp << std::endl;
+		if (_libmap.find(tmp) == _libmap.end()) {
+			
+			_libmap[tmp] = new MatchLoadStoreStacksRecursive();
+		}
+		_libmap[tmp]->InsertEntry(points, pos+1, stackID);
+
+/*		uint64_t libOffset = points[pos].libOffset;
+		std::string libname = points[pos].libname;
+		if (_libmap.find(libname) == _libmap.end()) 
+			_libmap[libname] = new MatchLoadStoreStacksRecursive();
+
+		if (pos + 1 >= points.size()) {
+			_libmap[libname]->AddOffset(libOffset, stackID);
+		} else
+			_libmap[libname]->AddOffset(libOffset, 0);
+		_libmap[libname]->InsertEntry(points, pos+1, stackID);
+
+/*		
+		if (points.size() == 0)
+			return;
+		if (points.size() <= pos){
+			if (myId != 0) {
+				std::cerr << "Stacks " << myId << " and " << stackID << " are identical!" << std::endl;
+				assert(myId == 0);
+			}
+			//assert(myId == 0);
+			myId = stackID;
+		} else {
+			uint64_t libOffset = points[pos].libOffset;
+			std::string libname = points[pos].libname;
+			if (_libmap.find(libname) == _libmap.end()) 
+				_libmap[libname] = new MatchLoadStoreStacksRecursive();
+			_libmap[libname]->AddOffset(libOffset);
+			_libmap[libname]->InsertEntry(points, pos+1, stackID);
+		}*/
+	};
+
+	uint64_t RecurseSinglePath() {
+		if (_libmap.size() == 0)
+			return myId;
+		if (_libmap.size() != 1)
+			return 0;
+		return _libmap.begin()->second->RecurseSinglePath();
+	};
+
+	uint64_t FindEntry(std::vector<StackPoint> & points, int pos) {
+		if(points.size() == 0)
+			return 0;
+
+		if (points.size() <= pos){
+			std::cerr << "In exit at pos " << pos << std::endl;
+			uint64_t ret = myId;
+			if (myId == 0){
+				std::cerr << "In recurse single path " << pos << std::endl;
+				//if there is one path from here to end, assume that this is a match.
+				// This is to deal with ambiguity between LS and MR stacks that may exists 
+				ret = RecurseSinglePath();
+			}
+			return ret;
+		}
+		for (int i = pos; i < points.size(); i++){
+			std::stringstream ss;
+			boost::filesystem::path p(points[i].libname);
+			std::string tmpfilename = p.stem().string();
+			if (tmpfilename.find('.') != std::string::npos) {
+				tmpfilename = tmpfilename.substr(0, tmpfilename.find('.'));
+			}
+			ss << tmpfilename << "@" << std::hex << points[i].libOffset;
+			std::string libname = ss.str();
+			std::cerr << "Looking up entry: " << libname << std::endl;
+			if (_libmap.find(libname) == _libmap.end())
+				continue;
+			std::cerr << "ENTRY FOUND: " << libname << std::endl;
+			uint64_t ret = _libmap[libname]->FindEntry(points, i+1);
+			if (ret != 0)
+				return ret;
+		}
+		return myId;
+		// if (points.size() == 0)
+		// 	return 0;
+		// uint64_t ret = 0;
+		// uint64_t startPos = 20000;
+		// for (int i = pos; i < points.size(); i++){
+		// 	uint64_t libOffset = points[i].libOffset;
+		// 	std::string libname = points[i].libname;	
+		// 	if (_libmap.find(libname) == _libmap.end())
+		// 		continue;
+		// 	if (_libmap[libname]->HasOffset(libOffset)){
+		// 		uint64_t nextOffset = _libmap[libname]->_offsetMap[libOffset];
+		// 		uint64_t tmp = _libmap[libname]->FindEntry(points, i + 1);
+		// 		tmp  = std::max(tmp,nextOffset);
+		// 		if ((ret  == 0 || i < startPos) && tmp != 0) {
+		// 			ret = tmp;
+		// 			startPos = i;
+		// 		}
+		// 	}
+		// }
+		// return ret;
+	};
+
+};
 
 
 struct StackPointTree {
@@ -426,6 +573,44 @@ struct RemovePoints {
 
 	StackPointVec mallocReplacements;
 	StackPointVec freeReplacements;
+
+
+
+
+
+	void Serialize() {
+		StackKeyWriter out(fopen("AC_RemovePoints.txt","w"));
+		if(cudaMallocReplacements.size() > 0)
+			out.InsertStack(10, cudaMallocReplacements);
+		if (cudaFreeReplacements.size() > 0)
+			out.InsertStack(20, cudaFreeReplacements);
+		if (cudaFreeReqSync.size() > 0)
+			out.InsertStack(30, cudaFreeReqSync);
+		if (cudaMemcpyAsyncRepl.size() > 0)
+			out.InsertStack(40, cudaMemcpyAsyncRepl);
+		if (mallocReplacements.size() > 0)
+			out.InsertStack(50, mallocReplacements);
+		if (freeReplacements.size() > 0)
+			out.InsertStack(60, freeReplacements);
+	};
+	void Deserialze() {
+		StackKeyReader out(fopen("AC_RemovePoints.txt","rb"));
+		std::map<uint64_t, std::vector<StackPoint> > points = out.ReadStacks();
+		if (points.find(10) != points.end())
+			cudaMallocReplacements = points[10];
+		if (points.find(20) != points.end()) 
+			cudaFreeReplacements = points[20];
+		if (points.find(30) != points.end())
+			cudaFreeReqSync = points[30];
+		if (points.find(40) != points.end())
+			cudaMemcpyAsyncRepl = points[40];
+		if (points.find(50) != points.end()) 
+			mallocReplacements = points[50];
+		if (points.find(60) != points.end())
+			freeReplacements = points[60];
+
+	};
+
 //    std::shared_ptr<StackPointTree> _TreeMapper;
     std::map<RemovePointsVecTypes, std::shared_ptr<StackPointTree>> _TreeMapper;
 	std::map<RemovePointsVecTypes, uint64_t> _curCounts;
@@ -552,9 +737,12 @@ void BuildMemoryGraph(std::vector<T> & memSites, std::map<int64_t, StackPoint> &
 
 class CallTransformation {
 public:
-	CallTransformation(GPUMallocVec & gpuVec,CPUMallocVec & cpuVec, MemTransVec & memVec, std::map<int64_t, StackPoint> & idPoints);
+	CallTransformation(GPUMallocVec & gpuVec,CPUMallocVec & cpuVec, MemTransVec & memVec, std::map<int64_t, StackPoint> & idPoints, std::unordered_map<std::string, StackPoint> & wrapperReplacements);
 	void BuildRequiredSet();
 	RemovePointsPtr GetRemoveCalls();
+	std::map<uint64_t, std::vector<StackPoint> > ReadMemRecorderKeys(std::map<uint64_t, std::string> & typeMap);
+	std::map<uint64_t, uint64_t> MatchLStoMR(std::map<uint64_t, std::vector<StackPoint> > & LS, std::map<uint64_t, std::vector<StackPoint> > & MR);
+	void PrintStackSet(std::stringstream & outdata, std::string header, std::vector<StackPoint> & sp, int count);
 	//void GetCudaFreeMallocPairs(std::map<uint64_t, std::shared_ptr<DyninstFunction> > & funcMap, CudaFreeCallsites & callsites);
 	//void GetMemTransReplacement(std::map<uint64_t, std::shared_ptr<DyninstFunction> > & funcMap, MemTransCallsites & callsites);
 private:
@@ -565,6 +753,7 @@ private:
 	GPUMallocVec _gpuVec;
 	CPUMallocVec _cpuVec;
 	MemTransVec _memVec;
+	std::unordered_map<std::string, StackPoint> _wrapperReplacements;
 	std::map<int64_t, StackPoint> _idPoints;
 	RemovePointsPtr _removeCalls;
 };

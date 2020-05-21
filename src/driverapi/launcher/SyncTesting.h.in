@@ -69,7 +69,10 @@ public:
 	void RunTimeUse(StackRecMap & recs, std::vector<StackPoint> & uses);
 	void FixProblems(StackRecMap & recs);
 	CallTransPtr MemRecorderLaunch(StackRecMap & recs);
-	void FixKnownProblems(StackRecMap & recs, CallTransPtr & trans);
+	void FixKnownProblems(StackRecMap & recs);
+	void RunAutoCorrect();
+	std::shared_ptr<DyninstProcess> LaunchApplicationByName(std::string name, bool debug);
+	void IndentifySyncFunction();
 private:
 	std::set<std::string> _syncCalls; 
 	std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string> > _wrapperDefFunctions;

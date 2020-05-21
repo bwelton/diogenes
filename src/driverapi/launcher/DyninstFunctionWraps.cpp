@@ -10,7 +10,7 @@ void OneTimeFillMap() {
 	DFW_MAP.clear();
 
 	// String search for char functions
-	tmp = {
+	/*tmp = {
 		.wrap =  std::string("strchr"),
 		.library = std::string("libc-2.17.so"),
 		.wrapperName = std::string("diogenes_strchr_wrapper"),
@@ -30,7 +30,7 @@ void OneTimeFillMap() {
 		.wrapperName = std::string("diogenes_strchr_wrapper"),
 		.argMap = {std::make_pair(0,0)},
 	};
-	DFW_MAP[tmp.wrap] = tmp;
+	DFW_MAP[tmp.wrap] = tmp;*/
 
 	// string copy style wrapper (dest, source)
 	tmp = {
@@ -134,6 +134,7 @@ void OneTimeFillMap() {
 		.argMap = {std::make_pair(0,0),std::make_pair(1,1)},
 	};
 	*/
+
 	DFW_MAP[tmp.wrap] = tmp;
 	tmp = {
 		.wrap =  std::string("__strcasecmp_power7"),
@@ -653,6 +654,7 @@ void OneTimeFillMap() {
 DyninstFunctionWraps::DyninstFunctionWraps(std::shared_ptr<DyninstProcess> proc) : _proc(proc) {}
 
 bool DyninstFunctionWraps::InsertLoadStoreInstrimentation(BPatch_function * func, std::shared_ptr<BinaryLocationIDMap> bmap) {
+
 	OneTimeFillMap();
 	if (DFW_MAP.find(func->getName()) == DFW_MAP.end())
 		return false;
@@ -660,7 +662,7 @@ bool DyninstFunctionWraps::InsertLoadStoreInstrimentation(BPatch_function * func
 	BPatch_object * obj = func->getModule()->getObject();
 	if (obj->pathName().find(DFW_MAP[tmpName].library) == std::string::npos)
 		return false;
-
+	//return true;
 //	std::cerr << "[DyninstFunctionWraps::InsertLoadStoreInstrimentation] Inserting custom function wrap for function " 
 //		      << func->getName() << " In library " <<  DFW_MAP[tmpName].library << std::endl;
 

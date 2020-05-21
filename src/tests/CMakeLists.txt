@@ -19,6 +19,7 @@ else()
 	set(SPACK_MOD_DIR "${SPACK_ROOT}share/spack/modules/cray-CNL-interlagos")
 endif (NOT DEFINED SPACK_ROOT)
 
+link_libraries("-L${BOOST_LIBRARYDIR}")
 add_executable(basic_checker_test "basic_checker_test.cpp")
 
 target_link_libraries(basic_checker_test ${Boost_LIBRARIES})
@@ -33,6 +34,7 @@ install(TARGETS basic_checker_test
         RUNTIME DESTINATION tests)
 
 add_executable(timeline_checker "timeline_checker.cpp")
+
 target_link_libraries(timeline_checker ${Boost_LIBRARIES})
 target_link_libraries(timeline_checker "-lpthread")
 target_link_libraries(timeline_checker "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -lcudart")
@@ -46,6 +48,7 @@ install(TARGETS timeline_checker
         RUNTIME DESTINATION tests)
 
 add_executable(desthash_check "DestHashCheck.cpp")
+
 target_link_libraries(desthash_check ${Boost_LIBRARIES})
 target_link_libraries(desthash_check "-lpthread")
 target_link_libraries(desthash_check "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -lcudart")

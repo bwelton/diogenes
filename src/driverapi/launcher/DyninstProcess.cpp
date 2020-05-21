@@ -2,6 +2,7 @@
 //extern BPatch bpatch;
 DyninstProcess::DyninstProcess(boost::program_options::variables_map vm, bool debug) {
 	_vm = vm;
+	_launchString = _vm["prog"].as<std::vector<std::string> >();
 	_ops.reset(new DynOpsClass());
 	_debug = debug;
 	_aspace = NULL;
@@ -9,7 +10,15 @@ DyninstProcess::DyninstProcess(boost::program_options::variables_map vm, bool de
 	_openInsertions = false;
 	_insertedInit = false;
 }
-
+DyninstProcess::DyninstProcess(std::string fileName, bool debug) {
+	_launchString.push_back(fileName);
+	_ops.reset(new DynOpsClass());
+	_debug = debug;
+	_aspace = NULL;
+	_MPIProc = false;
+	_openInsertions = false;
+	_insertedInit = false;	
+}
 void DyninstProcess::SetDynOps(std::shared_ptr<DynOpsClass> ops) {
 	_ops = ops;
 }
@@ -78,6 +87,13 @@ BPatch_object * DyninstProcess::LoadLibrary(std::string library) {
 	return appProc->loadLibrary(original.c_str());
 }
 
+void DyninstProcess::CloseInsertionSet() {
+	if (_openInsertions) {
+		_aspace->finalizeInsertionSet(false);
+		_openInsertions = false;
+	}
+}
+
 bool DyninstProcess::RunUntilCompleation(std::string filename) {
 	int terminal_stdout, terminal_stderr;
 	/**
@@ -135,7 +151,7 @@ bool DyninstProcess::IsMPIProgram() {
 	/**
 	 * Checks to see if the program we are launching is an MPI program. If so, return true. Otherwise return false.
 	 */
-	std::vector<std::string> progName = _vm["prog"].as<std::vector<std::string> >();
+	std::vector<std::string> progName = _launchString; //_vm["prog"].as<std::vector<std::string> >();
 	if (progName[0].find("mpirun") != std::string::npos || progName[0].find("/ij") != std::string::npos) 
 		return true;
 	return false;	
@@ -161,7 +177,7 @@ BPatch_addressSpace * DyninstProcess::LaunchProcess() {
 	if (IsMPIProgram())
 		return LaunchMPIProcess();
 
-	std::vector<std::string> progName = _vm["prog"].as<std::vector<std::string> >();
+	std::vector<std::string> progName = _launchString; //_vm["prog"].as<std::vector<std::string> >();
 	
 	// Setup program arguements
 	char ** argv = (char**)malloc(progName.size() * sizeof(char *)+1);
@@ -203,7 +219,7 @@ BPatch_addressSpace * DyninstProcess::LaunchMPIProcess() {
 	// What this process entails is attaching to the process instead of launching it.
 	// This REQUIRES that you use some other method to stop the process at the start of main
 	// Such as kill(getpid(), SIGSTOP);
-	std::vector<std::string> progName = _vm["prog"].as<std::vector<std::string> >();
+	std::vector<std::string> progName = _launchString;//_vm["prog"].as<std::vector<std::string> >();
 	char ** argv = (char**)malloc(progName.size() * sizeof(char *)+1);
 	int appPosition = -1;
 	for (int i = 0; i < progName.size(); i++) {

@@ -12,7 +12,9 @@
 #include <deque>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
-
+#include <unistd.h>
+#include <dlfcn.h>
+#include "gotcha/gotcha.h"
 #include "MemRecDataFile.h"
 #include "StackPoint.h"
 #include "StackwalkingCommon.h"
@@ -94,7 +96,7 @@ public:
 	MemAddress * Set(uint64_t addr, uint64_t size, int64_t loc) {
 		MemAddress * n;
 		if (_addressMap.find(addr) != _addressMap.end()) {
-		   std::cerr << "We have already seen this address! Potential Memory Leak/Weirdness! " << std::dec << loc << std::endl;
+		   //std::cerr << "We have already seen this address! Potential Memory Leak/Weirdness! " << std::dec << loc << std::endl;
 			n = _addressMap[addr];
 		} else {
 			n = ReturnEmpty();
@@ -365,24 +367,476 @@ inline bool DIOGENES_GetWrapperStatus() {
 	return DIOGENES_MEM_IN_WRAPPER.load();
 };
 
+enum DIOG_IDNUMBER
+{
+E_cudaFree = 10,
+E_cudaMalloc = 11,
+E_cudaMemcpyAsync = 12,
+E_cudaMemcpy = 13,
+E_cudaMallocHost = 14,
+E_cuMemcpyHtoD_v2 = 15,
+E_cuMemcpyDtoH_v2 = 16,
+E_cuMemFree_v2 = 17,
+E_cuMemAlloc_v2 = 18,
+E_cuMemAllocHost_v2 = 19,
+E_cuMemFreeHost = 20,
+E_glibMalloc = 21,
+E_glibFree = 22,
+};
+
+struct EnumClassHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const
+    {
+        return static_cast<std::size_t>(t);
+    }
+};
 
 std::shared_ptr<MemTracker> DIOGENES_MEMORY_RECORDER;
 std::shared_ptr<StackKeyWriter> DIOGENES_MEM_KEYFILE;
 std::shared_ptr<WriteTotals> DIOG_WriteTotals;
+std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> DIOG_GLOBAL_SPS;
+extern "C" void * DIOGENES_REC_GLIBMALLOC(size_t size);
+extern "C" void DIOGENES_REC_GLIBFREE(void * addr);
+extern "C" cudaError_t DIOGENES_cudaFree(void * mem);
+extern "C" cudaError_t DIOGENES_cudaMemcpy(void * dst, void * src, size_t count, cudaMemcpyKind kind);
+extern "C" cudaError_t DIOGENES_cudaMemcpyAsync(void * dst, void * src, size_t count, cudaMemcpyKind kind, cudaStream_t stream);
+
+gotcha_wrappee_handle_t DIOGENES_cudaFree_handle;
+gotcha_wrappee_handle_t DIOGENES_cudaMemcpy_handle;
+gotcha_wrappee_handle_t DIOGENES_libcmalloc_handle;
+gotcha_wrappee_handle_t DIOGENES_libcfree_handle;
+gotcha_wrappee_handle_t DIOGENES_cudaMemcpyAsync_handle;
+
+typeof(&DIOGENES_cudaMemcpy) DIOGENES_cudaMemcpy_wrapper;
+typeof(&DIOGENES_cudaFree) DIOGENES_cudaFree_wrapper;
+typeof(&DIOGENES_REC_GLIBMALLOC) DIOGENES_libcmalloc_wrapper;
+typeof(&DIOGENES_REC_GLIBFREE) DIOGENES_libcfree_wrapper;
+typeof(&DIOGENES_cudaMemcpyAsync) DIOGENES_cudaMemcpyAsync_wrapper;
+
+struct gotcha_binding_t DIOGNESE_gotfuncs[] = {{"cudaFree", (void*)DIOGENES_cudaFree,&DIOGENES_cudaFree_handle},
+											   {"cudaMemcpyAsync", (void*)DIOGENES_cudaMemcpyAsync,&DIOGENES_cudaMemcpyAsync_handle},
+											   {"cudaMemcpy", (void*)DIOGENES_cudaMemcpy,&DIOGENES_cudaMemcpy_handle},
+											   {"malloc", (void*)DIOGENES_REC_GLIBMALLOC,&DIOGENES_libcmalloc_handle},
+											   {"free", (void *)DIOGENES_REC_GLIBFREE, &DIOGENES_libcfree_handle}};
+
+
+void SetupDiogGlobalSPS() {
+	DIOG_GLOBAL_SPS.reset(new std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>());
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cudaFree, StackPoint("cudaFree", "cudaFree",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cudaMalloc, StackPoint("cudaMalloc", "cudaMalloc",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cudaMemcpyAsync, StackPoint("cudaMemcpyAsync", "cudaMemcpyAsync",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cudaMemcpy, StackPoint("cudaMemcpy", "cudaMemcpy",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cudaMallocHost, StackPoint("cudaMallocHost", "cudaMallocHost",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemcpyHtoD_v2, StackPoint("cuMemcpyHtoD_v2", "cuMemcpyHtoD_v2",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemcpyDtoH_v2, StackPoint("cuMemcpyDtoH_v2", "cuMemcpyDtoH_v2",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemFree_v2, StackPoint("cuMemFree_v2", "cuMemFree_v2",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemAlloc_v2, StackPoint("cuMemAlloc_v2", "cuMemAlloc_v2",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemAllocHost_v2, StackPoint("cuMemAllocHost_v2","cuMemAllocHost_v2",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_cuMemFreeHost, StackPoint("cuMemFreeHost","cuMemFreeHost",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_glibMalloc, StackPoint("__GI___libc_malloc","__GI___libc_malloc",0,0)));
+	DIOG_GLOBAL_SPS->insert(std::make_pair(E_glibFree, StackPoint("__libc_free","__libc_free",0,0)));
+	DIOG_GLOBAL_SPS->find(E_cudaFree)->second.raFramePos =(uint64_t)E_cudaFree; 
+	DIOG_GLOBAL_SPS->find(E_cudaMalloc)->second.raFramePos =(uint64_t)E_cudaMalloc; 
+	DIOG_GLOBAL_SPS->find(E_cudaMemcpyAsync)->second.raFramePos =(uint64_t)E_cudaMemcpyAsync; 
+	DIOG_GLOBAL_SPS->find(E_cudaMemcpy)->second.raFramePos =(uint64_t)E_cudaMemcpy; 
+	DIOG_GLOBAL_SPS->find(E_cudaMallocHost)->second.raFramePos =(uint64_t)E_cudaMallocHost; 
+	DIOG_GLOBAL_SPS->find(E_cuMemcpyHtoD_v2)->second.raFramePos =(uint64_t)E_cuMemcpyHtoD_v2; 
+	DIOG_GLOBAL_SPS->find(E_cuMemcpyDtoH_v2)->second.raFramePos =(uint64_t)E_cuMemcpyDtoH_v2; 
+	DIOG_GLOBAL_SPS->find(E_cuMemFree_v2)->second.raFramePos =(uint64_t)E_cuMemFree_v2; 
+	DIOG_GLOBAL_SPS->find(E_cuMemAlloc_v2)->second.raFramePos =(uint64_t)E_cuMemAlloc_v2; 
+	DIOG_GLOBAL_SPS->find(E_cuMemFreeHost)->second.raFramePos = (uint64_t)E_cuMemFreeHost;
+	DIOG_GLOBAL_SPS->find(E_glibMalloc)->second.raFramePos = (uint64_t)E_glibMalloc;
+	DIOG_GLOBAL_SPS->find(E_glibFree)->second.raFramePos = (uint64_t)E_glibFree;
+};
+
+
 
 
 #define PLUG_BUILD_FACTORY() \
-	if (DIOGENES_MEMORY_RECORDER.get() == NULL) { \
+	if (DIOGENES_MEMORY_RECORDER.get() == NULL && DIOGENES_TEAR_DOWN == false) { \
+		atexit(DIOGENES_exitDestroyer); \
 		DIOGENES_MEMORY_RECORDER.reset(new MemTracker()); \
+		SetupDiogGlobalSPS();\
+		DIOGENES_SETUP_GOTCHA();\
 		DIOGENES_MEM_KEYFILE.reset(new StackKeyWriter(fopen("DIOENES_MemRecUnknowns.bin","w"), static_cast<uint64_t>(DIOGENES_UNKNOWN_CTX_ID))); \
 	} 
-
+		//
 #define PLUG_FACTORY_PTR DIOGENES_MEMORY_RECORDER.get()
 
 int debugPrintCount = 0;
 
+thread_local void ** DIOGENES_MALLOC_MEMLOCATION = NULL;
+thread_local size_t DIOGENES_MALLOC_MEMSIZE = 0;
+thread_local bool DIOGENES_SEEN_RUNTIMEMALLOCAPI = false;
+thread_local bool DIOGENES_SEEN_RUNTIMECPY = false;
+thread_local bool DIOGENES_SEEN_RUNTIMEFREE = false;
+thread_local std::vector<StackPoint> DIOGENES_CACHED_POINTS;
+thread_local volatile size_t DIOGENSE_GLIB_MALLOC_SIZE = 0;
+thread_local volatile bool DIOGENES_IN_MEMORYFREE = false;
+thread_local volatile bool DIOGENSE_IN_MEMORYALLOC = false;
+volatile bool SEEN_FIRST_CUDACALL = false;
 extern "C" {
-	void * DIOGENES_REC_MALLOCWrapper(size_t size)  {
+
+	void DIOGENES_exitDestroyer() {
+		DIOGENES_TEAR_DOWN = true;
+		DIOGENES_GetGlobalLock();
+	}
+
+	void DIOGENES_SETUP_BINDINGS() {
+		// PLUG_BUILD_FACTORY();
+		// void * glibc = dlopen("libc.so.6", RTLD_LAZY); 
+		std::cerr << "[DIOGENES_SETUP_BINDINGS] In Original Wrapping for libc_malloc and libc_free" << std::endl;
+		// DIOGENES_libcmalloc_wrapper = (typeof(&DIOGENES_REC_GLIBMALLOC))dlsym(glibc,"malloc"); 
+		// DIOGENES_libcfree_wrapper = (typeof(&DIOGENES_REC_GLIBFREE))dlsym(glibc,"free"); 
+		// gotcha_wrap(DIOGNESE_gotfuncs, sizeof(DIOGNESE_gotfuncs)/sizeof(struct gotcha_binding_t), "diogenes"); 
+	}
+
+	void DIOGENES_SETUP_GOTCHA() {
+		void * glibc = dlopen("libc.so.6", RTLD_LAZY);
+		void * cudarthandle = dlopen("libcudart.so", RTLD_LAZY); 
+		std::cerr << "[DIOGENES_SETUP_BINDINGS] Wrapping libc_malloc and libc_free" << std::endl;
+		DIOGENES_libcmalloc_wrapper = (typeof(&DIOGENES_REC_GLIBMALLOC))dlsym(glibc,"malloc"); 
+		DIOGENES_libcfree_wrapper = (typeof(&DIOGENES_REC_GLIBFREE))dlsym(glibc,"free"); 
+		DIOGENES_cudaFree_wrapper = (typeof(&DIOGENES_cudaFree))dlsym(cudarthandle,"cudaFree");
+		DIOGENES_cudaMemcpy_wrapper = (typeof(&DIOGENES_cudaMemcpy))dlsym(cudarthandle,"cudaMemcpy");
+		DIOGENES_cudaMemcpyAsync_wrapper = (typeof(&DIOGENES_cudaMemcpyAsync))dlsym(cudarthandle,"cudaMemcpyAsync");
+		gotcha_wrap(DIOGNESE_gotfuncs, sizeof(DIOGNESE_gotfuncs)/sizeof(struct gotcha_binding_t), "diogenes"); 		
+	}
+
+	void DIOGENES_REC_CudaMalloc(void ** mem, size_t size) {
+		DIOGENES_MALLOC_MEMLOCATION = mem;
+		DIOGENES_MALLOC_MEMSIZE = size;
+		DIOGENES_SEEN_RUNTIMEMALLOCAPI = true;
+	}
+
+	void DIOGENES_REC_HostCudaMalloc(void ** mem, size_t size) {
+		DIOGENES_MALLOC_MEMLOCATION = mem;
+		DIOGENES_MALLOC_MEMSIZE = size;
+		DIOGENES_SEEN_RUNTIMEMALLOCAPI = true;
+	}
+
+
+	void DIOGENES_REC_cuMemAllocHost(void ** mem, size_t size) {
+		if(!DIOGENES_SEEN_RUNTIMEMALLOCAPI) {
+			DIOGENES_MALLOC_MEMLOCATION = mem;
+			DIOGENES_MALLOC_MEMSIZE = size;
+		}
+	}
+
+	void DIOGENES_REC_cuMemAlloc(void ** mem, size_t size) {
+		if(!DIOGENES_SEEN_RUNTIMEMALLOCAPI) {
+			DIOGENES_MALLOC_MEMLOCATION = mem;
+			DIOGENES_MALLOC_MEMSIZE = size;
+		}		
+	}
+	
+
+	
+	void POSTPROCESS_MALLOC(uint64_t addr, size_t size, DIOG_IDNUMBER idType) {
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			SEEN_FIRST_CUDACALL = true;
+			PLUG_BUILD_FACTORY();
+			std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> local = DIOG_GLOBAL_SPS;
+			DIOGENES_CACHED_POINTS.clear();
+			bool ret = GET_FP_STACKWALK(DIOGENES_CACHED_POINTS);
+			auto n = local->find(idType);
+			if (n == local->end())
+				assert(n != local->end());
+			DIOGENES_CACHED_POINTS.push_back(n->second);
+			int64_t myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(DIOGENES_CACHED_POINTS));
+			if (idType != E_cuMemAllocHost_v2 && idType != E_cudaMallocHost)
+				PLUG_FACTORY_PTR->GPUMallocData((uint64_t)addr, size, myID);
+			else
+				PLUG_FACTORY_PTR->AllocatePinnedMemory(addr, size);
+			DIOGENES_ReleaseGlobalLock();
+		}
+	}
+
+
+	void POSTPROCESS_GNUMALLOC(uint64_t addr, size_t size) {
+		if (DIOGENSE_IN_MEMORYALLOC == false && DIOGENES_IN_MEMORYFREE == false && DIOGENES_TEAR_DOWN == false) {
+			DIOGENSE_IN_MEMORYALLOC = true;
+			if(DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+				PLUG_BUILD_FACTORY();
+				//std::cout << "Processing Malloc at addr: " << std::hex << addr << " size of " << std::dec << size << std::endl;
+				std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> local = DIOG_GLOBAL_SPS;
+				std::vector<StackPoint> freeSiteStacks;
+
+				int64_t myID = GET_FP_STACKWALK_FAST_NONSW(freeSiteStacks);
+				if (myID <= 1) {
+					auto n = local->find(E_glibMalloc);
+					if (n == local->end())
+						assert(n != local->end());
+					freeSiteStacks.push_back(n->second);
+					myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(freeSiteStacks));
+					freeSiteStacks.pop_back();
+					GET_FP_REGISTER_ID(myID, freeSiteStacks);
+					//freeSiteStacks.push_back(n->second);
+				}
+				//bool ret = GET_FP_STACKWALK_NONSW(freeSiteStacks);
+
+				// bool ret = GET_FP_STACKWALK_NONSW(freeSiteStacks);
+				// auto n = local->find(E_glibMalloc);
+				// if (n == local->end())
+				// 	assert(n != local->end());
+				// freeSiteStacks.push_back(n->second);
+				// int64_t myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(freeSiteStacks));
+				PLUG_FACTORY_PTR->CPUMallocData(addr, size, myID);
+				DIOGENES_ReleaseGlobalLock();
+			}
+			DIOGENSE_IN_MEMORYALLOC = false;
+		}
+	}
+
+	void POSTPROCESS_GNUFREE(uint64_t addr) {
+		// if (SEEN_FIRST_CUDACALL == false)
+		// 	return;
+		if (DIOGENES_IN_MEMORYFREE == false && DIOGENSE_IN_MEMORYALLOC == false && DIOGENES_TEAR_DOWN == false){
+			DIOGENES_IN_MEMORYFREE = true;
+			if(DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+				PLUG_BUILD_FACTORY();
+				//std::cout << "Processing Free at addr: " << std::hex << addr << std::endl;
+				std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> local = DIOG_GLOBAL_SPS;
+				std::vector<StackPoint> freeSiteStacks;
+				//DIOGENES_CACHED_POINTS.clear();
+
+				int64_t myID = GET_FP_STACKWALK_FAST_NONSW(freeSiteStacks);
+				if (myID <= 1) {
+					auto n = local->find(E_glibFree);
+					if (n == local->end())
+						assert(n != local->end());
+					freeSiteStacks.push_back(n->second);
+					myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(freeSiteStacks));
+					freeSiteStacks.pop_back();
+					GET_FP_REGISTER_ID(myID, freeSiteStacks);
+					//freeSiteStacks.push_back(n->second);
+				}
+
+				// bool ret = GET_FP_STACKWALK_NONSW(freeSiteStacks);
+				// auto n = local->find(E_glibFree);
+				// if (n == local->end())
+				// 	assert(n != local->end());
+				// freeSiteStacks.push_back(n->second);
+				// int64_t myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(freeSiteStacks));
+				PLUG_FACTORY_PTR->CPUFreeData(addr, myID);
+				DIOGENES_ReleaseGlobalLock();
+			}
+			DIOGENES_IN_MEMORYFREE = false;
+		}
+	}
+
+	void DIOGENES_RESET_MALLOCMEM() {
+		DIOGENES_MALLOC_MEMLOCATION = NULL;
+		DIOGENES_MALLOC_MEMSIZE = 0;
+		DIOGENES_SEEN_RUNTIMEMALLOCAPI = false;
+	}
+	
+	void DIOGENES_REC_CudaMallocPost() {
+		uint64_t addr;
+		if (DIOGENES_MALLOC_MEMLOCATION != NULL) {
+			addr = (uint64_t)(*DIOGENES_MALLOC_MEMLOCATION);
+			POSTPROCESS_MALLOC(addr, DIOGENES_MALLOC_MEMSIZE,E_cudaMalloc);
+		}
+		DIOGENES_RESET_MALLOCMEM();
+	}
+
+	void DIOGENES_REC_cudaMallocHostpost() {
+		uint64_t addr;
+		if (DIOGENES_MALLOC_MEMLOCATION != NULL) {
+			addr = (uint64_t)(*DIOGENES_MALLOC_MEMLOCATION);
+			POSTPROCESS_MALLOC(addr, DIOGENES_MALLOC_MEMSIZE,E_cudaMallocHost);
+		}
+		DIOGENES_RESET_MALLOCMEM();
+	}
+
+	void DIOGENES_REC_cuMemAllocpost() {
+		uint64_t addr;
+		if(!DIOGENES_SEEN_RUNTIMEMALLOCAPI) {
+			if(DIOGENES_MALLOC_MEMLOCATION != NULL) {				
+				addr = (uint64_t)(*DIOGENES_MALLOC_MEMLOCATION);
+				POSTPROCESS_MALLOC(addr, DIOGENES_MALLOC_MEMSIZE,E_cuMemAlloc_v2);
+			}
+			DIOGENES_RESET_MALLOCMEM();
+		}
+	}
+
+	// Driver API wrappers
+
+	void POSTPROCESS_COPY(uint64_t hostptr, DIOG_IDNUMBER idType) {
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			SEEN_FIRST_CUDACALL = true;
+			PLUG_BUILD_FACTORY();
+			std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> local = DIOG_GLOBAL_SPS;
+			DIOGENES_CACHED_POINTS.clear();
+			bool ret = GET_FP_STACKWALK(DIOGENES_CACHED_POINTS);
+			auto n = local->find(idType);
+			if (n == local->end())
+				assert(n != local->end());
+			DIOGENES_CACHED_POINTS.push_back(n->second);
+			int64_t myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(DIOGENES_CACHED_POINTS));
+			//std::cout << "Processing Memcpy at addr: " << std::hex << hostptr << std::endl;
+			PLUG_FACTORY_PTR->RecordMemTransfer(hostptr, myID);
+			DIOGENES_ReleaseGlobalLock();
+		}
+	}
+
+	void POSTPROCESS_FREE(uint64_t ptr, DIOG_IDNUMBER idType) {
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			SEEN_FIRST_CUDACALL = true;
+			PLUG_BUILD_FACTORY();
+			std::shared_ptr<std::unordered_map<DIOG_IDNUMBER,StackPoint,EnumClassHash>> local = DIOG_GLOBAL_SPS;
+			DIOGENES_CACHED_POINTS.clear();
+			bool ret = GET_FP_STACKWALK(DIOGENES_CACHED_POINTS);
+			auto n = local->find(idType);
+			if (n == local->end())
+				assert(n != local->end());
+			DIOGENES_CACHED_POINTS.push_back(n->second);
+			int64_t myID = static_cast<int64_t>(DIOGENES_MEM_KEYFILE->InsertStack(DIOGENES_CACHED_POINTS));
+			PLUG_FACTORY_PTR->GPUFreeData(ptr, myID);
+			DIOGENES_ReleaseGlobalLock();
+		} else {
+			fprintf(stderr, "COULD NOT PROCESS FREE REQUEST!\n");
+		}	
+	}
+
+
+	
+	void DIOGENES_REC_cuMemAllocHostpost() {
+		uint64_t addr;
+		if(!DIOGENES_SEEN_RUNTIMEMALLOCAPI) {
+			if(DIOGENES_MALLOC_MEMLOCATION != NULL) {				
+				addr = (uint64_t)(*DIOGENES_MALLOC_MEMLOCATION);
+				POSTPROCESS_MALLOC(addr, DIOGENES_MALLOC_MEMSIZE,E_cuMemAllocHost_v2);
+			}
+			DIOGENES_RESET_MALLOCMEM();
+		}		
+	}
+	
+	void DIOGENES_REC_cuMemcpyHtoD(void * devptr, void * hostptr, size_t size) {
+		if(!DIOGENES_SEEN_RUNTIMECPY){
+			POSTPROCESS_COPY((uint64_t)hostptr,E_cuMemcpyHtoD_v2);
+		}
+	}
+	
+	void DIOGENES_REC_cuMemcpyDtoH(void * hostptr, void * devptr, size_t size) {
+		if(!DIOGENES_SEEN_RUNTIMECPY){
+			POSTPROCESS_COPY((uint64_t)hostptr,E_cuMemcpyDtoH_v2);
+		}
+	}
+
+	void DIOGENES_REC_CudaMemcpyAsync(void * dst, void * src, size_t size, cudaMemcpyKind kind, cudaStream_t stream) {
+		void * hostptr = NULL;
+		if (kind == cudaMemcpyDeviceToHost) {
+			hostptr = dst;
+		} else if (kind == cudaMemcpyHostToDevice) {
+			hostptr = src;
+		} else {
+			return;
+		}
+		DIOGENES_SEEN_RUNTIMECPY = true;
+		POSTPROCESS_COPY((uint64_t)hostptr,E_cudaMemcpyAsync);
+	}
+
+
+	void DIOGENES_REC_CudaMemcpy(void * dst, void * src, size_t size, cudaMemcpyKind kind) {
+		void * hostptr = NULL;
+		if (kind == cudaMemcpyDeviceToHost) {
+			hostptr = dst;
+		} else if (kind == cudaMemcpyHostToDevice) {
+			hostptr = src;
+		} else {
+			return;
+		}
+		DIOGENES_SEEN_RUNTIMECPY = true;
+		POSTPROCESS_COPY((uint64_t)hostptr,E_cudaMemcpy);
+	}
+
+	void DIOGENES_REC_CudaMemcpyAsyncPost() {
+		DIOGENES_SEEN_RUNTIMECPY = false;
+	}
+
+	void DIOGENES_REC_CudaFree(void * ptr) {
+		DIOGENES_SEEN_RUNTIMEFREE = true;
+		POSTPROCESS_FREE((uint64_t)ptr, E_cudaFree);
+	}
+	void DIOGENES_REC_CudaFreePost(void * ptr) {
+		DIOGENES_SEEN_RUNTIMEFREE = false;
+	}
+	void DIOGENES_REC_cuMemFree(void * ptr) {
+		if (!DIOGENES_SEEN_RUNTIMEFREE)
+			POSTPROCESS_FREE((uint64_t)ptr, E_cuMemFree_v2);
+	}
+
+	void DIOGENES_REC_cuMemFreeHost(void * ptr) {
+		if(!DIOGENES_SEEN_RUNTIMEFREE)
+			POSTPROCESS_FREE((uint64_t)ptr, E_cuMemFreeHost);		
+	}
+
+
+	void * DIOGENES_REC_GLIBMALLOC(size_t size) {
+		void * addr =  DIOGENES_libcmalloc_wrapper(size);
+		if (DIOGENES_TEAR_DOWN == false)
+			POSTPROCESS_GNUMALLOC((uint64_t)addr, size);
+		return addr;
+	}
+
+	void DIOGENES_REC_GLIBFREE(void* addr) {
+		
+		if (addr != NULL)
+			POSTPROCESS_GNUFREE((uint64_t)addr);
+		if (DIOGENES_TEAR_DOWN == false)
+			DIOGENES_libcfree_wrapper(addr);
+	}
+
+	cudaError_t DIOGENES_cudaFree(void * ptr) {
+		DIOGENES_SEEN_RUNTIMEFREE = true;
+		if (ptr != NULL)
+			POSTPROCESS_FREE((uint64_t)ptr, E_cudaFree);
+		cudaError_t ret = DIOGENES_cudaFree_wrapper(ptr);
+		DIOGENES_SEEN_RUNTIMEFREE = false;
+		return ret;
+	}
+
+	cudaError_t DIOGENES_cudaMemcpy(void * dst, void * src, size_t count, cudaMemcpyKind kind) {
+		DIOGENES_SEEN_RUNTIMECPY = true;
+		void * hostptr = NULL;
+		if (kind == cudaMemcpyDeviceToHost) {
+			hostptr = dst;
+		} else if (kind == cudaMemcpyHostToDevice) {
+			hostptr = src;
+		}
+		if (hostptr != NULL)
+			POSTPROCESS_COPY((uint64_t)hostptr,E_cudaMemcpy);		
+		auto ret = DIOGENES_cudaMemcpy_wrapper(dst, src, count, kind);
+		DIOGENES_SEEN_RUNTIMECPY = false;
+		return ret;
+	}
+
+	cudaError_t DIOGENES_cudaMemcpyAsync(void * dst, void * src, size_t count, cudaMemcpyKind kind, cudaStream_t stream) {
+		DIOGENES_SEEN_RUNTIMECPY = true;
+		void * hostptr = NULL;
+		if (kind == cudaMemcpyDeviceToHost) {
+			hostptr = dst;
+		} else if (kind == cudaMemcpyHostToDevice) {
+			hostptr = src;
+		}
+		if (hostptr != NULL)
+			POSTPROCESS_COPY((uint64_t)hostptr,E_cudaMemcpyAsync);	
+		auto ret = DIOGENES_cudaMemcpyAsync_wrapper(dst, src, count, kind, stream);
+		DIOGENES_SEEN_RUNTIMECPY = false;
+		return ret;
+	}
+/*	void DIOGENES_REC_GLIBMALLOC_PRE(size_t size) {
+		DIOGENSE_GLIB_MALLOC_SIZE = size;
+	}
+
+	void DIOGENES_REC_GLIBMALLOC_POST(uint64_t retAddress) {
+		POSTPROCESS_GNUMALLOC(retAddress,DIOGENSE_GLIB_MALLOC_SIZE);
+	}*/
+
+/*	void * DIOGENES_REC_MALLOCWrapper(size_t size)  {
 		int64_t cache = DIOGENES_CTX_ID;
 		if(DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
 			PLUG_BUILD_FACTORY();
@@ -397,6 +851,8 @@ extern "C" {
 			return malloc(size);
 		}
 	}
+
+
 	void DIOGENES_REC_FREEWrapper(void * mem) {
 		int64_t cache = DIOGENES_CTX_ID;
 		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
@@ -423,7 +879,20 @@ extern "C" {
 		DIOGENES_UnsetInWrapper();
 		return ret;		
 	}
-
+	CUresult DIOGENES_REC_cuMemAllocHost(void ** data, size_t size) {
+		CUresult ret = CUDA_ERROR_UNKNOWN;
+		DIOGENES_SetInWrapper();
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			PLUG_BUILD_FACTORY();
+			ret = cuMemAllocHost(data, size);
+			PLUG_FACTORY_PTR->AllocatePinnedMemory((uint64_t)(*data), size);
+			DIOGENES_ReleaseGlobalLock();
+		} else {
+			ret = cuMemAllocHost(data, size);
+		}		
+		DIOGENES_UnsetInWrapper();
+		return ret;		
+	}
 
 	cudaError_t DIOGENES_REC_CudaMalloc(void ** data, size_t size) {
 		int64_t cache = DIOGENES_CTX_ID;
@@ -442,6 +911,24 @@ extern "C" {
 		return ret;
 	}
 
+
+	CUresult DIOGENES_REC_cuMemAlloc(CUdeviceptr* data, size_t size) {
+		int64_t cache = DIOGENES_CTX_ID;
+		CUresult ret = CUDA_ERROR_UNKNOWN;
+		DIOGENES_SetInWrapper();
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			PLUG_BUILD_FACTORY();
+			ret = cuMemAlloc(data, size);
+			PLUG_FACTORY_PTR->GPUMallocData((uint64_t)(*data), size, cache);
+			DIOGENES_ReleaseGlobalLock();
+		} else {
+			ret = cuMemAlloc(data, size);
+		}
+		DIOGENES_UnsetInWrapper();
+		//assert(1==0);
+		return ret;
+	}
+
 	cudaError_t DIOGENES_REC_CudaFree(void * data) {
 		int64_t cache = DIOGENES_CTX_ID;
 		DIOGENES_SetInWrapper();
@@ -451,6 +938,19 @@ extern "C" {
 			DIOGENES_ReleaseGlobalLock();
 		}
 		cudaError_t ret = cudaFree(data);
+		DIOGENES_UnsetInWrapper();
+		return ret;
+	} 
+
+	CUresult DIOGENES_REC_cuMemFree(CUdeviceptr data) {
+		int64_t cache = DIOGENES_CTX_ID;
+		DIOGENES_SetInWrapper();
+		if (DIOGENES_GetGlobalLock() && DIOGENES_TEAR_DOWN == false) {
+			PLUG_BUILD_FACTORY();
+			PLUG_FACTORY_PTR->GPUFreeData((uint64_t)(data), cache);
+			DIOGENES_ReleaseGlobalLock();
+		}
+		CUresult ret = cuMemFree(data);
 		DIOGENES_UnsetInWrapper();
 		return ret;
 	} 
@@ -533,7 +1033,7 @@ extern "C" {
 	// 	}
 
 	// }
-
+*/
 }
 
 

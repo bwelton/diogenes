@@ -62,6 +62,18 @@ bool DynOpsClass::FillStackpoint(BPatch_addressSpace * aspace, StackPoint & p) {
 	return 1;
 
 }
+
+StackPoint DynOpsClass::GenerateStackPoint(BPatch_addressSpace * aspace, BPatch_function * func) {
+	StackPoint ret;
+	ret.libname = func->getModule()->getObject()->pathName();
+	uint64_t libOffsetAddr = 0;
+	BPatchPointVecPtr entryPoints = GetPoints(func, BPatch_locEntry);
+	assert(entryPoints->size() > 0);
+	if (!GetFileOffset(aspace, (*entryPoints)[0], libOffsetAddr, true))
+		libOffsetAddr = (uint64_t) (*entryPoints)[0]->getAddress();
+	ret.libOffset = libOffsetAddr;
+	return ret;
+}
 int DynOpsClass::FindFuncByStackPoint(BPatch_addressSpace * aspace, BPatch_function * & ret, StackPoint & point) {
 	if (aspace == NULL) 
 		return -1;
@@ -75,7 +87,7 @@ int DynOpsClass::FindFuncByStackPoint(BPatch_addressSpace * aspace, BPatch_funct
 }
 
 bool DynOpsClass::IsNeverInstriment(BPatch_function * func) {
-	static std::vector<std::string> librariesToSkip = {"dyninst/install","cudadedup-develop", "/usr/lib64/librt-"};
+	static std::vector<std::string> librariesToSkip = {"libstdc++","libgcc","xerces-c","libelf", "libscalapack", "dyninst_10", "dyninst/build", "libessl", "dyninst/install","cudadedup-develop", "/opt/mellanox", "/usr/lib64/librt-", "spectrum-mpi", "ld-2.17", "libpthread-2.17.so"};
     std::string tmpLibname = func->getModule()->getObject()->pathName();
     for (auto i : librariesToSkip)
     	if (tmpLibname.find(i) != std::string::npos)
@@ -86,6 +98,51 @@ bool DynOpsClass::IsNeverInstriment(BPatch_function * func) {
 
 }
 
+
+void DynOpsClass::GenerateAddrList(BPatch_addressSpace * aspace) {
+	BPatch_Vector<BPatch_function*> fvec;
+	BPatch_image * img = aspace->getImage();
+	img->getProcedures(fvec);
+	std::set<BPatch_basicBlock *>  blocks;
+	for (auto i : fvec) {
+		blocks.clear();
+		GetBasicBlocks(i, blocks);
+		for (auto n : blocks) {
+			auto start = n->getStartAddress();
+			auto end =  n->getEndAddress(); 
+			for (uint64_t z = start; z <= end; z++){
+				//if (_addressList.find(z) != _addressList.end())
+				//	std::cerr << "Conflix between functions - " << _addressList[z]->getName() << " and " << i->getName() << " at addr " << z << std::endl;
+				_addressList[z] = i;
+			}
+		}
+	}
+}
+
+
+BPatch_function * DynOpsClass::FindFunctionInAddrList(BPatch_addressSpace * aspace, StackPoint & p) {
+	boost::filesystem::path pDir(p.libname);
+	std::string filename = pDir.stem().string();
+	std::vector<BPatch_object *> objects = GetObjects(aspace);
+	for (auto i : objects) {
+		//std::cerr << i->pathName() << std::endl;
+		//std::cerr << filename << std::endl;
+		if (i->pathName().find(filename) != std::string::npos) {
+			if (i->pathName().find(".so") != std::string::npos) {
+				std::vector<BPatch_module *> mods;
+				i->modules(mods);
+				if (mods.size() == 0){
+					std::cerr << "CANNOT FIND MODULE FOR PATHNAME - " << i->pathName() << std::endl;
+					continue;
+				}
+				if(_addressList.find(((uint64_t)mods[0]->getBaseAddr()) + p.libOffset) != _addressList.end())
+					return _addressList[((uint64_t)mods[0]->getBaseAddr()) + p.libOffset];
+				std::cerr << "Did not find funcname in this library - " << i->pathName() << std::endl;
+			}
+		}
+	}
+	return NULL;
+}
 BPatchPointVecPtr DynOpsClass::GetPoints(BPatch_function * func, const BPatch_procedureLocation pos) {
 	BPatchPointVecPtr ret;
 	ret.reset(func->findPoint(pos));
@@ -107,6 +164,20 @@ void DynOpsClass::PowerFunctionCheck(BPatch_addressSpace * addr, BPatch_function
 	else if ((uint64_t)ret[1]->getBaseAddr() == baseAddr + 0x8)
 		funcToCheck = ret[1];
 
+}
+
+std::map<uint64_t, std::string> DynOpsClass::GetRealAddressAndLibName(BPatch_addressSpace * aspace) {
+	std::map<uint64_t, std::string> ret;
+	BPatch_image * img = aspace->getImage();
+	std::vector<BPatch_module*> modules;
+	img->getModules(modules);
+	for (auto i : modules){
+		if (i->isSharedLib())
+			ret[(uint64_t)(i->getBaseAddr())] = i->getObject()->pathName();
+		else 
+			ret[0] = i->getObject()->pathName();
+	}
+	return ret;
 }
 
 std::vector<BPatch_function *> DynOpsClass::FindFuncsInObjectByName(BPatch_addressSpace * aspace, BPatch_object * obj, std::string name) {

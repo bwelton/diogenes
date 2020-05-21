@@ -1,4 +1,5 @@
 add_compile_options(-O3 -g)
+link_libraries("-L${BOOST_LIBRARYDIR}")
 add_library(StubLib SHARED "StubLib.cpp")
 target_link_libraries(StubLib ${Boost_LIBRARIES})
 target_link_libraries(StubLib ${DYNINST_LIBRARIES})

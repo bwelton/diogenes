@@ -60,6 +60,7 @@ public:
 	std::map<uint64_t,uint64_t> MatchStackTraces(std::map<uint64_t, StackRecord> & a, std::map<uint64_t, StackRecord> & b);
 	void WriteStackFile(std::string stackFile, std::string fileName);
 	void TranslateStackfile(std::string fileName, std::string outFilename);
+	void TranslateStackRecords(std::vector<StackPoint> & points);
 private:
 	double _fastestExecTime;
 	uint64_t _capturedSyncs;

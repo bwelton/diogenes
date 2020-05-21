@@ -27,8 +27,6 @@ libcudnn.so
 libaccinj64.so
 libcublas.so
 libcudart.so
-libcufft.so
-libcufftw.so
 libcuinj64.so
 libcurand.so
 libcusolver.so

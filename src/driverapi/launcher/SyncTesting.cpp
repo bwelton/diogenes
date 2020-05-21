@@ -46,6 +46,16 @@ std::shared_ptr<DyninstProcess> SyncTesting::LaunchApplication(bool debug) {
 	return ret;
 }
 
+std::shared_ptr<DyninstProcess> SyncTesting::LaunchApplicationByName(std::string name, bool debug) {
+	std::shared_ptr<DyninstProcess> ret(new DyninstProcess(name, debug));
+	assert(ret->LaunchProcess() != NULL);
+
+	// Load libcuda.so into the address space of the process
+	ret->LoadLibrary(std::string("libcuda.so.1"));
+	return ret;
+}
+
+
 void SyncTesting::CaptureDriverCalls() {
 	system("exec rm -rf ./stackOut.*");
 	std::shared_ptr<DyninstProcess> proc = LaunchApplication(false);
@@ -258,23 +268,33 @@ void SyncTesting::FixProblems(StackRecMap & recs) {
 
 CallTransPtr SyncTesting::MemRecorderLaunch(StackRecMap & recs) {
 	system("exec rm -rf ./stackOut.*");
-	std::shared_ptr<DyninstProcess> proc = LaunchApplication(false);
-	proc->RunCudaInit();
+	std::shared_ptr<DyninstProcess> proc; //= LaunchApplication(false);
+//	proc->RunCudaInit();
 	MemRecorder t(proc);
-	t.InsertAnalysis(recs);
+//	t.InsertAnalysis(recs);
 //	proc->DetachForDebug();
-	TIMER_FUNCTION_CALL(proc->RunUntilCompleation(), "[SEGMENTTIME] Timing of synchronizations = ")
+//	TIMER_FUNCTION_CALL(proc->RunUntilCompleation(), "[SEGMENTTIME] Timing of synchronizations = ")
 	CallTransPtr ret = t.PostProcessing();
 	return ret;
+
+// 	system("exec rm -rf ./stackOut.*");
+// 	std::shared_ptr<DyninstProcess> proc = LaunchApplication(false);
+// 	proc->RunCudaInit();
+// 	MemRecorder t(proc);
+// 	t.InsertAnalysis(recs);
+// //	proc->DetachForDebug();
+// 	TIMER_FUNCTION_CALL(proc->RunUntilCompleation(), "[SEGMENTTIME] Timing of synchronizations = ")
+// 	CallTransPtr ret = t.PostProcessing();
+// 	return ret;
 	//t.PostProcessing(recs);
 }
 
-void SyncTesting::FixKnownProblems(StackRecMap & recs, CallTransPtr & trans) {
+void SyncTesting::FixKnownProblems(StackRecMap & recs) {
 	system("exec rm -rf ./stackOut.*");
 	std::shared_ptr<DyninstProcess> proc = LaunchApplication(false);
 	proc->RunCudaInit();
 	FixCudaProblems t(proc);
-	t.InsertAnalysis(recs, trans);
+	t.InsertAnalysis(recs);
 //	proc->DetachForDebug();
 	TIMER_FUNCTION_CALL(proc->RunUntilCompleation(), "[SEGMENTTIME] Timing of synchronizations = ")
 	t.PostProcessing();
@@ -310,11 +330,181 @@ void SyncTesting::RunTimeUse(StackRecMap & recs, std::vector<StackPoint> & uses)
 }
 
 
+void SyncTesting::RunAutoCorrect() {
+	StackRecMap empty_map;
+	FixKnownProblems(empty_map);
+}
+#include "LocateCudaSynchronization.h"
+#include "LaunchIdentifySync.h"
+
+void SyncTesting::IndentifySyncFunction() {
+	LocateCudaSynchronization scuda;
+	if (scuda.FindLibcudaOffset(false) != 0)
+		return;
+	std::vector<uint64_t> potentials = scuda.IdentifySyncFunction();
+	{
+		std::shared_ptr<DyninstProcess> proc = LaunchApplicationByName(std::string("/g/g17/welton2/scratch/nfs/apps/cumf_als/hang_devsynch"), false);
+		proc->RunCudaInit();
+		LaunchIdentifySync sync(proc);
+		sync.InsertAnalysis(potentials, std::string("cudaDeviceSynchronize"), true);
+		proc->RunUntilCompleation();
+		potentials.clear();
+		uint64_t addr = sync.PostProcessing(potentials);
+		if (potentials.size() > 1) {
+			std::cout << "[SyncTesting::IndentifySyncFunction] We have more than one possibility for sync function, picking lowest level one" << std::endl;
+		}
+		scuda.WriteSyncLocation(addr);
+	}
+	// {
+	// 	std::shared_ptr<DyninstProcess> proc = LaunchApplicationByName(std::string("/g/g17/welton2/scratch/nfs/apps/cumf_als/hang_devsynch"), false);
+	// 	proc->RunCudaInit();
+	// 	LaunchIdentifySync sync(proc);
+	// 	sync.InsertAnalysis(potentials, std::string("cudaDeviceSynchronize"), true);
+	// 	proc->RunUntilCompleation();
+	// 	uint64_t addr = sync.PostProcessing(potentials);
+	// }
+}
+
+uint64_t SerializeStackRecMap(FILE * fp,std::map<uint64_t, StackRecord> & srmap) {
+	uint64_t ret = 0;
+	uint64_t size = srmap.size();
+	ret += SerializeUint64(fp, size);
+	for (auto i : srmap) {
+		ret += SerializeUint64(fp, i.first);
+		ret += i.second.SerializeStack(fp);
+	}
+	return ret;
+};
+
+void DeSerializeStackRecMap(FILE * fp, std::map<uint64_t, StackRecord> & srmap) {
+	uint64_t size = 0;
+	ReadUint64(fp, size);
+	for (int i = 0; i < size; i++) {
+		uint64_t tmp = 0;
+		StackRecord sr;
+		ReadUint64(fp, tmp);
+		sr.DeserializeStack(fp);
+		srmap[tmp] = sr;
+		std::cout << "[DeSerializeStackRecMap]" << std::endl;
+		sr.PrintStack();
+	}
+};
+
+void CheckSerialization(StackRecMap & expected, std::string fname, std::vector<StackPoint> & euses, bool LSCheck) {
+	StackRecMap tmpMap;
+	FILE * tmp = fopen(fname.c_str(), "rb");
+	DeSerializeStackRecMap(tmp, tmpMap);
+	if (!LSCheck)
+		fclose(tmp);
+
+	for (auto i : expected) {
+		if (tmpMap.find(i.first) == tmpMap.end())
+			assert("COULD NOT FIND ENTRY THAT SHOULD EXIST!" == 0);
+		if (i.second.FullCompare(tmpMap[i.first]) == false)
+			assert("COULD NOT FIND ENTRY THAT SHOULD EXIST!" == 0);
+	}
+	if (LSCheck) {
+		uint64_t size;
+		ReadUint64(tmp, size);
+		if (size != euses.size())
+			assert("COULD NOT FIND ENTRY THAT SHOULD EXIST!" == 0);
+		for (int i = 0; i < size; i++) {
+			StackPoint st;
+			st.DeserializeFP(tmp);
+			if (!st.FullCompare(euses[i]))
+				assert("COULD NOT FIND ENTRY THAT SHOULD EXIST!" == 0);
+		}
+		fclose(tmp);
+	}
+}
+
+
 void SyncTesting::Run() {
+	IndentifySyncFunction();
+	std::vector<StackPoint> emptyUses;
+	std::string stageSelect = _vm["mrun"].as<std::string>();
+
+
+	if (stageSelect.find("all") != std::string::npos || stageSelect.find("CP") != std::string::npos){
+		CopyOldFiles();
+	}	
+
+	if (stageSelect.find("ST") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		StackRecMap syncTiming; 
+		FILE * tmp = fopen("DIOG_ST_Intermediate.bin", "wb");
+		RunWithSyncStacktracing(syncTiming);
+		SerializeStackRecMap(tmp, syncTiming);
+		fclose(tmp);
+		CheckSerialization(syncTiming, std::string("DIOG_ST_Intermediate.bin"),emptyUses, false);
+	}
+
+	if (stageSelect.find("TT") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		TimeTransfers();
+	}
+
+	if (stageSelect.find("DT") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		CaptureDuplicateTransfers();
+	}
+	//RunWithoutInstrimentation();
+	if (stageSelect.find("TS") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		StackRecMap syncTiming;
+		FILE * tmp = fopen("DIOG_ST_Intermediate.bin", "rb");
+		DeSerializeStackRecMap(tmp, syncTiming); 
+		fclose(tmp);
+		TimeSynchronizations(syncTiming);
+		tmp = fopen("DIOG_TS_Intermediate.bin", "wb");
+		SerializeStackRecMap(tmp, syncTiming);
+		fclose(tmp);
+		CheckSerialization(syncTiming, std::string("DIOG_TS_Intermediate.bin"), emptyUses, false);
+	}
+
+	if (stageSelect.find("LS") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		StackRecMap syncTiming;
+		std::vector<StackPoint> uses;
+		FILE * tmp = fopen("DIOG_TS_Intermediate.bin", "rb");
+		DeSerializeStackRecMap(tmp, syncTiming);
+		fclose(tmp);
+
+		RunLoadStoreAnalysis(syncTiming, uses);
+
+		tmp = fopen("DIOG_LS_Intermediate.bin", "wb");
+		SerializeStackRecMap(tmp, syncTiming);
+		uint64_t size = uses.size();
+		SerializeUint64(tmp, size);
+		for (auto i : uses)
+			i.SerializeFP(tmp);
+		fclose(tmp);
+		CheckSerialization(syncTiming, std::string("DIOG_LS_Intermediate.bin"), uses, true);
+
+	}
+	if (stageSelect.find("TU") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		StackRecMap syncTiming;
+		std::vector<StackPoint> uses;		
+		FILE * tmp = fopen("DIOG_LS_Intermediate.bin", "rb");
+		DeSerializeStackRecMap(tmp, syncTiming);
+		uint64_t size;
+		ReadUint64(tmp, size);
+		for (int i = 0; i < size; i++) {
+			uses.push_back(StackPoint());
+			uses.back().DeserializeFP(tmp);
+		}
+		fclose(tmp);
+		RunTimeUse(syncTiming, uses);
+	}
+
+	if (stageSelect.find("MR") != std::string::npos || stageSelect.find("all") != std::string::npos) {
+		StackRecMap empty_map;
+		CallTransPtr transRec = MemRecorderLaunch(empty_map);
+	}
+
+	if (stageSelect.find("AC") != std::string::npos || stageSelect.find("all") != std::string::npos) { 
+		StackRecMap empty_map;
+		FixKnownProblems(empty_map);
+	}
 	// CopyOldFiles();
 	// return;
-	StackRecMap syncTiming; 
-	double time;
+	// StackRecMap syncTiming; 
+	// double time;
 	// {
 	// 	TimeApplications base(_vm);
 	// 	std::cerr << "Running " << _programName << " without instrimentation to obtain total execution time" << std::endl;
@@ -327,20 +517,24 @@ void SyncTesting::Run() {
 	// }
 	//CaptureDriverCalls();
 
-	//return;
-	CopyOldFiles();
-	RunWithSyncStacktracing(syncTiming);
-	TimeTransfers();
-	CaptureDuplicateTransfers();
-    //RunWithoutInstrimentation();
-	TimeSynchronizations(syncTiming);
-	std::vector<StackPoint> uses;
-	RunLoadStoreAnalysis(syncTiming, uses);
-	RunTimeUse(syncTiming, uses);
-	/*
-	StackRecMap empty_map;
-	CallTransPtr transRec = MemRecorderLaunch(empty_map);
-	FixKnownProblems(empty_map, transRec);*/
+	
+//	LocateCudaSynchronization scuda;
+//	scuda.IdentifySyncFunction();
+
+	// //return;
+	// CopyOldFiles();
+	// RunWithSyncStacktracing(syncTiming);
+	// //TimeTransfers();
+	// //CaptureDuplicateTransfers();
+ //    //RunWithoutInstrimentation();
+	// TimeSynchronizations(syncTiming);
+	// std::vector<StackPoint> uses;
+	// RunLoadStoreAnalysis(syncTiming, uses);
+	// //RunTimeUse(syncTiming, uses);
+
+	// StackRecMap empty_map;
+	// CallTransPtr transRec = MemRecorderLaunch(empty_map);
+	// FixKnownProblems(empty_map);
 	//RunTimeUse(sy)
 	return;
 	//RunWithCUPTI();

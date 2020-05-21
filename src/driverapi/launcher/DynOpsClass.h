@@ -21,6 +21,7 @@
 #include <mutex>
 #include <queue>
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 // Dyninst includes
 #include "CodeObject.h"
@@ -78,8 +79,15 @@ public:
 	bool FillStackpoint(BPatch_addressSpace * aspace, StackPoint & p);
 	BPatchPointVecPtr GetPoints(BPatch_function * func, const BPatch_procedureLocation pos);
 	bool IsNeverInstriment(BPatch_function * func);
+	StackPoint GenerateStackPoint(BPatch_addressSpace * aspace, BPatch_function * func);
+
+	BPatch_function * FindFunctionInAddrList(BPatch_addressSpace * aspace, StackPoint & p);
+	void GenerateAddrList(BPatch_addressSpace * aspace);
+
+	std::map<uint64_t, std::string> GetRealAddressAndLibName(BPatch_addressSpace * aspace);
 private:
 	std::map<uint64_t, BPatch_function *> _powerFuncmap;
+	std::unordered_map<uint64_t, BPatch_function *> _addressList;
 	bool init;
 	uint64_t _syncLocation;
 	LocateCudaSynchronization _syncClass;

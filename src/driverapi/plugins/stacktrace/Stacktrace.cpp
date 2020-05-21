@@ -17,7 +17,7 @@
 #include "StackPoint.h"
 #include "StackwalkingCommon.h"
 //std::shared_ptr<std::vector<bool>> DIOGENES_seenCalls(1024, false);
-int DIOGENES_CURRENT_CALL_ID = -1;
+thread_local int DIOGENES_CURRENT_CALL_ID = -1;
 //bool DIOGENES_CHECK_KERN_START =false;
 
 struct OutputFile {
@@ -58,7 +58,7 @@ public:
 		// }
 		if (id >= 0 && id < 1024){
 			_seenCalls[id] = true;
-			//_callCounts[id]++;
+			_callCounts[id]++;
 		}
 		else {
 			fprintf(stderr, "%s\n", "Unknown ID Seen");
@@ -69,8 +69,8 @@ public:
 		for (int i = 0; i < _seenCalls.size(); i++) {
 			if (_seenCalls[i] == true)
 				fwrite(&i, 1, sizeof(int),_outFile.outFile);
-			// if (_callCounts[i] > 0)
-			// 	std::cerr << "[CallCount] " << i << " - " << _callCounts[i] << std::endl;
+			if (_callCounts[i] > 0)
+			 	std::cerr << "[CallCount] " << i << " - " << _callCounts[i] << std::endl;
 		}
 	};
 private:
@@ -79,11 +79,13 @@ private:
 	OutputFile _outFile;
 };
 
-thread_local uint64_t skippedStacks;
-thread_local pid_t my_thread_id = -1;
-thread_local std::shared_ptr<OutputFile> outputFile;
-thread_local std::shared_ptr<StackKeyWriter> keyFile;
-thread_local std::shared_ptr<WriteIDKeys> DIOGENES_WRITEKEYID;
+#include <mutex>
+std::mutex DIOG_globalLock;
+uint64_t skippedStacks;
+pid_t my_thread_id = -1;
+std::shared_ptr<OutputFile> outputFile;
+std::shared_ptr<StackKeyWriter> keyFile;
+std::shared_ptr<WriteIDKeys> DIOGENES_WRITEKEYID;
 
 
 extern "C" {
@@ -172,8 +174,10 @@ extern "C" {
 	}
 
 	void SYNC_RECORD_SYNC_CALL_IDTYPE() {
+		DIOG_globalLock.lock();
 		SETUP_NEWINTERCEPTOR();
 		DIOGENES_WRITEKEYID->RecordKey(DIOGENES_CURRENT_CALL_ID);
+		DIOG_globalLock.unlock();
 	}
 
 	void ENTER_CUDA_FUNCT(int id) {

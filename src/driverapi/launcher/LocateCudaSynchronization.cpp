@@ -8,7 +8,7 @@
  */
 #include "LocateCudaSynchronization.h"
 #define DEBUG_LOCATECUDA 1
-uint64_t LocateCudaSynchronization::FindLibcudaOffset() {
+uint64_t LocateCudaSynchronization::FindLibcudaOffset(bool dassert) {
 	std::string md5cuda = GetMD5Sum(FindLibCuda());
 	assert(md5cuda != std::string(""));
 	std::map<std::string, uint64_t> driverList = ReadDriverList();
@@ -18,7 +18,9 @@ uint64_t LocateCudaSynchronization::FindLibcudaOffset() {
 		std::cerr << "Dumping Supported Driver MD5SUMs with Offsets: " << std::endl;
 		for (auto i : driverList) 
 			std::cerr << i.first << "," << std::hex << i.second << std::endl;
-		assert(driverList.find(md5cuda) != driverList.end());
+		if(dassert == true)
+			assert(driverList.find(md5cuda) != driverList.end());
+		return 0;
 	}
 	return driverList[md5cuda];
 }
@@ -47,6 +49,23 @@ std::map<std::string, uint64_t> LocateCudaSynchronization::ReadDriverList() {
 		ret[res[0]] = uint64_t(std::stoull(res[1], nullptr, 16));
 	}	
 	return ret;
+}
+
+
+std::vector<uint64_t> LocateCudaSynchronization::IdentifySyncFunction() {
+	// Strategy: look at various 
+	std::string cudaName = FindLibCuda().string();
+	BPatchBinary bin(cudaName, false, std::string("DONOTWRITE"));
+	std::vector<uint64_t> ret = bin.FindSyncCandidates();
+	return ret;
+}
+
+void LocateCudaSynchronization::WriteSyncLocation(uint64_t addr) {
+	std::string md5cuda = GetMD5Sum(FindLibCuda());
+	std::fstream fs;
+  	fs.open(std::string(LOCAL_INSTALL_PATH) + std::string("/lib/SyncDriverVerisons.txt"), std::fstream::out | std::fstream::app);
+  	fs << md5cuda << "$0x" << std::hex << addr << std::dec << std::endl;
+  	fs.close();
 }
 
 std::string LocateCudaSynchronization::GetMD5Sum(boost::filesystem::path file) {

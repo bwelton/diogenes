@@ -26,4 +26,7 @@
 extern "C" {
 	void INIT_FP_STACKWALKER();
 	bool GET_FP_STACKWALK(std::vector<StackPoint> & ret);
+	bool GET_FP_STACKWALK_NONSW(std::vector<StackPoint> & ret);
+	int64_t GET_FP_STACKWALK_FAST_NONSW(std::vector<StackPoint> & ret);
+	void GET_FP_REGISTER_ID(int64_t id, std::vector<StackPoint> & vec);
 }

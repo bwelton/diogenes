@@ -158,5 +158,28 @@ struct MemRecDataFile {
 				exit(-1); 
 			}
 		}
+		// ret->allocSite = ptr[0];
+		// ret->copyID = ptr[1];
+		// ret->count = ptr[2];
+		// Memory Transfer Dump
+		int64_t aggro = 0;
+		for (auto i : MemTrans){
+			std::cerr << "[DEBUG_MemRecDataFile_Raw MEMORY TRANFER] " << "ID = " << i->copyID << " COUNT = " << i->count << " AllocSite = " << i->allocSite << std::endl;
+			aggro += i->count;
+		}
+		std::cerr << "[DEBUG_MemRecDataFile_Raw] TOTAL transfer count = " << aggro << std::endl;
+		aggro = 0;
+		for (auto i : MallocTrac){
+			std::cerr << "[DEBUG_MemRecDataFile_Raw CUDA_MALLOC] " << "AllocSite = " << i->allocSite << " COUNT = " << i->count << " FreeSite = " << i->freeSite << std::endl;
+			aggro += i->count;
+		}
+		std::cerr << "[DEBUG_MemRecDataFile_Raw] TOTAL cudaMalloc count = " << aggro << std::endl;
+		aggro = 0;
+		for (auto i : GLIBMalloc){
+			std::cerr << "[DEBUG_MemRecDataFile_Raw GLIB_MALLOC] " << "AllocSite = " << i->allocSite << " COUNT = " << i->count << " FreeSite = " << i->freeSite << std::endl;
+			aggro += i->count;
+		}
+		std::cerr << "[DEBUG_MemRecDataFile_Raw] TOTAL glib malloc count = " << aggro << std::endl;
+
 	};
 };

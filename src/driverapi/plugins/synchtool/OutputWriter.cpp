@@ -11,6 +11,10 @@ OutputWriter::OutputWriter(bool timeType) : _curPos(1), _timeType(timeType), _pr
 	}
 }
 
+// LS_stackkey.bin = stacks that synchronize
+// LS_trace.bin = stacks that write/read locations of GPU written data
+// LS_syncaccess.bin = sequence info. 
+
 void OutputWriter::RecordAccess(uint64_t id, std::vector<uint64_t> & currentStack, double timeID) {
 	uint64_t hash = HashStack(currentStack);
 	if (_prevStacks.find(hash) == _prevStacks.end()) {
@@ -26,6 +30,19 @@ void OutputWriter::RecordAccess(uint64_t id, std::vector<uint64_t> & currentStac
 	} else {
 		_timingValues->Write(id, _prevStacks[hash], timeID);
 	}
+}
+
+void OutputWriter::FlushAll() {
+	if (_accessFile)
+		_accessFile->FlushFile();
+	if (_stackKeyFile)
+		_stackKeyFile->FlushFile();
+	if (_syncAccess)
+		_syncAccess->FlushFile();
+	if (_timingValues)
+		_timingValues->FlushFile();
+	if (_firstUse)
+		_firstUse->FlushFile();
 }
 
 void OutputWriter::WriteSequenceInfo(std::vector<uint64_t> & currentStack, bool newDependents) {

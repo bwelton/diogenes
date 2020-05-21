@@ -3,6 +3,7 @@
 #include <memory>
 #include "CheckAccesses.h"
 #include "OutputWriter.h"
+#include <chrono>
 // No Synchronization = Disabled
 // Synchronization and No Use = Enabled
 // Synchronization and use = Enabled
@@ -46,6 +47,9 @@ public:
 private:
 	std::vector<uint64_t> _storedStack;
 	std::vector<uint64_t> _stackAtSync;
+	uint64_t _checkCount;
+	uint64_t _totalCheck;
+	std::chrono::time_point<std::chrono::high_resolution_clock> _start;
 	OutputWriterPtr _writer;
 	CheckAccessesPtr _access;
 	bool _syncTriggered;
@@ -54,6 +58,7 @@ private:
 	bool _firstSync;
 	uint64_t _syncStackDepth;
 	bool _timefu;
+
 	InstrimentationControl _instControler;
 };
 

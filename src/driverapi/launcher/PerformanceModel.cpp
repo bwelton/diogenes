@@ -497,6 +497,17 @@ void PerformanceModel::TranslateStackfile(std::string fileName, std::string outF
 	outFile.close();
 }
 
+void PerformanceModel::TranslateStackRecords(std::vector<StackPoint> & points) {
+	std::map<uint64_t, std::vector<StackPoint> > tmp;
+	tmp[1] = points;
+	std::map<uint64_t, StackRecord> translateRecords; 
+	for (auto & i : tmp)
+		translateRecords[i.first] = StackRecord(i.first, i.second);	
+	ExtractLineInfo(translateRecords);
+	points = translateRecords[1].GetStackpoints();
+}
+
+
 void PerformanceModel::ReadTimingStacks(std::string keyFile, std::string timelineFile) {
 	std::cerr << "[PerformanceModel] Reading Timing Information" << std::endl;
 	std::cerr << "[PerformanceModel] Reading timing stack file: " << timelineFile << std::endl;

@@ -17,11 +17,14 @@
 #include <unistd.h>   
 #include "Constants.h"
 #include "Common.h"
+#include "BPatchBinary.h"
 
 class LocateCudaSynchronization {
 public:
-	uint64_t FindLibcudaOffset();
+	uint64_t FindLibcudaOffset(bool dassert=true);
 	std::map<std::string, uint64_t> ReadDriverList();
 	std::string GetMD5Sum(boost::filesystem::path file);
 	boost::filesystem::path FindLibCuda();
+	void WriteSyncLocation(uint64_t addr);
+	std::vector<uint64_t> IdentifySyncFunction();
 };

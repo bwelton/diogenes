@@ -1,3 +1,4 @@
+link_libraries("-L${BOOST_LIBRARYDIR}")
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/driverapi/launcher/main.cpp.in"
 	"${PROJECT_SOURCE_DIR}/src/driverapi/launcher/main.cpp"
@@ -10,7 +11,7 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/src/driverapi/launcher/Constants.h.in"
 	"${PROJECT_SOURCE_DIR}/src/driverapi/launcher/Constants.h"
 )
-add_executable(LaunchCUInstriment "main.cpp" "SyncTesting.cpp" "LoadStoreInst.cpp" "PerformanceModel.cpp" "SymbolLookup.cpp" "StacktraceInst.cpp" "StackStorage.cpp" "DynOpsClass.cpp" "BinaryLocationIDMap.cpp" "InstrimentationTracker.cpp" "ReadLoadStoreFiles.cpp" "TimeFirstUse.cpp" "Common.cpp" "LocateCudaSynchronization.cpp" "DyninstProcess.cpp" "APICaptureInstrimentation.cpp" "StacktraceSynchronizations.cpp" "ReadStackKeys.cpp" "TimerInstrimentation.cpp" "LoadStoreInstrimentation.cpp" "DyninstFunction.cpp" "TimeUse.cpp" "DyninstFunctionWraps.cpp" "DyninstCallsite.cpp" "DebugInstrimentationTemp.cpp" "FixCudaFree.cpp" "MemRecorder.cpp" "CallTransformation.cpp" "FixCudaProblems.cpp")
+add_executable(LaunchCUInstriment "main.cpp" "SyncTesting.cpp" "LoadStoreInst.cpp" "PerformanceModel.cpp" "SymbolLookup.cpp" "StacktraceInst.cpp" "StackStorage.cpp" "DynOpsClass.cpp" "BinaryLocationIDMap.cpp" "InstrimentationTracker.cpp" "ReadLoadStoreFiles.cpp" "TimeFirstUse.cpp" "Common.cpp" "LocateCudaSynchronization.cpp" "DyninstProcess.cpp" "APICaptureInstrimentation.cpp" "StacktraceSynchronizations.cpp" "ReadStackKeys.cpp" "TimerInstrimentation.cpp" "LoadStoreInstrimentation.cpp" "DyninstFunction.cpp" "TimeUse.cpp" "DyninstFunctionWraps.cpp" "DyninstCallsite.cpp" "DebugInstrimentationTemp.cpp" "FixCudaFree.cpp" "MemRecorder.cpp" "CallTransformation.cpp" "FixCudaProblems.cpp" "BPatchBinary.cpp" "LaunchIdentifySync.cpp" "SerializeTypes.cpp")
 target_link_libraries(LaunchCUInstriment ${DYNINST_LIBRARIES})
 target_link_libraries(LaunchCUInstriment ${Boost_LIBRARIES})
 target_link_libraries(LaunchCUInstriment "-lpthread")

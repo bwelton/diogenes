@@ -22,9 +22,13 @@ void InstrimentationControl::ExitingInst() {
 }
 
 LoadStoreDriver::LoadStoreDriver(CheckAccessesPtr access, bool timefu) : _firstSync(true), _syncTriggered(false), _firstWrite(true), _found(false), _access(access), _timefu(timefu) {
+	_start = std::chrono::high_resolution_clock::now();
+	_checkCount = 0;
+	_totalCheck = 0;
 }
 
 void LoadStoreDriver::RecordAccessRange(uint64_t id, uint64_t addr, uint64_t count) {
+	//_checkCount++;
 	if (_syncTriggered && !_found) {
 		if(_access->IsAddressRangeProtected(addr, count)) {
 			if (_firstWrite)
@@ -38,13 +42,25 @@ void LoadStoreDriver::RecordAccessRange(uint64_t id, uint64_t addr, uint64_t cou
 }
 
 void LoadStoreDriver::RecordAccess(uint64_t id, uint64_t addr) {
+	//_checkCount++;
 	if (_syncTriggered && !_found) {
 		if(_access->IsAddressProtected(addr)) {
 			if (_firstWrite)
 				_writer.reset(new OutputWriter(_timefu));
+
 			_firstWrite = false;
 			_writer->RecordAccess(id,_stackAtSync);
 			_found = true;
+			/*if (_checkCount > 100000){
+				_totalCheck += _checkCount;
+				auto end = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<double> diff =  std::chrono::high_resolution_clock::now() - _start;
+				std::cerr << "[LoadStoreDriver::RecordAccess] Flushing files at checkcount " << std::dec << _totalCheck << " at time " << std::dec << diff.count() << std::endl;
+				_writer->FlushAll();
+				if (diff.count()/60 > 40)
+					exit(0);
+				_checkCount = 0;
+			}*/			
 			_instControler.FoundUse();
 		}
 	}

@@ -1,6 +1,7 @@
 #include "SynchTool.h"
 volatile int SYNCTOOL_exited = 0;
 volatile int SYNCTOOL_inSpecialCase = 0;
+volatile uint64_t SYNCTOOL_LOADSTORE_COUNT =0;
 std::shared_ptr<SynchTool> Worker;
 thread_local LoadStoreDriverPtr _LoadStoreDriver;
 thread_local CheckAccessesPtr _dataAccessManager;
@@ -14,12 +15,17 @@ volatile bool SYNCTOOL_INCUDACALL = false;
 extern "C" {
 
 // Warpper Functions;
+	void DIOGENES_exitDestroyer_syncTool() {
+		SYNCTOOL_exited = 1;
+		//DIOGENES_GetGlobalLock();
+	}
 
 void INIT_SYNC_COMMON() {
 	if(SYNCTOOL_exited == 1)
 		return;
 	if (_dataAccessManager.get() != NULL)
 		return;
+	atexit(DIOGENES_exitDestroyer_syncTool);
 	// gotcha_set_priority("cuda/specialcases", 1);
 	// int result = gotcha_wrap(gotfuncs, 1, "cuda/specialcases");
 	// assert(result == GOTCHA_SUCCESS);
@@ -148,6 +154,9 @@ struct gotcha_binding_t SYNCTOOL_funcBinders[] = { {"memcpy",(void *)memcpyWrapp
 
 	void SYNC_RECORD_MEM_ACCESS(uint64_t addr, uint64_t id) {
 		
+		if (SYNCTOOL_exited == 1)
+			return;
+		SYNCTOOL_LOADSTORE_COUNT++;
 		//fprintf(stderr, "Inside of stack %llu\n",id);
 		INIT_SYNC_COMMON();
 		_LoadStoreDriver->EnterInstrimentation();
@@ -214,6 +223,8 @@ SynchTool::~SynchTool() {
 	SYNCTOOL_exited = 1;
 	_LoadStoreDriver.reset();
 	_dataAccessManager.reset();
+	std::cerr << "Exiting SyncTool Now!" << std::endl;
+	std::cerr << "[SynchTool::~SynchTool] Load Store Count = " << SYNCTOOL_LOADSTORE_COUNT << std::endl;
 }
 
 
@@ -272,12 +283,12 @@ void SynchTool::GetLiveTransfer(std::shared_ptr<Parameters> params) {
 	_dataAccessManager->AddMemoryTransfer(tmp);
 
 //#ifdef SYNCH_DEBUG
-	std::stringstream ss;
+	/*std::stringstream ss;
 	ss << "[SynchTool] Adding Memory Transfer - " << params.get()->GetName() << " with the following info\n" 
 	   << "\tCPU Starting Address = 0x" << std::hex << tmp.begin << std::dec 
 	   << "\n\tTransfer Size = " << tmp.size 
 	   << "\n\tStream = " << tmp.stream;
-	std::cerr << ss.str() << std::endl;
+	std::cerr << ss.str() << std::endl;*/
 	//_sync_log.get()->Write(ss.str());
 //#endif
 }

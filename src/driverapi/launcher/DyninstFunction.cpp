@@ -8,7 +8,7 @@ DyninstFunction::DyninstFunction(std::shared_ptr<DyninstProcess> proc, BPatch_fu
 	std::shared_ptr<DynOpsClass> ops = proc->ReturnDynOps();
 	ops->GetBasicBlocks(func, _bblocks);
 	_ops = ops;
-	std::cerr << "[DyninstFunction] Iterating through " << _bblocks.size() << " blocks" << std::endl;
+	//std::cerr << "[DyninstFunction] Iterating through " << _bblocks.size() << " blocks" << std::endl;
 	std::vector<std::pair<Dyninst::InstructionAPI::Instruction, Dyninst::Address> > instructionVector;
 
 	for (auto i : _bblocks) {
@@ -69,6 +69,7 @@ std::string DyninstFunction::PrintInst(InstStats & stats) {
 }
 
 void DyninstFunction::EntryExitWrapping() {
+	//return;
 	// Find the function calls being made
 	if(_exitEntryDone == true)
 		return;
@@ -112,6 +113,7 @@ void DyninstFunction::EntryExitWrapping() {
 			if (_proc->GetAddressSpace()->insertSnippet(exitExpr,singlePoint,BPatch_callAfter) == NULL) {
 				std::cerr << "[LoadStoreInst][EntryExit] \t\t ERROR! Could not insert exit tracking into " << _func->getName() << std::endl;
 			}
+			std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Entry Exit Wrapping inserted into function inserted at point - " << libname << "@" << std::dec << libOffsetAddr << std::endl;
 		}
 
 		if(_insertedInst.find((uint64_t)i->getAddress()) == _insertedInst.end()){
@@ -121,22 +123,37 @@ void DyninstFunction::EntryExitWrapping() {
 			std::get<0>(_insertedInst[(uint64_t)i->getAddress()]) = writeValue;
 		}
 	}
+	if (_addedTRAC == true)
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Entry Exit Wrapping inserted into function: " << _func->getName() << " in library " << libname << std::endl;
 	_exitEntryDone = true;
 }
 
 void DyninstFunction::InsertLoadStoreAnalysis() {
 	if(_wrapper.InsertLoadStoreInstrimentation(_func, _bmap))
 		return;
-	if (IsExcludedFunction(LOAD_STORE_INST) || _lsDone || _entrySize < (0x4 * 7) ){
+	if (_func->getName().find("xerces") != std::string::npos || _func->getName().find("RuntimeException") != std::string::npos || _func->getName().find("Exception") != std::string::npos) {
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis by being in xerces (and unsupported library)" << std::endl;
+		return;
+	}
+	// if (_obj->pathName().find("qb") != std::string::npos)
+	//  	_func->relocateFunction();
+	
+	if (IsExcludedFunction(LOAD_STORE_INST) || _lsDone || _entrySize < (0x4 * 5) ){
 		_lsDone = true;
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis by IsExcludedFunction or its size is too small (" << _entrySize << ")" << std::endl;
+
 		if (_obj->pathName().find("cuibm") != std::string::npos && _addedTRAC == false )
 			_func->relocateFunction();
+		return;
+	}
+	if (_obj->pathName().find("libcufft.") != std::string::npos){
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis by being libcufft" << std::endl;
 		return;
 	}
 	_lsDone = true;
 	if (_func->getName().find("__device_stub__") != std::string::npos || 
 		//_func->getName().find("thrust::") != std::string::npos ||
-		//_func->getName().find("std::string::_Rep") != std::string::npos ||
+		_func->getName().find("std::string::_Rep") != std::string::npos ||
 		_func->getName().find("cudaRegisterAll") != std::string::npos ||
 		//_func->getName().find("YAML::") != std::string::npos ||
 		_func->getName().find("__tcf_0") != std::string::npos)
@@ -152,19 +169,26 @@ void DyninstFunction::InsertLoadStoreAnalysis() {
 	assert(recordMemAccess.size() == 1);
 	std::string libname = _obj->pathName();
  	if (libname.find("/lib64/ld64") != std::string::npos || 
-	    libname.find("lib/spectrum_mpi/") != std::string::npos)
+	    libname.find("lib/spectrum_mpi/") != std::string::npos) {
+ 		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis by being in spectrum_mpi/ld64" << std::endl;
  		return;
+ 	}
 	std::set<BPatch_opCode> axs;
 	axs.insert(BPatch_opLoad);
 	axs.insert(BPatch_opStore);
 	BPatchPointVecPtr loadsAndStores(_func->findPoint(axs));
-	if (loadsAndStores == NULL)
+	if (loadsAndStores == NULL){
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis due to no load stores" << std::endl;
 		return;
+	}
 	std::set<uint64_t> exclude;
 	uint64_t setID = 0;
+	bool AddedLoadStoreInst = false;
 	// Check for non-returning functions (not supported)
-	if (!GenExclusionSet(exclude))
+	if (!GenExclusionSet(exclude)) {
+		std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Function " << _func->getName() << " is excluded from LS analysis due being a non-returning function" << std::endl;
 		return;
+	}
 	for (auto i : *loadsAndStores) {
 		int writeValue = 0;
 		uint64_t addr = (uint64_t)i->getAddress();
@@ -177,6 +201,7 @@ void DyninstFunction::InsertLoadStoreAnalysis() {
 			if(_bmap->AlreadyExists(libname, libOffsetAddr)){
 				writeValue = -1;
 			} else {
+				AddedLoadStoreInst = true;
 				std::vector<BPatch_point*> singlePoint;
 				singlePoint.push_back(i);
 				writeValue = 1;
@@ -198,6 +223,8 @@ void DyninstFunction::InsertLoadStoreAnalysis() {
 			std::get<1>(_insertedInst[(uint64_t)i->getAddress()]) = writeValue;
 		}
 	}
+	//if (AddedLoadStoreInst == true)
+	std::cerr << "[DyninstFunction::InsertLoadStoreAnalysis] Load store analysis inserted into function: " << _func->getName() << " in library " << libname << std::endl;
 	if (_obj->pathName().find("cuibm") != std::string::npos && _addedTRAC == false  && _addedLS == false)
                _func->relocateFunction();
 
@@ -332,6 +359,14 @@ uint64_t DyninstFunction::GetSmallestEntryBlockSize() {
 }
 
 bool DyninstFunction::IsExcludedFunction(InstType T) {
+	//if(_track->ShouldInstrimentFunciton(_func, T))
+	//if (!_track->ShouldInstrimentFunciton(_func, T))
+	//	std::cerr << "[DyninstFunction::IsExcludedFunction] Returned false for function" << std::endl;
+	//if (!_track->ShouldInstrimentModule(_func, T))
+	//	std::cerr << "[DyninstFunction::IsExcludedFunction] Returned false for module" << std::endl;
+	if (_track->ShouldInstrimentFunciton(_func, T) && (_obj->pathName().find("qb_cuda8_mpirun") != std::string::npos || _obj->pathName().find("libcufftw") != std::string::npos 
+		|| _obj->pathName().find("/main") != std::string::npos || _obj->pathName().find("/cuibm") != std::string::npos))
+		return false;
 	if (_track->ShouldInstrimentFunciton(_func, T) && _track->ShouldInstrimentModule(_func, T))
 		return false;
 	return true;

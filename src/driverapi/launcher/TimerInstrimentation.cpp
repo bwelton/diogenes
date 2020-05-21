@@ -40,9 +40,11 @@ void TimerInstrimentation::InsertTimers(StackRecMap & recs) {
 
 	uint64_t curId = 1;
 	for (auto i : instFuncs) {
+		//if (curId != 3)
 		InsertTimer(i, curId);
 		_idToFunc[curId] = GetPointFromBpatchFunc(i);
 		curId++;
+		//break;
 	}
 
 }
@@ -75,7 +77,7 @@ void TimerInstrimentation::PostProcessing(StackRecMap & recs) {
 			for (auto n : i.second._timing)
 				assert(n.s.dynId == dynID);
 			assert(_idToFunc.find(dynID) != _idToFunc.end());
-			i.second.ReplaceLibDynRT(_idToFunc[dynID]);
+			i.second.ReplaceLibDynRT(_idToFunc[dynID], std::string("libTimeCall.so"));
 		}
 		i.second.PrintStack();
 		std::vector<StackPoint> tmp_map = i.second.GetStackpoints();

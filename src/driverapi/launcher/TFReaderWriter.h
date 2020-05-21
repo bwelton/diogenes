@@ -18,6 +18,11 @@ enum TF_RECORD_TYPE {
 struct TF_SyncRecord {
 	uint64_t dynId, stackId, count;
 	double time;
+	bool FullCompare(TF_SyncRecord & other) {
+		if (dynId == other.dynId && stackId == other.stackId && count == other.count && time == other.time)
+			return true;
+		return false;
+	};
 	void Write(FILE * fp) {
 		fwrite(&dynId, 1, sizeof(uint64_t), fp);
 		fwrite(&stackId, 1, sizeof(uint64_t), fp);
@@ -35,6 +40,11 @@ struct TF_SyncRecord {
 struct TF_TransferRec {
 	uint64_t dynId, stackId;
 	double time;
+	bool FullCompare(TF_TransferRec & other) {
+		if (dynId == other.dynId && stackId == other.stackId && time == other.time)
+			return true;
+		return false;
+	};
 	void Write(FILE * fp) {
 		fwrite(&dynId, 1, sizeof(uint64_t), fp);
 		fwrite(&stackId, 1, sizeof(uint64_t), fp);
@@ -57,6 +67,15 @@ struct TF_Record {
 	TF_SyncRecord s;
 	TF_TransferRec r;
 	TF_RECORD_TYPE type;
+	bool FullCompare(TF_Record & other) {
+		if (other.type == type) {
+			if (type == TF_SYNCRECORD && s.FullCompare(other.s))
+				return true;
+			if (type == TF_TRANSFERREC &&  r.FullCompare(other.r))
+				return true;
+		}
+		return false;
+	};
 	void Write(FILE * fp) {
 		int tmp = int(type);
 		fwrite(&tmp, 1, sizeof(int), fp);

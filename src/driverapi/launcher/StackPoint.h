@@ -7,6 +7,7 @@
 #include <cassert>
 #include <deque>
 #include <sys/time.h>
+#include <unordered_map>
 #include <cstdlib>
 #include <sstream>
 #include <tuple>
@@ -43,8 +44,10 @@
 #include "set"
 #include "LogInfo.h"
 #include "Constants.h"
-
+#include "SerializeTypes.h"
 //#define SP_DEBUG 1
+
+enum SPPointType {NONE = 0, LIBCUDART = 1, LIBCUDA = 2}; 
 
 struct StackPoint {
 	std::string libname;
@@ -57,22 +60,68 @@ struct StackPoint {
 	// Not used for anything other than giving to python analysis tool....
 	uint64_t lineNum;
 	std::string fileName;
+
+	uint64_t raFramePos;
+
+	// Not saved
+	bool _cached;
+	SPPointType _ptype;
 	StackPoint(std::string _libname, std::string _funcName, uint64_t _libOffset, uint64_t _funcOffset) : empty(false), libname(_libname), funcName(_funcName), libOffset(_libOffset), funcOffset(_funcOffset) 
 	{
 		fileName = std::string("");
 		lineNum = 0;
 		inMain = false;
+		_cached = false;
+		raFramePos = 0;
 	};
+
+
 
 	StackPoint() : empty(true), libOffset(0), funcOffset(0), funcName(std::string("")), libname(std::string("")) {
 		fileName = std::string("");
 		lineNum = 0;
 		inMain = false;
+		raFramePos = 0;
+		_cached = false;
+	};
+
+	void SetPType() {
+		if (_cached)
+			return;
+		_cached = true;
+		if (libname.find("libcudart") != std::string::npos)
+			_ptype =LIBCUDART;
+		else if (libname.find("libcuda") != std::string::npos) 
+			_ptype = LIBCUDA;
+		else
+			_ptype = NONE;
+	};
+
+	bool IsDriverAPI() {
+		SetPType();
+		if (_ptype == LIBCUDA)
+			return true;
+		return false;
+	};
+	bool IsRuntimeAPI() {
+		SetPType();
+		if (_ptype == LIBCUDART)
+			return true;
+		return false;		
 	};
 
 	bool IsEqual(StackPoint & other) {
 		if(libname == other.libname && libOffset == other.libOffset)
 			return true;
+		return false;
+	};
+
+	bool FullCompare(StackPoint & other) {
+		if(libname == other.libname && libOffset == other.libOffset &&
+		   libOffset == other.libOffset && funcOffset == other.funcOffset && 
+		   timerID == other.timerID && inMain == other.inMain && empty == other.empty && 
+		   lineNum == other.lineNum && fileName == other.fileName)
+			return true;		
 		return false;
 	};
 
@@ -100,6 +149,33 @@ struct StackPoint {
 		return pos + sizeof(uint64_t);
 	}
 
+	uint64_t SerializeFP(FILE * fp) {
+		int ret = 0;
+		ret += SerializeSring(fp, libname);
+		ret += SerializeSring(fp, funcName);
+		ret += SerializeUint64(fp, libOffset);
+		ret += SerializeUint64(fp, funcOffset);
+		ret += SerializeUint64(fp, timerID);
+		ret += SerializeBool(fp, inMain);
+		ret += SerializeBool(fp, empty);
+		ret += SerializeUint64(fp, lineNum);
+		ret += SerializeSring(fp, fileName);
+		return ret;
+	};
+
+	void DeserializeFP(FILE * fp) {
+		DeserializeString(fp, libname);
+		DeserializeString(fp, funcName);
+		ReadUint64(fp, libOffset);
+		ReadUint64(fp, funcOffset);
+		ReadUint64(fp, timerID);
+		DeserializeBool(fp, inMain);
+		DeserializeBool(fp, empty);
+		ReadUint64(fp, lineNum);
+		DeserializeString(fp, fileName);
+		_cached = false;		
+	}
+
 	int Deserialize(char * data, int len) {
 		char tmp[1024];
 		uint64_t size = 0;
@@ -121,12 +197,46 @@ struct StackPoint {
 #endif
 		empty = false;
 		pos += sizeof(uint64_t);
+		_cached = false;
 		return pos;
 	}
 
 };
 
 typedef std::vector<StackPoint> StackPointVec;
+
+struct RecursiveDictionaryStackHasher{
+	std::unordered_map<uint64_t, std::shared_ptr<RecursiveDictionaryStackHasher>> _map;
+	uint64_t _localID;
+	bool _written;
+	RecursiveDictionaryStackHasher(uint64_t localID) : _localID(localID), _written(false) {};
+
+	uint64_t FindIfExists(std::vector<StackPoint> & points, int pos) {
+		if (points.size() <= pos){
+			if (_written == false)
+				return 0;
+			return _localID;
+		}
+		auto it = _map.find(points[pos].raFramePos);
+		if (it == _map.end())
+			return 0;
+		return it->second->FindIfExists(points, pos+1);
+	};
+
+	void InsertStack(std::vector<StackPoint> & points, int pos, uint64_t & globalID) {
+		if (points.size() <= pos){
+			_written = true;
+			return;
+		}
+		auto it = _map.find(points[pos].raFramePos);
+		if (it == _map.end()) {
+			_map[points[pos].raFramePos] = std::shared_ptr<RecursiveDictionaryStackHasher>(new RecursiveDictionaryStackHasher(globalID));
+			globalID++;
+			it = _map.find(points[pos].raFramePos);
+		}
+		it->second->InsertStack(points, pos + 1, globalID);
+	};
+};
 
 struct StackHasher{
 	std::stringstream ss;
@@ -141,24 +251,61 @@ struct StackHasher{
 };
 
 
+
+
 // Key file for the stacks outputted
 struct StackKeyWriter {
+	RecursiveDictionaryStackHasher _fastHash;
 	char buffer[512000];
 	uint64_t curPos;
 	std::map<uint64_t, uint64_t> prevStacks;
 	StackHasher h;
 	FILE * out;
-	StackKeyWriter(FILE * fp) {
+	StackKeyWriter(FILE * fp) : _fastHash(0) {
 		out = fp;
 		curPos = 1;
 	}
-	StackKeyWriter(FILE * fp, uint64_t startPos) {
+	StackKeyWriter(FILE * fp, uint64_t startPos) : _fastHash(0) {
 		out = fp;
 		curPos = startPos;
 	}
 	~StackKeyWriter() {
 		fclose(out);
 	}
+
+	uint64_t ReserveNextID() {
+		uint64_t ret = curPos;
+		curPos++;
+		return ret;
+	}
+	uint64_t InsertStackFastCheck(std::vector<StackPoint> & points) {
+		uint64_t hash = _fastHash.FindIfExists(points, 0);
+		if (hash == 0) {
+			_fastHash.InsertStack(points, 0, curPos);
+			hash = _fastHash.FindIfExists(points,0);
+			assert(hash != 0);
+		} else {
+			return hash;
+		}
+		int pos = 0;
+		std::stringstream outStr;
+		outStr << hash << "$";
+		for (auto i : points)
+			outStr << i.libname << "@" << i.libOffset << "$";
+
+		std::string t = outStr.str();
+		t.pop_back();
+		t = t + std::string("\n");
+		do {
+			const char * myString = t.c_str();
+			pos += fwrite(&myString[pos], 1, t.size() - pos, out);
+		} while(pos != t.size());
+		std::cerr << "Wrote stack with hash id: " << hash << std::endl;
+		fflush(out);
+		return hash;
+	};
+
+
 	uint64_t InsertStack(std::vector<StackPoint> & points){
 		uint64_t hash = h.HashStack(points);
 		if (hash == 0)
@@ -185,6 +332,7 @@ struct StackKeyWriter {
 			pos += fwrite(&myString[pos], 1, t.size() - pos, out);
 		} while(pos != t.size());
 		std::cerr << "Wrote stack with hash id: " << hash << std::endl;
+		fflush(out);
 		return hash;
 	}
 	void InsertStack(uint64_t id, std::vector<StackPoint> & points){
@@ -217,6 +365,9 @@ struct LSDependency{
 	uint64_t id;
 	uint64_t newDependents;
 	uint64_t lastDependent;
+	uint64_t isRequired;
+
+	LSDependency() : id(0), newDependents(0), lastDependent(0), isRequired(0) {};
 
 	inline static uint64_t GetSize() {
 		return sizeof(uint64_t) * 3;
@@ -229,6 +380,39 @@ struct LSDependency{
 		ret->newDependents = tmp[1];
 		ret->lastDependent = tmp[2];
 		return ret;
+	};
+};
+
+struct ReadLSTraceDepFile {
+	FILE * _fid;
+
+	std::set<uint64_t> _needed;
+	ReadLSTraceDepFile(FILE * fp) : _fid(fp) { };
+	~ReadLSTraceDepFile() { fclose(_fid);};
+
+	void Read() {
+		fseek(_fid, 0, SEEK_END);
+		size_t size = ftell(_fid);
+		fseek(_fid, 0, SEEK_SET);
+		//size = size / (sizeof(uint64_t) * 2);
+		uint64_t count = 0;
+		uint64_t id = 0;
+		uint64_t hashID = 0;
+		while (count + sizeof(uint64_t) * 2 <= size) {
+			fread(&id, 1, sizeof(uint64_t), _fid);
+			fread(&hashID, 1, sizeof(uint64_t), _fid);
+			count += sizeof(uint64_t) * 2;
+			_needed.insert(hashID);
+		}
+		for (auto i : _needed) {
+			std::cout << "NEED LS ID OF = " << i << std::endl;
+		}
+	};
+
+	inline bool IsInSet(uint64_t id) {
+		if (_needed.find(id) != _needed.end())
+			return true;
+		return false;
 	};
 };
 
@@ -252,16 +436,94 @@ struct ReadDependencyFile {
 	};
 };
 
+struct RAStackReaderWriter{
+	FILE * io;
+	RAStackReaderWriter (FILE * fp) {
+		io = fp;
+	};
+	~RAStackReaderWriter() {
+		fclose(io);
+	};
+	void WriteRAStack(std::vector<uint64_t> & stack) {
+		uint64_t size = stack.size();
+		fwrite(&size, 1, sizeof(uint64_t), io);
+		for(auto i : stack)
+			fwrite(&i, 1, sizeof(uint64_t), io);
+	};
+
+	std::vector<std::vector<uint64_t>> ReadStacks() {
+		std::vector<std::vector<uint64_t>> ret;
+		fseek(io, 0, SEEK_END);
+  		uint64_t size = ftell(io);
+  		fseek(io, 0, SEEK_SET);
+  		while(size > 0) {
+  			uint64_t stackSize = 0;
+  			uint64_t tmp = 0;
+  			ret.push_back(std::vector<uint64_t>());
+  			fread(&stackSize,1,sizeof(uint64_t),io);
+  			for(int i = 0; i < stackSize; i++) {
+  				fread(&tmp, 1, sizeof(uint64_t), io);
+  				ret.back().push_back(tmp);
+  			}
+  			if (size - ((stackSize * sizeof(uint64_t)) + sizeof(uint64_t)) < size)
+  				size = size - ((stackSize * sizeof(uint64_t)) + sizeof(uint64_t));
+  			else 
+  				size = 0;
+  		}
+  		return ret;
+	};
+
+};
+struct HostToDeviceLimiter{ 
+	FILE * in;
+	HostToDeviceLimiter(FILE * fp) {
+		in = fp;
+	};
+	~HostToDeviceLimiter() {
+		if (in != NULL)
+			fclose(in);
+	};
+	void WriteLimiter(bool limit){
+		uint64_t l;
+		if (limit == true)
+			l = 1;
+		else
+			l = 0;
+		fwrite(&l, 1, sizeof(uint64_t), in);
+	};
+
+	std::vector<uint64_t> ReadLimiter() {
+		std::vector<uint64_t> ret;
+		if (in == NULL)
+			return ret;
+		fseek(in, 0, SEEK_END);
+  		uint64_t size = ftell(in);
+  		fseek(in, 0, SEEK_SET);
+  		while(size > 0) {
+  			uint64_t tmp = 0;
+  			fread(&tmp, 1, sizeof(uint64_t), in);
+  			if (size - sizeof(uint64_t) > size)
+  				size = 0;
+  			else
+  				size = size - sizeof(uint64_t);
+  			ret.push_back(tmp);
+  		}
+  		return ret;
+	};
+};
 struct StackKeyReader {
 	FILE * in;
 	StackKeyReader(FILE * fp) {
 		in = fp;
 	}
 	~StackKeyReader() {
-		fclose(in);
+		if (in != NULL)
+			fclose(in);
 	}
 	std::map<uint64_t, std::vector<StackPoint> > ReadStacks() {
 		std::map<uint64_t, std::vector<StackPoint> > ret;
+		if (in == NULL)
+			return ret;
 		fseek(in, 0, SEEK_END);
   		uint64_t size = ftell(in);
   		fseek(in, 0, SEEK_SET);
@@ -280,6 +542,7 @@ struct StackKeyReader {
   			std::string line;
   			while (getline(ifstring, line, '$')) {
   				if (line.find("@") == std::string::npos){
+
   					hash = std::stoull(line);
   					//std::cerr << "My hash - " << hash << std::endl;
   					ret[hash] = std::vector<StackPoint>();

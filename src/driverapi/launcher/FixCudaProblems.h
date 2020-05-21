@@ -54,11 +54,13 @@
 class FixCudaProblems {
 public:
 	FixCudaProblems(std::shared_ptr<DyninstProcess> proc);
-	void InsertAnalysis(StackRecMap & recs, CallTransPtr callTrans);
+	void InsertAnalysis(StackRecMap & recs);
 	void PostProcessing();
+	uint64_t GetAbsoluteAddress(StackPoint & point);
 private:
 	std::shared_ptr<DyninstProcess> _proc;
 	//std::vector<std::shared_ptr<DyninstFunction> > _dyninstFunctions;
 	std::map<uint64_t, std::shared_ptr<DyninstFunction>> _dyninstFunctions;
 	std::shared_ptr<BinaryLocationIDMap> _bmap;
+	std::map<std::string, uint64_t> _object_offsets;
 };

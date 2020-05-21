@@ -57,11 +57,14 @@ public:
 	MemRecorder(std::shared_ptr<DyninstProcess> proc);
 	void InsertAnalysis(StackRecMap & recs);
 	CallTransPtr PostProcessing();
+	void FixMemDataRecs();
 private:
-	void InsertPrePostCall(BPatch_function * origFunction, BPatch_function * instrimentation, bool postCall, int numParams);
+	void InsertPrePostCall(BPatch_function * origFunction, BPatch_function * instrimentation, bool postCall, int numParams, bool getRetExpression);
 	std::shared_ptr<DyninstProcess> _proc;
 	//std::vector<std::shared_ptr<DyninstFunction> > _dyninstFunctions;
 	std::map<uint64_t, std::shared_ptr<DyninstFunction>> _dyninstFunctions;
 	std::shared_ptr<BinaryLocationIDMap> _bmap;
 	std::map<int64_t, StackPoint> _idToStackPoint;
+	std::unordered_map<std::string, StackPoint> _wrapperReplacements;
+	std::map<uint64_t, std::string> _absoluteAddrToPathname;
 };

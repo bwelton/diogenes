@@ -25,8 +25,10 @@ int main(int argc, char * argv[]) {
 		("prog,p", value<std::vector<std::string> >()->multitoken(), "Program to instrument with all parameters")
 		("plugindir", value<std::string>()->default_value(std::string("@CMAKE_INSTALL_PREFIX@/lib")), "Directory containing the plugins (install lib directory)")
 		("synch,s", bool_switch()->default_value(false), "Enable synchronization checker")
+		("autocorrect,a", bool_switch()->default_value(false), "Run Autocorrected Binary Only")
 		("reevaluate,r", bool_switch()->default_value(false), "Reevaluate existing synchronization trace files")
 		("decode,d", bool_switch()->default_value(false), "Decode stack trace file only (using symtab to get line info)")
+		("mrun,m",value<std::string>()->default_value(std::string("all")), "Manually select an analysis to run (ST, TT, DT, TS, LS, TU, AC, MR)")
 		("infile,i",value<std::string>()->default_value(std::string("")), "Input file to decode")
 		("outfile,o",value<std::string>()->default_value(std::string("")), "Ouput file to decode");
 
@@ -73,6 +75,9 @@ int main(int argc, char * argv[]) {
 			if (vm["synch"].as<bool>() == true) {
 				SyncTesting runSync(vm);
 				runSync.Run();
+			} else if (vm["autocorrect"].as<bool>() == true) {
+				SyncTesting runSync(vm);
+				runSync.RunAutoCorrect();				
 			}
 		} else if (vm["reevaluate"].as<bool>() == true) {
 			SyncTesting runSync(vm);

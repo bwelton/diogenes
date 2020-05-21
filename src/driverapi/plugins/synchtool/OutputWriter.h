@@ -12,6 +12,10 @@ struct OutputFile {
 	OutputFile(std::string filename) {
 		outFile = fopen(filename.c_str(),"w");
 	}
+	void FlushFile() {
+		if (outFile)
+			fflush(outFile);
+	}
 	void Write(uint64_t id, uint64_t stackId) {
 		fwrite(&id, 1, sizeof(uint64_t), outFile);
 		fwrite(&stackId, 1, sizeof(uint64_t), outFile);
@@ -53,6 +57,7 @@ public:
 	void RecordAccess(uint64_t id, std::vector<uint64_t> & currentStack, double timeID = 0.0);
 	uint64_t HashStack(std::vector<uint64_t> & currentStack);
 	void WriteSequenceInfo(std::vector<uint64_t> & currentStack, bool newDependents);
+	void FlushAll();
 private:
 	uint64_t _prevDependency;
 	uint64_t _curPos;

@@ -1,7 +1,5 @@
 #include "StackStorage.h"
 
-
-
 StackRecord::StackRecord() {}
 
 StackRecord::StackRecord(uint64_t id, std::vector<StackPoint> & points) : _id(id), _points(points) {
@@ -27,12 +25,53 @@ std::vector<StackPoint> StackRecord::GetStackpoints() {
 	return _points;
 }
 
+
+bool StackRecord::FullCompare(StackRecord & other) {
+	if (_id != other._id)
+		return false;
+	auto oPoints = other.GetStackpoints();
+	if (_points.size() != oPoints.size())
+		return false;
+	for (int i = 0; i < _points.size(); i++) 
+		if (!_points[i].FullCompare(oPoints[i]))
+			return false;
+	
+	if (_timing.size() != other._timing.size())
+		return false;
+
+	for(int i = 0; i < _timing.size(); i++) 
+		if(!_timing[i].FullCompare(other._timing[i]))
+			return false;
+
+	if (_ranges.size() != other._ranges.size())
+		return false;
+
+	for (int i = 0; i < _ranges.size(); i++)
+		if (!_ranges[i].FullCompare(other._ranges[i]))
+			return false;
+
+	if (_occurances.size() != other._occurances.size())
+		return false;
+
+	for (int i = 0; i < _occurances.size(); i++)
+		if(_occurances[i] != other._occurances[i])
+			return false;
+
+
+	return true;
+
+}
 // Walking out of instrimented frames causes the frame being walked out of to look like it is
 // coming from libdyninstAPI_RT.so, we need to get that position
-uint64_t StackRecord::GetFirstLibDynRTPosition() {
+uint64_t StackRecord::GetFirstLibDynRTPosition(std::string extraLib) {
 	for (int i = _points.size() - 1; i >= 0; i = i - 1){
 		if(_points[i].libname.find("libdyninstAPI_RT.so") != std::string::npos){
 			return i;
+		}
+		if (extraLib.size() > 0) {
+			if(_points[i].libname.find(extraLib) != std::string::npos){
+				return i;
+			}			
 		}
 	}	
 	return 0;
@@ -64,8 +103,8 @@ bool StackRecord::IsEqual(StackRecord & other) {
 	return true;
 }
 
-bool StackRecord::ReplaceLibDynRT(StackPoint p) {
-	uint64_t pos = GetFirstLibDynRTPosition();
+bool StackRecord::ReplaceLibDynRT(StackPoint p, std::string extraLib) {
+	uint64_t pos = GetFirstLibDynRTPosition(extraLib);
 	if (pos == 0)
 		return false;
 	std::vector<StackPoint> tmp;
@@ -143,6 +182,63 @@ void StackRecord::PrintStack(std::stringstream & outStream) {
 void StackRecord::PrintEncodedStack(std::ofstream & outStream) {
 	for (auto i : _points) {
 		outStream << "$" << i.libname << "@" << i.funcName << "@" << std::hex << i.libOffset << "@" << i.fileName << "|" << i.lineNum;
+	}
+}
+
+uint64_t StackRecord::SerializeStack(FILE * fp) {
+	int ret = 0;
+	uint64_t count = _points.size();
+	fwrite(&_id, 1, sizeof(uint64_t), fp);
+	fwrite(&count, 1, sizeof(uint64_t), fp);
+	ret += sizeof(uint64_t) * 2;
+	for (auto i  : _points) {
+		ret += i.SerializeFP(fp);
+	}
+	count = _ranges.size();
+	fwrite(&count, 1, sizeof(uint64_t), fp);
+	ret += sizeof(uint64_t);
+	for (auto i : _ranges) {
+		ret += i.SerializeFP(fp);
+	}
+	count = _occurances.size();
+	ret += sizeof(uint64_t);
+	fwrite(&count, 1, sizeof(uint64_t), fp);
+	for (auto i : _occurances) {
+		ret += SerializeUint64(fp, i);
+	}
+
+	count = _timing.size();
+	ret += sizeof(uint64_t);
+	fwrite(&count, 1, sizeof(uint64_t), fp);
+	for (auto i : _timing) {
+		i.Write(fp);
+	}		
+	return ret;
+}
+
+void StackRecord::DeserializeStack(FILE * fp) {
+	uint64_t count = 0;
+	fread(&_id, 1, sizeof(uint64_t), fp);
+	fread(&count, 1, sizeof(uint64_t), fp);
+	for (int i = 0; i < count; i++) {
+		_points.push_back(StackPoint());
+		_points.back().DeserializeFP(fp);
+	}
+	fread(&count, 1, sizeof(uint64_t), fp);
+	for (int i = 0; i < count; i++) {
+		_ranges.push_back(SyncRangeRecord(0));
+		_ranges.back().DeserializeFP(fp);
+	}
+	fread(&count, 1, sizeof(uint64_t), fp);
+	for (int i = 0; i < count; i++) {
+		uint64_t n = 0;
+		ReadUint64(fp, n);
+		_occurances.push_back(n);
+	}	
+	fread(&count, 1, sizeof(uint64_t), fp);
+	for (int i = 0; i < count; i++) {
+		_timing.push_back(TF_Record());
+		_timing.back().Read(fp);
 	}
 }
 
