@@ -11,7 +11,9 @@ A substantial difference between the autocorrect paper and this implementation i
 Five dependencies are required for install of this redesign of Diogenes. Boost, LLNL's Gotcha, UW-Madison's Dyninst, libunwind, and the cuda sync analyzer (https://github.com/dyninst/tools/tree/master/cuda_sync_analyzer/src). Installation can be performed using standard cmake commands:
 
 cd build
+
 cmake ..  -DCMAKE_INSTALL_PREFIX= -DBOOST_ROOT= -DGOTCHA_INSTALL_DIR= -DDYNINST_ROOT= -DLIBUNWIND_INSTALL_DIR= -DLIBCSA_INSTALL_DIR=
+
 make install
 
 **Usage**
