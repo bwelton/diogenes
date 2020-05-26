@@ -1,49 +1,32 @@
-# Diogenes
+# Diogenes - Redesign
 
-Diogenes is a performance tool to identify unnecessary/misplaced synchronizations and memory tranfers. Diogenes provides an estimate of potential benefit of fixing the unnecessary/misplaced operation.
+This is a redesign of Diogenes to substantially clean up the code base, expand compatibility to x86 architectures, substantially improve stability and performance, and to allow future researchers of the Paradyn group (or other groups) to have something that is easier to work with to expand functionality. 
 
-This project is very much a work in progress and is very much in a research state (lots of dead code, difficult to build, lots of bugs, no polish, etc).  
+Currently supported features from the original version of Diogenes are all of the features demonstrated in our autocorrect paper at ICS 2020 (automatic remedy identification and autocorrection of synchronization problems in CUDA programs) EXCEPT for the automatic correction of memory transfer problems (most of the framework is in place to support this and this feature can be added easily by modifying the autocorrect mutatee, my time at Wisconsin finished before I was able to complete this). 
 
-**NOTE**
-
-There is an enormous bug fix patch in the works. In addition a few new features will be added soon. In the near future, work will begin on generalizing Diogenes to take it out of the PhD realm and into something usable by other (such as the ability to run on more systems other than LLNL's machines). If you are interested in running Diogenes on your machine, contact me at welton [at] cs.wisc.edu. 
+A substantial difference between the autocorrect paper and this implementation is the usage of page protection instead of load store analysis to determine the location of first use of data after a synchronization. We have found that  page protection substantially reduces the overhead of running Diogenes (we have seen as low as 2-3x overhead from by using this new method over the 40x of the original Diogenes implementation). We should note that testing with this technique has been limited and overhead may be higher when tested on a wider range of applications. 
 
 **Building and Installation**
 
-Due to the number of dependencies that this project has (Dyninst, Boost, Cuda, Libdwarf, Libelf, and others), it is highly recommended you build this package with the spack package manager (https://github.com/LLNL/spack). A premade spack repo package for this project is availible in spack/. Adding ./spack to ~/.spack/repos.yaml will allow you to build the deduplicator with the following commands:
+Five dependencies are required for install of this redesign of Diogenes. Boost, LLNL's Gotcha, UW-Madison's Dyninst, libunwind, and the cuda sync analyzer (https://github.com/dyninst/tools/tree/master/cuda_sync_analyzer/src). Installation can be performed using standard cmake commands:
 
-cd SPACK_DIR
-./bin/spack install cudadedup 
-
-**Required build parameters if building manually (unwise)**
-
-The following parameters are required at CMake configure time if not set by environment variables.
-
-- -DCUDA_TOOLKIT_ROOT_DIR=*Location of Cuda Toolkit* (Optional on Cray Machines)
-- -DLIBCUDA_SO=*Absolute path to libcuda.so, this should be the path to libcuda that applications are linked against* (Optional on Cray Machines)
-- -DLIBCUDART_SO=*Absolute path to libcudart.so* (Optional on Cray Machines)
-- -DLIBELF_LIBFILE=*Absolute path to Libelf.so* (Optional on ORNL Cray Titan)
-- -DLIBELF_INCLUDE=*Path to libelf include directory* (Optional on ORNL Cray Titan)
-- -DLIBDWARF_LIBFILE=*Absolute path to libdwarf.so, CANNOT be the static version of libdwarf* (Optional on ORNL Cray Titan)
-- -DLIBDWARF_INCLUDE=*Path to libdwarf include directory* (Optional on ORNL Cray Titan)
-
-**Optional Build Parameters**
-
-The following parameters are not required but can reduce compilation time if set (by skipping compilation of python/dyninst)
-
-- -DDYNINST_ROOT=*Path to the installation directory of dyninst* (containing /lib and /include)
-- -DPYTHON_ROOT=*Path to the installation directory of python 2.7*
-- -DCMAKE_INSTALL_PREFIX=*Installation Directory*
+cd build
+cmake ..  -DCMAKE_INSTALL_PREFIX= -DBOOST_ROOT= -DGOTCHA_INSTALL_DIR= -DDYNINST_ROOT= -DLIBUNWIND_INSTALL_DIR= -DLIBCSA_INSTALL_DIR=
+make install
 
 **Usage**
+In the install directory, three executables will be created:
 
-To be filled in....
+1. MemGraphBuild which builds the memory graph needed for autocorrection. 
+2. SyncDetector that detects the necessity of a synchronization. 
+3. Autocorrect which applies corrections to the binary at execution time. 
+
+These should be run in order and each executable takes the application you want to run (and its parameters) as its execution parameters (i.e. MemGraphBuild <application name> <application parameters>).
+
+**NOTE**
+
+If you are interested in running Diogenes on your machine, contact me at welton [at] cs.wisc.edu. Its highly likely you will run into issues 
 
 **Disclaimer**
 
 This software should be considered research grade right now, use at your own risk. 
-
-
-
-
-
