@@ -1,3 +1,0 @@
-wrap,cuMemcpyHtoDAsync_v2,cuMemcpyHtoDAsync_dedup,@CMAKE_INSTALL_PREFIX@/lib/libdedup.so,cuMemcpyHtoDAsync_dedup_CALL
-wrap,cuMemcpyAtoD_v2,cuMemcpyAtoD_dedup,@CMAKE_INSTALL_PREFIX@/lib/libdedup.so,cuMemcpyAtoD_dedup_CALL
-wrap,cuMemcpyHtoD_v2,cuMemcpyHtoD_dedup,@CMAKE_INSTALL_PREFIX@/lib/libdedup.so,cuMemcpyHtoD_dedup_CALL

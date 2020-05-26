@@ -1,8 +1,0 @@
- [SynchTool] Adding Memory Transfer - cuMemcpyDtoH_v2 with the following info
-	CPU Starting Address = 0x2500d40
-	Transfer Size = 8
-	Stream = 0
- [SynchTool] Adding Memory Transfer - cuMemcpyDtoH_v2 with the following info
-	CPU Starting Address = 0x299f650
-	Transfer Size = 8
-	Stream = 0
