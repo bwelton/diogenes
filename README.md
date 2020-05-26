@@ -23,7 +23,7 @@ In the install directory, three executables will be created:
 2. SyncDetector that detects the necessity of a synchronization. 
 3. Autocorrect which applies corrections to the binary at execution time. 
 
-These should be run in order and each executable takes the application you want to run (and its parameters) as its execution parameters (i.e. MemGraphBuild <application name> <application parameters>).
+These should be run in order and each executable takes the application you want to run (and its parameters) as its execution parameters (i.e. MemGraphBuild application_name application_parameters).
 
 **NOTE**
 
